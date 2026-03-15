@@ -2,40 +2,56 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>暗黑魔兽文字挂机</title>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Arial', sans-serif; background-color: #191c23; color: #ffffff; min-height: 100vh; }
-        .top-bar { background-color: #2a2d38; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffd700; }
-        .top-bar-left { display: flex; gap: 20px; align-items: center; }
-        .resource-item { display: flex; align-items: center; gap: 5px; font-size: 14px; }
-        .resource-icon { font-size: 18px; }
-        .resource-value { color: #ffd700; font-weight: bold; }
-        .game-container { display: grid; grid-template-columns: 280px 1fr 280px; gap: 15px; max-width: 1400px; margin: 0 auto; padding: 15px; height: calc(100vh - 60px); }
-        .player-status, .combat-area, .right-panel { background-color: #2a2d38; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+        html, body { font-family: 'Arial', sans-serif; background-color: #191c23; color: #ffffff; height: 100%; overflow: hidden; }
+        body { display: flex; justify-content: center; align-items: center; }
+        .game-canvas { width: 100vw; height: 100vh; background-color: #191c23; position: relative; overflow: hidden; }
+        @media (max-width: 750px) {
+            .game-canvas {
+                transform: scale(calc(100vw / 750));
+                transform-origin: top left;
+                width: 100vw;
+                height: calc(100vw * 1334 / 750);
+            }
+        }
+        .top-bar { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffd700; box-shadow: 0 4px 12px rgba(0,0,0,0.3); position: relative; z-index: 100; }
+        .top-bar::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0) 50%, rgba(255,215,0,0.1) 100%); }
+        .top-bar-left { display: flex; gap: 20px; align-items: center; overflow-x: auto; white-space: nowrap; padding-bottom: 5px; position: relative; z-index: 101; }
+        .resource-item { display: flex; align-items: center; gap: 5px; font-size: 14px; padding: 6px 12px; background: rgba(0,0,0,0.3); border-radius: 20px; border: 1px solid rgba(255,215,0,0.2); transition: all 0.3s; }
+        .resource-item:hover { background: rgba(0,0,0,0.5); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .resource-icon { font-size: 18px; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
+        .resource-value { color: #ffd700; font-weight: bold; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
+        .game-container { display: grid; grid-template-columns: 30% 40% 30%; gap: 10px; padding: 10px; height: calc(100vh - 60px); overflow: hidden; }
+        .player-status, .right-panel { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); overflow-y: auto; max-height: 100%; }
+        .combat-area { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex: 1; }
         h2 { color: #ffd700; font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .status-item { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .status-value { background-color: #3a3d48; padding: 8px; border-radius: 6px; text-align: center; }
-        .status-label { font-size: 11px; color: #cccccc; margin-bottom: 3px; }
-        .status-number { font-size: 14px; font-weight: bold; color: #ffd700; }
-        .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .action-button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
-        .action-button:hover, .action-button:active { transform: translateY(-2px); }
-        .button-red { background-color: #ff4757; color: #fff; }
-        .button-green { background-color: #27ae60; color: #fff; }
-        .button-blue { background-color: #3498db; color: #fff; }
-        .button-yellow { background-color: #f39c12; color: #fff; }
-        .button-orange { background-color: #e67e22; color: #fff; }
-        .button-purple { background-color: #9b59b6; color: #fff; }
-        .button-teal { background-color: #1abc9c; color: #fff; }
+        .status-value { background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%); padding: 6px; border-radius: 8px; text-align: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.1); }
+        .status-label { font-size: 10px; color: #cccccc; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-number { font-size: 13px; font-weight: bold; color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.3); }
+        .action-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
+        .action-button { padding: 8px; border: none; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 4px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
+        .action-button:hover, .action-button:active { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+        .action-button::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
+        .action-button:hover::before { left: 100%; }
+        .button-red { background: linear-gradient(135deg, #ff4757 0%, #e84118 100%); color: #fff; }
+        .button-green { background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: #fff; }
+        .button-blue { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: #fff; }
+        .button-yellow { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: #fff; }
+        .button-orange { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: #fff; }
+        .button-purple { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); color: #fff; }
+        .button-teal { background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%); color: #fff; }
         .combat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .player-id-display { background-color: #3a3d48; padding: 6px 12px; border-radius: 6px; display: flex; gap: 8px; font-size: 12px; }
+        .player-id-display { background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%); padding: 6px 12px; border-radius: 8px; display: flex; gap: 8px; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.1); }
         .id-label { color: #ccc; }
         .id-value { color: #ffd700; font-weight: bold; }
-        .mob-info { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border: 3px solid #16213e; border-radius: 20px; padding: 24px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 12px 24px rgba(0,0,0,0.6), 0 0 30px rgba(100, 255, 218, 0.2), 0 0 60px rgba(100, 255, 218, 0.1); position: relative; overflow: hidden; } .mob-info::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(100, 255, 218, 0.2) 0%, rgba(100, 255, 218, 0.1) 40%, transparent 70%); animation: pulse 4s ease-in-out infinite; } .mob-info::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); animation: shine 3s ease-in-out infinite; } @keyframes pulse { 0% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.2); opacity: 0.6; } 100% { transform: scale(1); opacity: 0.4; } } @keyframes shine { 0% { left: -100%; } 50% { left: 100%; } 100% { left: 100%; } }
-        .mob-icon { font-size: 56px; margin-bottom: 15px; position: relative; z-index: 1; text-shadow: 0 0 20px rgba(100, 255, 218, 0.8), 0 0 40px rgba(100, 255, 218, 0.6); animation: iconGlow 3s ease-in-out infinite alternate; } @keyframes iconGlow { 0% { text-shadow: 0 0 20px rgba(100, 255, 218, 0.6), 0 0 40px rgba(100, 255, 218, 0.4); transform: scale(1); } 100% { text-shadow: 0 0 30px rgba(100, 255, 218, 1), 0 0 60px rgba(100, 255, 218, 0.8), 0 0 90px rgba(100, 255, 218, 0.6); transform: scale(1.05); } }
-        .damage-text { position: fixed; font-size: 28px; font-weight: 900; pointer-events: none; white-space: nowrap; z-index: 10000; font-family: 'Arial Black', sans-serif; 
+        .mob-info { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border: 3px solid #16213e; border-radius: 20px; padding: 12px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 12px 24px rgba(0,0,0,0.6), 0 0 30px rgba(100, 255, 218, 0.2), 0 0 60px rgba(100, 255, 218, 0.1); position: relative; overflow: hidden; } .mob-info::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(100, 255, 218, 0.2) 0%, rgba(100, 255, 218, 0.1) 40%, transparent 70%); animation: pulse 4s ease-in-out infinite; } .mob-info::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); animation: shine 3s ease-in-out infinite; } @keyframes pulse { 0% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.2); opacity: 0.6; } 100% { transform: scale(1); opacity: 0.4; } } @keyframes shine { 0% { left: -100%; } 50% { left: 100%; } 100% { left: 100%; } }
+        .mob-icon { font-size: 48px; margin-bottom: 10px; position: relative; z-index: 1; text-shadow: 0 0 20px rgba(100, 255, 218, 0.8), 0 0 40px rgba(100, 255, 218, 0.6); animation: iconGlow 3s ease-in-out infinite alternate; } @keyframes iconGlow { 0% { text-shadow: 0 0 20px rgba(100, 255, 218, 0.6), 0 0 40px rgba(100, 255, 218, 0.4); transform: scale(1); } 100% { text-shadow: 0 0 30px rgba(100, 255, 218, 1), 0 0 60px rgba(100, 255, 218, 0.8), 0 0 90px rgba(100, 255, 218, 0.6); transform: scale(1.05); } }
+        .damage-text { position: absolute; font-size: 28px; font-weight: 900; pointer-events: none; white-space: nowrap; z-index: 10000; font-family: 'Arial Black', sans-serif; 
             color: #ffd700;
             text-shadow: 2px 2px 4px #000, 0 0 10px #ffd700;
             filter: drop-shadow(0 0 5px #ffd700); }
@@ -43,45 +59,49 @@
             text-shadow: 2px 2px 4px #000, 0 0 15px #ff0000;
             filter: drop-shadow(0 0 10px #ff0000); }
         @keyframes floatUp { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -150%) scale(1.2); } }
-        .mob-name { font-size: 24px; font-weight: bold; color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,0.8), 0 0 30px rgba(255,215,0,0.6), 0 0 45px rgba(255,215,0,0.4); margin-bottom: 20px; letter-spacing: 1px; position: relative; z-index: 1; animation: nameGlow 2s ease-in-out infinite alternate; } @keyframes nameGlow { 0% { text-shadow: 0 0 15px rgba(255,215,0,0.6), 0 0 30px rgba(255,215,0,0.4); } 100% { text-shadow: 0 0 20px rgba(255,215,0,1), 0 0 40px rgba(255,215,0,0.8), 0 0 60px rgba(255,215,0,0.6); } }
-        .mob-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .mob-name { font-size: 20px; font-weight: bold; color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,0.8), 0 0 30px rgba(255,215,0,0.6), 0 0 45px rgba(255,215,0,0.4); margin-bottom: 12px; letter-spacing: 1px; position: relative; z-index: 1; animation: nameGlow 2s ease-in-out infinite alternate; } @keyframes nameGlow { 0% { text-shadow: 0 0 15px rgba(255,215,0,0.6), 0 0 30px rgba(255,215,0,0.4); } 100% { text-shadow: 0 0 20px rgba(255,215,0,1), 0 0 40px rgba(255,215,0,0.8), 0 0 60px rgba(255,215,0,0.6); } }
+        .mob-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-bottom: 12px; }
         .stat-card { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 2px solid #16213e; padding: 12px; border-radius: 8px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 15px rgba(100, 255, 218, 0.2); transition: all 0.3s ease; position: relative; overflow: hidden; } .stat-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.2), transparent); animation: cardShine 3s ease-in-out infinite; } @keyframes cardShine { 0% { left: -100%; } 50% { left: 100%; } 100% { left: 100%; } }
         .stat-card-label { font-size: 11px; color: #ccc; margin-bottom: 3px; }
         .stat-card-value { font-size: 16px; font-weight: bold; color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.3); }
-        .combat-buttons { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 12px; }
+        .combat-buttons { display: grid; grid-template-columns: 1fr; gap: 6px; margin-bottom: 8px; }
         .dungeon-buttons { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 10px; }
         .dungeon-button { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; transition: all 0.3s ease; }
         .dungeon-button:hover, .dungeon-button:active { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
-        .combat-button { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; position: relative; z-index: 10; }
+        .combat-button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; position: relative; z-index: 10; }
         .combat-button:hover, .combat-button:active { transform: translateY(-2px); }
         .button-attack { background-color: #e74c3c; color: #fff; }
         .button-stop { background-color: #95a5a6; color: #fff; }
         .button-next { background-color: #f39c12; color: #fff; }
-        .combat-log { background-color: #1a1a2e; border-radius: 8px; padding: 10px; flex: 1; overflow-y: auto; max-height: 200px; }
-        .log-entry { margin-bottom: 5px; font-size: 11px; }
-        .log-entry.success { color: #27ae60; }
-        .log-entry.danger { color: #e74c3c; }
-        .log-entry.info { color: #3498db; }
-        .log-entry.warning { color: #f39c12; }
+        .combat-log { background: linear-gradient(145deg, #1a1a2e 0%, #161625 100%); border-radius: 10px; padding: 10px; flex: 1; overflow-y: auto; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); border: 1px solid rgba(100, 255, 218, 0.1); }
+        .log-entry { margin-bottom: 6px; font-size: 11px; padding: 4px 8px; border-radius: 4px; background: rgba(0,0,0,0.2); transition: all 0.2s; }
+        .log-entry:hover { background: rgba(0,0,0,0.3); transform: translateX(2px); }
+        .log-entry.success { color: #27ae60; border-left: 3px solid #27ae60; }
+        .log-entry.danger { color: #e74c3c; border-left: 3px solid #e74c3c; }
+        .log-entry.info { color: #3498db; border-left: 3px solid #3498db; }
+        .log-entry.warning { color: #f39c12; border-left: 3px solid #f39c12; }
         .zone-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .zone-item { background-color: #3a3d48; padding: 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
-        .zone-item:hover { background-color: #4a4d58; }
-        .zone-item.active { border: 2px solid #ffd700; }
+        .zone-item { background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%); padding: 10px; border-radius: 8px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.1); }
+        .zone-item:hover { background: linear-gradient(145deg, #4a4d58 0%, #3a3d48 100%); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .zone-item.active { border: 2px solid #ffd700; box-shadow: 0 0 15px rgba(255,215,0,0.3); }
         .zone-name { font-weight: bold; font-size: 13px; margin-bottom: 3px; }
         .zone-level { font-size: 11px; color: #ccc; }
         .zone-icons { font-size: 12px; margin-top: 5px; }
         .setting-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
-        .setting-button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .setting-button { padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); position: relative; overflow: hidden; background: linear-gradient(135deg, #3a3d48 0%, #2f323a 100%); color: #fff; }
+        .setting-button:hover, .setting-button:active { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+        .setting-button::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
+        .setting-button:hover::before { left: 100%; }
+        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background-color: #2a2d38; border-radius: 10px; padding: 20px; width: 95%; max-width: 900px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-content { background-color: #2a2d38; border-radius: 10px; padding: 20px; width: 95%; max-width: 900px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; align-self: flex-start; margin-top: 50px; }
         .panel-tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 2px solid #3a3d48; padding-bottom: 5px; }
         .panel-tab { padding: 8px 16px; border: none; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 12px; font-weight: bold; background-color: #3a3d48; color: #ccc; transition: all 0.3s ease; }
         .panel-tab:hover { background-color: #4a4d58; }
         .panel-tab.active { background-color: #ffd700; color: #000; }
-        .panel-content { flex: 1; overflow: hidden; }
-        .panel-tab-content { display: none; height: 100%; overflow-y: auto; }
-        .panel-tab-content.active { display: block; }
+        .panel-content { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        .panel-tab-content { display: none; flex: 1; overflow-y: auto; }
+        .panel-tab-content.active { display: flex; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .modal-title { font-size: 18px; font-weight: bold; color: #ffd700; }
         .modal-close { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
@@ -110,6 +130,12 @@
         .item-card.darkgold { border-color: #8b5a2b; box-shadow: 0 0 22px rgba(139, 90, 43, 0.9); background-color: #5d4a48; border-width: 4px; }
         .item-card.myth { border-color: #ff3296; box-shadow: 0 0 24px rgba(255, 50, 150, 1); background-color: #6d3a58; border-width: 4px; }
         .item-card.supreme { border-color: #ff0000; box-shadow: 0 0 26px rgba(255, 0, 0, 1); background-color: #6d3a48; border-width: 4px; }
+        .item-card.zenith { border-color: #ffffff; box-shadow: 0 0 30px rgba(255, 255, 255, 1), 0 0 40px rgba(0, 255, 255, 0.8), 0 0 50px rgba(255, 0, 255, 0.6); background-color: #4a4d58; border-width: 4px; animation: zenithGlow 2s ease-in-out infinite alternate; }
+        @keyframes zenithGlow {
+            0% { box-shadow: 0 0 30px rgba(255, 255, 255, 1), 0 0 40px rgba(0, 255, 255, 0.8), 0 0 50px rgba(255, 0, 255, 0.6); }
+            50% { box-shadow: 0 0 35px rgba(255, 255, 255, 1), 0 0 45px rgba(255, 255, 0, 0.8), 0 0 55px rgba(255, 0, 255, 0.6); }
+            100% { box-shadow: 0 0 30px rgba(255, 255, 255, 1), 0 0 40px rgba(0, 255, 255, 0.8), 0 0 50px rgba(255, 0, 255, 0.6); }
+        }
         .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 12px; border-top: 1px solid #3a3d48; flex-wrap: wrap; gap: 10px; }
         .decompose-info { font-size: 13px; color: #ffd700; }
         .decompose-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -174,26 +200,206 @@
         .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #3a3d48; font-size: 12px; }
         .info-label { color: #aaa; }
         .info-value { color: #ffd700; font-weight: bold; }
-        @media (max-width: 1200px) { .game-container { grid-template-columns: 1fr; height: auto; } .player-status, .combat-area, .right-panel { min-height: 300px; } }        @media (max-width: 768px) { .top-bar { padding: 8px 12px; } .top-bar-left { gap: 10px; } .resource-item { font-size: 12px; } .resource-icon { font-size: 16px; } .game-container { padding: 10px; gap: 10px; } .player-status, .combat-area, .right-panel { padding: 12px; gap: 10px; } h2 { font-size: 14px; } .status-value { padding: 6px; } .status-label { font-size: 10px; } .status-number { font-size: 12px; } .action-button { padding: 8px; font-size: 11px; } .mob-icon { font-size: 40px; margin-bottom: 10px; } .mob-name { font-size: 18px; margin-bottom: 15px; } .mob-stats { gap: 8px; } .stat-card { padding: 8px; } .stat-card-label { font-size: 10px; } .stat-card-value { font-size: 14px; } .combat-button { padding: 10px; font-size: 12px; } .combat-log { max-height: 150px; font-size: 10px; } .zone-item { padding: 8px; } .zone-name { font-size: 12px; } .zone-level { font-size: 10px; } .setting-button { padding: 8px; font-size: 11px; } .modal-content { padding: 15px; max-height: 90vh; } .modal-title { font-size: 16px; } .modal-body { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; } .item-card { padding: 15px; min-height: 120px; } .item-name { font-size: 16px; } .item-quality { font-size: 12px; padding: 3px 8px; } .item-details, .item-stats { font-size: 12px; } }        @media (max-width: 480px) { .top-bar-left { gap: 8px; } .resource-item { font-size: 11px; } .resource-icon { font-size: 14px; } .game-container { padding: 8px; gap: 8px; } .player-status, .combat-area, .right-panel { padding: 10px; gap: 8px; } h2 { font-size: 13px; } .action-buttons { gap: 6px; } .action-button { padding: 7px; font-size: 10px; } .mob-icon { font-size: 32px; margin-bottom: 8px; } .mob-name { font-size: 16px; margin-bottom: 12px; } .mob-stats { grid-template-columns: repeat(2, 1fr); } .combat-log { max-height: 120px; } .modal-body { grid-template-columns: 1fr; } .item-card { min-height: 100px; } .item-name { font-size: 14px; } }
+        @media (max-width: 1200px) {
+            .game-container { 
+                grid-template-columns: 1fr; 
+                height: calc(100vh - 60px); 
+                overflow-y: auto;
+            } 
+            .player-status, .combat-area, .right-panel { 
+                min-height: 300px; 
+                max-height: none;
+            } 
+        }
+        
+        @media (max-width: 768px) {
+            .game-canvas {
+                width: 100vw;
+                height: 100vh;
+                transform: none;
+            }
+            .top-bar { 
+                padding: 8px 12px; 
+            } 
+            .top-bar-left { 
+                gap: 10px; 
+                overflow-x: auto;
+                white-space: nowrap;
+            } 
+            .resource-item { 
+                font-size: 12px; 
+            } 
+            .resource-icon { 
+                font-size: 16px; 
+            } 
+            .game-container { 
+                padding: 10px; 
+                gap: 10px; 
+                height: calc(100vh - 60px);
+                overflow-y: auto;
+            } 
+            .player-status, .combat-area, .right-panel { 
+                padding: 12px; 
+                gap: 10px; 
+                max-height: none;
+            } 
+            h2 { 
+                font-size: 14px; 
+            } 
+            .status-value { 
+                padding: 6px; 
+            } 
+            .status-label { 
+                font-size: 10px; 
+            } 
+            .status-number { 
+                font-size: 12px; 
+            } 
+            .action-button { 
+                padding: 8px; 
+                font-size: 11px; 
+            } 
+            .mob-icon { 
+                font-size: 40px; 
+                margin-bottom: 10px; 
+            } 
+            .mob-name { 
+                font-size: 18px; 
+                margin-bottom: 15px; 
+            } 
+            .mob-stats { 
+                gap: 8px; 
+            } 
+            .stat-card { 
+                padding: 8px; 
+            } 
+            .stat-card-label { 
+                font-size: 10px; 
+            } 
+            .stat-card-value { 
+                font-size: 14px; 
+            } 
+            .combat-button { 
+                padding: 10px; 
+                font-size: 12px; 
+            } 
+            .combat-log { 
+                max-height: 150px; 
+                font-size: 10px; 
+            } 
+            .zone-item { 
+                padding: 8px; 
+            } 
+            .zone-name { 
+                font-size: 12px; 
+            } 
+            .zone-level { 
+                font-size: 10px; 
+            } 
+            .setting-button { 
+                padding: 8px; 
+                font-size: 11px; 
+            } 
+            .modal-content { 
+                padding: 15px; 
+                max-height: 90vh; 
+            } 
+            .modal-title { 
+                font-size: 16px; 
+            } 
+            .modal-body { 
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+                gap: 10px; 
+            } 
+            .item-card { 
+                padding: 15px; 
+                min-height: 120px; 
+            } 
+            .item-name { 
+                font-size: 16px; 
+            } 
+            .item-quality { 
+                font-size: 12px; 
+                padding: 3px 8px; 
+            } 
+            .item-details, .item-stats { 
+                font-size: 12px; 
+            } 
+        }
+        
+        @media (max-width: 480px) {
+            .top-bar-left { 
+                gap: 8px; 
+            } 
+            .resource-item { 
+                font-size: 11px; 
+            } 
+            .resource-icon { 
+                font-size: 14px; 
+            } 
+            .game-container { 
+                padding: 8px; 
+                gap: 8px; 
+            } 
+            .player-status, .combat-area, .right-panel { 
+                padding: 10px; 
+                gap: 8px; 
+            } 
+            h2 { 
+                font-size: 13px; 
+            } 
+            .action-buttons { 
+                gap: 6px; 
+            } 
+            .action-button { 
+                padding: 7px; 
+                font-size: 10px; 
+            } 
+            .mob-icon { 
+                font-size: 32px; 
+                margin-bottom: 8px; 
+            } 
+            .mob-name { 
+                font-size: 16px; 
+                margin-bottom: 12px; 
+            } 
+            .mob-stats { 
+                grid-template-columns: repeat(2, 1fr); 
+            } 
+            .stat-card { 
+                padding: 6px; } .stat-card-label { font-size: 9px; } .stat-card-value { font-size: 12px; } .combat-log { max-height: 120px; font-size: 10px; } .zone-item { padding: 8px; } .zone-name { font-size: 12px; } .zone-level { font-size: 10px; } .setting-button { padding: 8px; font-size: 11px; } .modal-content { padding: 15px; max-height: 90vh; } .modal-title { font-size: 16px; } .modal-body { grid-template-columns: 1fr; gap: 8px; } .item-card { padding: 12px; min-height: 100px; } .item-name { font-size: 14px; } .item-quality { font-size: 11px; padding: 2px 6px; } .item-details, .item-stats { font-size: 11px; } }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <div class="top-bar-left">
-            <div class="resource-item"><span class="resource-icon">💰</span><span class="resource-value" id="top-gold">0</span></div>
-            <div class="resource-item"><span class="resource-icon">💎</span><span class="resource-value" id="top-diamonds">0</span></div>
-            <div class="resource-item"><span class="resource-icon">🎫</span><span class="resource-value" id="top-elite-tickets">0</span></div>
-            <div class="resource-item"><span class="resource-icon">🔥</span><span class="resource-value" id="top-hell-tickets">0</span></div>
-            <div class="resource-item"><span class="resource-icon">🛡️</span><span class="resource-value" id="top-protection-scrolls">0</span></div>
-            <div class="resource-item"><span class="resource-icon">📖</span><span class="resource-value" id="top-skill-protection-scrolls">0</span></div>
-            <div class="resource-item"><span class="resource-icon">💎</span><span class="resource-value" id="top-gem-protection-scrolls">0</span></div>
-            <div class="resource-item" id="exp-potion-timer" style="display: none;"><span class="resource-icon">⏰</span><span class="resource-value">经验药水: 00:00</span></div>
-            <div class="resource-item" id="drop-potion-timer" style="display: none;"><span class="resource-icon">⏰</span><span class="resource-value">爆率药水: 00:00</span></div>
+    <div class="game-canvas">
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <div class="resource-item"><span class="resource-icon">💰</span><span class="resource-value" id="top-gold">0</span></div>
+                <div class="resource-item"><span class="resource-icon">💎</span><span class="resource-value" id="top-diamonds">0</span></div>
+                <div class="resource-item"><span class="resource-icon">🎫</span><span class="resource-value" id="top-elite-tickets">0</span></div>
+                <div class="resource-item"><span class="resource-icon">🔥</span><span class="resource-value" id="top-hell-tickets">0</span></div>
+                <div class="resource-item"><span class="resource-icon">🛡️</span><span class="resource-value" id="top-protection-scrolls">0</span></div>
+                <div class="resource-item"><span class="resource-icon">📖</span><span class="resource-value" id="top-skill-protection-scrolls">0</span></div>
+                <div class="resource-item"><span class="resource-icon">💎</span><span class="resource-value" id="top-gem-protection-scrolls">0</span></div>
+                <div class="resource-item" id="exp-potion-timer" style="display: none;"><span class="resource-icon">⏰</span><span class="resource-value">经验药水: 00:00</span></div>
+                <div class="resource-item" id="drop-potion-timer" style="display: none;"><span class="resource-icon">⏰</span><span class="resource-value">爆率药水: 00:00</span></div>
+            </div>
         </div>
-    </div>
-    <div class="game-container">
+        <div class="game-container">
         <div class="player-status">
-            <h2>👤 玩家状态</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2>👤 玩家状态</h2>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                    <div class="player-id-display">
+                        <span class="id-label">ID:</span>
+                        <span class="id-value" id="gameId">0000AAAA</span>
+                    </div>
+                    <div style="background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%); padding: 4px 8px; border-radius: 6px; display: flex; gap: 4px; font-size: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.1);">
+                        <span style="color: #ccc;">QQ群:</span>
+                        <span style="color: #ffd700; font-weight: bold;">1087031624</span>
+                    </div>
+                </div>
+            </div>
             <div class="status-item">
                 <div class="status-value"><div class="status-label">职业</div><div class="status-number" id="class">战士</div></div>
                 <div class="status-value"><div class="status-label">等级</div><div class="status-number" id="level">1</div></div>
@@ -219,7 +425,10 @@
                 <div class="status-value"><div class="status-label">抗爆伤</div><div class="status-number" id="antiCritDmg">0</div></div>
             </div>
             <div class="panel-section">
-                <div class="panel-title">📊 角色属性</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div class="panel-title">📊 角色属性 版本1.01</div>
+                    <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
+                </div>
                 <div class="quick-stats">
                     <div class="quick-stat"><div class="quick-stat-label">吸血</div><div class="quick-stat-value" id="stat-lifesteal">0%</div></div>
                     <div class="quick-stat"><div class="quick-stat-label">穿透</div><div class="quick-stat-value" id="stat-penetration">0%</div></div>
@@ -234,26 +443,13 @@
                 <button class="action-button button-blue" id="equipment">🛡️ 装备</button>
                 <button class="action-button button-blue" id="skills">🔮 技能</button>
                 <button class="action-button button-yellow" id="gems">💎 宝石</button>
-                <button class="action-button button-orange" id="market">🏪 黑市</button>
+                <button class="action-button button-orange" id="market">🏪 黑店</button>
                 <button class="action-button button-blue" id="titles">🏆 称号</button>
                 <button class="action-button button-green" id="daily">📅 日常</button>
+
             </div>
         </div>
         <div class="combat-area">
-            <div class="combat-header">
-                <h2>⚔️ 战斗区域</h2>
-                <div class="player-id-display">
-                    <span class="id-label">ID:</span>
-                    <span class="id-value" id="gameId">0000AAAA</span>
-                </div>
-            </div>
-            <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-                <button class="action-button button-purple" id="game-intro">📖 游戏简介</button>
-            </div>
-            <div class="elite-ticket-display">
-                <div class="ticket-item"><span class="ticket-icon">🎫</span><span class="ticket-count" id="elite-tickets">0</span></div>
-                <div class="ticket-item"><span class="ticket-icon">🔥</span><span class="ticket-count" id="hell-tickets">0</span></div>
-            </div>
             <div class="mob-info">
                 <div class="mob-icon" id="mob-icon">🟢</div>
                 <div class="mob-name" id="mob-name">史莱姆</div>
@@ -271,6 +467,14 @@
             </div>
             <div class="combat-log" id="combat-log">
                 <div class="log-entry info">📜 战斗日志</div>
+            </div>
+            <div class="combat-header">
+                <h2>⚔️ 战斗区域</h2>
+            </div>
+
+            <div class="elite-ticket-display" style="margin-top: 5px;">
+                <div class="ticket-item"><span class="ticket-icon">🎫</span><span class="ticket-count" id="elite-tickets">0</span></div>
+                <div class="ticket-item"><span class="ticket-icon">🔥</span><span class="ticket-count" id="hell-tickets">0</span></div>
             </div>
         </div>
         <div class="right-panel">
@@ -290,19 +494,16 @@
                     <div class="zone-list" id="hell-zone-list"></div>
                 </div>
             </div>
-            <div class="panel-section">
-                <div class="panel-title">🏆 称号</div>
-                <div id="title-badges" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
-            </div>
+
             <div class="setting-buttons">
                 <button class="setting-button button-teal" id="save-game">💾 保存</button>
                 <button class="setting-button button-orange" id="load-game">📂 加载</button>
-                <button class="setting-button button-purple" id="rebirth">🔄 重生</button>
+                <button class="setting-button" id="rebirth" style="background: linear-gradient(135deg, #ff4757 0%, #e84118 100%); color: #fff;">🔄 重生</button>
             </div>
         </div>
-    </div>
+        </div>
 
-    <div class="modal-overlay" id="decompose-modal">
+        <div class="modal-overlay" id="decompose-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">🔧 分解系统</div>
@@ -343,7 +544,7 @@
     <div class="modal-overlay" id="market-modal">
         <div class="modal-content modal-large">
             <div class="modal-header">
-                <div class="modal-title">🏪 黑市交易</div>
+                <div class="modal-title">🏪 黑店</div>
                 <button class="modal-close" id="close-market">&times;</button>
             </div>
             <div class="modal-body" id="market-body"></div>
@@ -429,8 +630,6 @@
                 <div class="modal-title">💎 宝石管理</div>
                 <button class="modal-close" id="close-gem">&times;</button>
             </div>
-            <div class="panel-title">💍 装备镶嵌 (点击装备打孔/镶嵌)</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px;" id="gem-equip-slots"></div>
             <div class="panel-title">💎 已拥有宝石</div>
             <div class="modal-body modal-body-list" id="gem-list"></div>
             <div style="padding: 15px; background-color: #2a2d38; border-top: 1px solid #3a3d48; margin-top: 15px;">
@@ -484,13 +683,14 @@
                 <br>
                 <button class="action-button button-green" id="redeem-cdk">兑换</button>
                 <div style="margin-top: 20px; text-align: left; background: #3a3d48; padding: 15px; border-radius: 8px;">
-                    <div style="color: #ffd700; font-weight: bold; margin-bottom: 10px;">VIP激活方式:</div>
-                    <div style="color: #3498db;">• 输入 "VIP1" 激活VIP1 (200钻+1000精英票)</div>
-                    <div style="margin-top: 10px; font-size: 12px; color: #888;">注: VIP等级越高,每日可保存次数越多</div>
+                    <div style="color: #ffd700; font-weight: bold; margin-bottom: 10px;">请前往Q群1087031624领取VIP1CDK 激活VIP1</div>
+                    <div style="color: #3498db; margin-bottom: 10px;">激活VIP1可以获得 经验金币爆率+10%(200钻+1000精英票)</div>
                 </div>
             </div>
         </div>
     </div>
+
+
 
     <div class="modal-overlay" id="daily-modal">
         <div class="modal-content">
@@ -592,11 +792,12 @@
                 </div>
             </div>
         </div>
+        </div>
     </div>
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.0.0",
+            GAME_VERSION: "1.0.1",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -610,29 +811,29 @@
             },
             SKILL_POOL: {
                 warrior: [
-                    { name: "刺杀剑术", cd: 5, mult: 200, desc: "快速突刺" },
-                    { name: "开天剑法", cd: 7, mult: 300, desc: "强力斩击" },
-                    { name: "逐日剑法", cd: 10, mult: 400, desc: "剑气纵横" },
-                    { name: "裂天斩", cd: 12, mult: 600, desc: "终极剑技" }
+                    { name: "刺杀剑术", cd: 5, mult: 110, desc: "快速突刺" },
+                    { name: "开天剑法", cd: 7, mult: 130, desc: "强力斩击" },
+                    { name: "逐日剑法", cd: 10, mult: 160, desc: "剑气纵横" },
+                    { name: "裂天斩", cd: 12, mult: 200, desc: "终极剑技" }
                 ],
                 mage: [
-                    { name: "小火球", cd: 5, mult: 250, desc: "投射火球" },
-                    { name: "大火球", cd: 7, mult: 350, desc: "烈焰爆裂" },
-                    { name: "雷电术", cd: 10, mult: 500, desc: "召唤雷电" },
-                    { name: "灭天火", cd: 12, mult: 700, desc: "毁灭之焰" }
+                    { name: "小火球", cd: 5, mult: 120, desc: "投射火球" },
+                    { name: "大火球", cd: 7, mult: 145, desc: "烈焰爆裂" },
+                    { name: "雷电术", cd: 10, mult: 180, desc: "召唤雷电" },
+                    { name: "灭天火", cd: 12, mult: 230, desc: "毁灭之焰" }
                 ],
                 assassin: [
-                    { name: "背刺", cd: 5, mult: 180, desc: "从背后突袭" },
-                    { name: "裂颅", cd: 7, mult: 230, desc: "精准打击" },
-                    { name: "X斩", cd: 10, mult: 350, desc: "交叉斩击" },
-                    { name: "致命一击", cd: 12, mult: 500, desc: "绝杀之刃" }
+                    { name: "背刺", cd: 5, mult: 105, desc: "从背后突袭" },
+                    { name: "裂颅", cd: 7, mult: 125, desc: "精准打击" },
+                    { name: "X斩", cd: 10, mult: 155, desc: "交叉斩击" },
+                    { name: "致命一击", cd: 12, mult: 190, desc: "绝杀之刃" }
                 ]
             },
             UNIVERSAL_SKILL_POOL: [
-                { name: "当头一棒", cd: 5, mult: 170, desc: "猛力一击" },
-                { name: "致命一击", cd: 7, mult: 220, desc: "精准打击" },
-                { name: "隐杀", cd: 10, mult: 330, desc: "暗影突袭" },
-                { name: "堕天一击", cd: 14, mult: 600, desc: "终极一击" }
+                { name: "当头一棒", cd: 5, mult: 100, desc: "猛力一击" },
+                { name: "致命一击", cd: 7, mult: 120, desc: "精准打击" },
+                { name: "隐杀", cd: 10, mult: 150, desc: "暗影突袭" },
+                { name: "堕天一击", cd: 14, mult: 200, desc: "终极一击" }
             ],
             SKILL_QUALITIES: [
                 { id: "gray", name: "灰", color: [160,160,160], mult: 1.00 },
@@ -653,7 +854,8 @@
                 { id: "diamond", name: "钻石", color: [185,242,255], affixCount: 7, dropRate: 0.001, eliteOnly: true },
                 { id: "darkgold", name: "暗金", color: [139,90,43], affixCount: 6, dropRate: 0.0005, eliteOnly: true },
                 { id: "myth", name: "神话", color: [255,50,150], affixCount: 7, dropRate: 0.0002, eliteOnly: true },
-                { id: "supreme", name: "至尊", color: [255,0,0], affixCount: 8, dropRate: 0.0001, eliteOnly: true }
+                { id: "supreme", name: "至尊", color: [255,0,0], affixCount: 8, dropRate: 0.0001, eliteOnly: true },
+                { id: "zenith", name: "至臻", color: [255,255,255], affixCount: 9, dropRate: 0.00001, eliteOnly: true }
             ],
             EQUIP_SLOTS: [
                 { id: "weapon", name: "武器", icon: "⚔️", primary: "atk" },
@@ -683,7 +885,8 @@
                 diamond: { aspd: [25,35], crit: [23,25], critDmg: [100,160], antiCrit: [23,25], antiCritDmg: [30,35], lifesteal: [1.0,1.5], penetration: [30,35], expBonus: [15,25], goldBonus: [15,25] },
                 darkgold: { aspd: [30,40], crit: [25,28], critDmg: [130,200], antiCrit: [25,28], antiCritDmg: [35,45], lifesteal: [1.3,1.8], penetration: [35,45], expBonus: [20,30], goldBonus: [20,30] },
                 myth: { aspd: [40,55], crit: [25,35], critDmg: [160,250], antiCrit: [25,35], antiCritDmg: [40,50], lifesteal: [1.5,2.0], penetration: [40,50], expBonus: [30,35], goldBonus: [30,35] },
-                supreme: { aspd: [50,70], crit: [30,40], critDmg: [200,300], antiCrit: [30,40], antiCritDmg: [50,60], lifesteal: [2.0,3.0], penetration: [50,60], expBonus: [35,40], goldBonus: [35,40] }
+                supreme: { aspd: [50,70], crit: [30,40], critDmg: [200,300], antiCrit: [30,40], antiCritDmg: [50,60], lifesteal: [2.0,3.0], penetration: [50,60], expBonus: [35,40], goldBonus: [35,40] },
+                zenith: { aspd: [80,88], crit: [50,55], critDmg: [350,400], antiCrit: [40,45], antiCritDmg: [60,70], lifesteal: [4.0,5.0], penetration: [70,80], expBonus: [45,50], goldBonus: [45,50] }
             },
             GEM_QUALITIES: [
                 { id: "gray", name: "灰", color: [160,160,160] },
@@ -711,11 +914,11 @@
             GEM_DECOMPOSE_GOLD: { gray: 1000, green: 5000, blue: 20000, purple: 100000, orange: 500000 },
             SOCKET_PROBS: [0.91, 0.047, 0.027, 0.01],
             MAX_SOCKETS: 5,
-            BLACK_MARKET: { skillPrice: 1000000, gemPrice: 500000 },
+            BLACK_MARKET: { skillPrice: 500000, gemPrice: 1000000 },
             BLACK_MARKET_QUALITY_PROBS: { gray: 0.75, green: 0.10, blue: 0.08, purple: 0.05, orange: 0.02 },
             DROP_RATES: { normalMob: 0.15, eliteTicket: 0.14, diamondDrop: 0.0035 },
-            ELITE_DROP_RATES: { equipment: { gold: 0.05, platinum: 0.02, diamond: 0.005, darkgold: 0.002, myth: 0.001, supreme: 0.00033 }, gem: { gray: 0.01, green: 0.005, blue: 0.0033, purple: 0.002, orange: 0.0005 }, skill: { gray: 0.02, green: 0.0067, blue: 0.0025, purple: 0.00125, orange: 0.0004 } },
-            HELL_DROP_RATES: { equipment: { gold: 0.15, platinum: 0.06, diamond: 0.015, darkgold: 0.006, myth: 0.003, supreme: 0.001 }, gem: { gray: 0.03, green: 0.015, blue: 0.01, purple: 0.006, orange: 0.0015 }, skill: { gray: 0.06, green: 0.02, blue: 0.0075, purple: 0.00375, orange: 0.0012 } },
+            ELITE_DROP_RATES: { equipment: { gold: 0.05, platinum: 0.02, diamond: 0.005, darkgold: 0.002, myth: 0.001, supreme: 0.00033, zenith: 0.0001 }, gem: { gray: 0.01, green: 0.005, blue: 0.0033, purple: 0.002, orange: 0.0005 }, skill: { gray: 0.02, green: 0.0067, blue: 0.0025, purple: 0.00125, orange: 0.0004 } },
+            HELL_DROP_RATES: { equipment: { gold: 0.15, platinum: 0.06, diamond: 0.015, darkgold: 0.006, myth: 0.003, supreme: 0.001, zenith: 0.0003 }, gem: { gray: 0.03, green: 0.015, blue: 0.01, purple: 0.006, orange: 0.0015 }, skill: { gray: 0.06, green: 0.02, blue: 0.0075, purple: 0.00375, orange: 0.0012 } },
             ELITE_TYPES: { normal: { name: "普通精英", color: [255,152,0], atkM: 1.5, defM: 1.5, hpM: 4, dropM: 2, critBonus: 1.0 }, silver: { name: "白银精英", color: [192,192,192], atkM: 2.0, defM: 2.0, hpM: 7, dropM: 3, critBonus: 1.5 }, gold: { name: "黄金精英", color: [255,215,0], atkM: 3.0, defM: 3.0, hpM: 12, dropM: 5, critBonus: 2.0 }, adventure: { name: "奇遇BOSS", color: [255,0,255], atkM: 1.0, defM: 1.0, hpM: 1, dropM: 1, critBonus: 1.0 } },
             ELITE_SKILL: { cooldown: 8, minMult: 200, maxMult: 1000 },
             HELL_MODE: { unlockLevel: 45, hpMult: 2, atkMult: 2, rewardMult: 3, dropMult: 3 },
@@ -746,13 +949,13 @@
             MOB_ICONS: { "史莱姆":"🟢","野兔":"🐇","蘑菇怪":"🍄","野狼":"🐺","野猪":"🐗","毒蛇":"🐍","暗影狼":"🐺","食人花":"🌺","树精":"🌳","石傀儡":"🗿","矿蝎":"🦂","地精":"👺","骷髅兵":"💀","幽灵":"👻","暗影法师":"🧙","毒蛙":"🐸","沼泽蛇":"🐍","腐尸":"🧟","火蜥蜴":"🦎","熔岩虫":"🐛","火焰元素":"🔥","冰狼":"🐺","雪人":"⛄","冰元素":"❄️","亡灵战士":"⚔️","吸血鬼":"🧛","死灵法师":"💀","龙蜥":"🦎","飞龙":"🐉","岩龙":"🐲","天使战士":"👼","风元素":"🌪️","光明守卫":"🛡️","恶魔卫兵":"👹","地狱犬":"🐕","暗影恶魔":"😈","魔族斥候":"👁️","魔族战士":"👹","魔族法师":"🔮","暗影刺客":"🗡️","噩梦":"😱","幻影":"👤","雷元素":"⚡","雷鸟":"🦅","风暴巨人":"🌩️","暗夜精灵":"🧝","梦魇":"🌑","月影狼":"🐺","血族骑士":"🩸","血族公爵":"🧛","血族伯爵":"🧛","混沌兽":"👾","虚空行者":"🌀","毁灭者":"💥","堕落天使":"😇","远古守卫":"🏛️","神殿骑士":"⚔️","远古巨龙":"🐲","泰坦":"🗿","神之仆从":"✨","史莱姆王":"👑","翡翠巨蛙":"🐸","暗影狼王":"🐺","矿洞领主":"⛏️","亡灵将军":"💀","沼泽巨兽":"🐊","熔岩巨人":"🌋","霜冻领主":"🥶","冥王":"☠️","荒原龙王":"🐲","堕落天使长":"😈","深渊领主":"👿","魔族统帅":"👹","迷宫守护者":"🏰","雷霆泰坦":"⚡","永夜之王":"🌑","血族亲王":"🧛","混沌君主":"🌀","远古神灵":"🔱","至高神王":"👑" },
             EQUIP_BASE_STATS: {
                 weapon: { stats: [{ id: "atk", base: 8, perZone: 7 }] },
-                helmet: { stats: [{ id: "def", base: 7, perZone: 5.5 }] },
-                armor: { stats: [{ id: "def", base: 7, perZone: 5.5 }] },
-                boots: { stats: [{ id: "def", base: 3.5, perZone: 2.75 }, { id: "hp", base: 17, perZone: 13.8 }] },
-                ring: { stats: [{ id: "def", base: 1.3, perZone: 1.1 }, { id: "atk", base: 2, perZone: 1.67 }, { id: "hp", base: 10, perZone: 8.3 }] },
-                necklace: { stats: [{ id: "atk", base: 2.5, perZone: 2.1 }, { id: "hp", base: 13.3, perZone: 11.1 }] }
+                helmet: { stats: [{ id: "def", base: 7, perZone: 6 }] },
+                armor: { stats: [{ id: "def", base: 7, perZone: 6 }] },
+                boots: { stats: [{ id: "def", base: 4, perZone: 3 }, { id: "hp", base: 17, perZone: 14 }] },
+                ring: { stats: [{ id: "def", base: 1, perZone: 1 }, { id: "atk", base: 2, perZone: 2 }, { id: "hp", base: 10, perZone: 8 }] },
+                necklace: { stats: [{ id: "atk", base: 3, perZone: 2 }, { id: "hp", base: 13, perZone: 11 }] }
             },
-            QUALITY_STAT_MULT: { gray:1.0, green:1.3, blue:1.7, purple:2.2, orange:3.0, red:5.0, gold:6.0, platinum:7.0, diamond:8.0, darkgold:8.5, myth:9.0, supreme:10.0 },
+            QUALITY_STAT_MULT: { gray:1.0, green:1.3, blue:1.7, purple:2.2, orange:3.0, red:5.0, gold:6.0, platinum:7.0, diamond:8.0, darkgold:8.5, myth:9.0, supreme:10.0, zenith:13.0 },
             ENHANCE_MULT: { equip: 0.5, skill: 0.1, gem: 0.1 },
             DECOMPOSE_FORMULA: { equip: 1, skill: 1, gem: 1 },
             TITLES: [
@@ -795,6 +998,7 @@
         }
 
         let gameData = {
+            gameVersion: "1.0.1",
             player: {
                 level: 1, exp: 0, expNext: 100, gold: 0, diamonds: 0,
                 classId: "warrior", className: "战士",
@@ -802,10 +1006,10 @@
                 lifesteal: 0, penetration: 0, antiCrit: 0, antiCritDmg: 0, expBonus: 0, goldBonus: 0,
                 killCount: 0, currentZone: 1, gameId: generateGameId(), vipLevel: 0,
                 eliteTickets: 0, hellTickets: 0, fragments: 0,
-                equipFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0, red: 0, gold: 0, platinum: 0, diamond: 0, darkgold: 0, myth: 0, supreme: 0 },
+                equipFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0, red: 0, gold: 0, platinum: 0, diamond: 0, darkgold: 0, myth: 0, supreme: 0, zenith: 0 },
                 skillFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0 },
                 gemFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0 },
-                autoDecompose: { equip: { gray: false, green: false, blue: false, purple: false, orange: false, red: false, gold: false, platinum: false, diamond: false, darkgold: false, myth: false, supreme: false }, skill: { gray: false, green: false, blue: false, purple: false, orange: false }, gem: { gray: false, green: false, blue: false, purple: false, orange: false } },
+                autoDecompose: { equip: { gray: false, green: false, blue: false, purple: false, orange: false, red: false, gold: false, platinum: false, diamond: false, darkgold: false, myth: false, supreme: false, zenith: false }, skill: { gray: false, green: false, blue: false, purple: false, orange: false }, gem: { gray: false, green: false, blue: false, purple: false, orange: false } },
                 protectionScrolls: 0, gemProtectionScrolls: 0, skillProtectionScrolls: 0,
                 dailyTasks: {
                     lastReset: new Date().toDateString(),
@@ -1040,7 +1244,6 @@
 
             renderEquipSlots();
             renderEquippedSkills();
-            renderTitleBadges();
         }
 
         function updatePotionTimers() {
@@ -1140,19 +1343,7 @@
             }
         }
 
-        function renderTitleBadges() {
-            const container = document.getElementById('title-badges');
-            container.innerHTML = '';
-            gameData.player.titles.forEach(titleId => {
-                const title = CONFIG.TITLES.find(t => t.id === titleId);
-                if (title) {
-                    const span = document.createElement('span');
-                    span.className = 'title-badge';
-                    span.innerHTML = `<span class="icon">${title.icon}</span>${title.name}`;
-                    container.appendChild(span);
-                }
-            });
-        }
+
 
         function addCombatLog(text, type) {
             type = type || 'info';
@@ -1166,21 +1357,68 @@
 
         function generateEquipment(zoneLevel, isElite) {
             zoneLevel = zoneLevel || gameData.gameState.currentZone;
+            const zoneIdx = zoneLevel - 1;
+            const zone = CONFIG.ZONES[zoneIdx];
+            const zoneReqLv = zone ? zone.reqLv : 1;
+            
+            // 计算装备等级范围：区域reqLv上下5级，但不超过角色等级
+            const playerLevel = gameData.player.level || 1;
+            const minLevel = Math.max(1, zoneReqLv - 5);
+            const maxLevel = Math.min(zoneReqLv + 5, playerLevel);
+            const equipLevel = minLevel + Math.floor(Math.random() * (maxLevel - minLevel + 1));
+            
             const slot = CONFIG.EQUIP_SLOTS[Math.floor(Math.random() * CONFIG.EQUIP_SLOTS.length)];
             let quality;
             const rand = Math.random();
             let cumulative = 0;
-            for (const q of CONFIG.EQUIP_QUALITIES) {
-                if (q.eliteOnly && !isElite) continue;
-                cumulative += q.dropRate;
-                if (rand <= cumulative) { quality = q; break; }
+            const isInEliteDungeon = gameData.gameState.inElite;
+            const isInHellDungeon = gameData.gameState.inHell;
+            
+            if ((isElite && isInEliteDungeon) || isInHellDungeon) {
+                // 精英副本或地狱副本使用专用的装备掉落率
+                const dropRates = isInHellDungeon ? CONFIG.HELL_DROP_RATES : CONFIG.ELITE_DROP_RATES;
+                
+                // 首先随机选择是否掉落精英专属品质
+                let eliteQuality = null;
+                for (const [qId, rate] of Object.entries(dropRates.equipment)) {
+                    cumulative += rate;
+                    if (rand <= cumulative) {
+                        eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === qId);
+                        break;
+                    }
+                }
+                
+                if (eliteQuality) {
+                    quality = eliteQuality;
+                } else {
+                    // 如果没有掉落精英专属品质，使用普通品质选择逻辑，但增加概率
+                    const qualityRand = Math.random();
+                    let qualityCumulative = 0;
+                    for (const q of CONFIG.EQUIP_QUALITIES) {
+                        if (q.eliteOnly) continue;
+                        // 精英副本普通品质概率翻倍
+                        qualityCumulative += q.dropRate * (isInHellDungeon ? 3 : 2);
+                        if (qualityRand <= qualityCumulative) {
+                            quality = q;
+                            break;
+                        }
+                    }
+                    if (!quality) quality = CONFIG.EQUIP_QUALITIES[0];
+                }
+            } else {
+                // 普通区域使用基础掉落率
+                for (const q of CONFIG.EQUIP_QUALITIES) {
+                    if (q.eliteOnly) continue;
+                    cumulative += q.dropRate;
+                    if (rand <= cumulative) { quality = q; break; }
+                }
+                if (!quality) quality = CONFIG.EQUIP_QUALITIES[0];
             }
-            if (!quality) quality = CONFIG.EQUIP_QUALITIES[0];
 
             const baseStats = CONFIG.EQUIP_BASE_STATS[slot.id];
             const stats = {};
             baseStats.stats.forEach(stat => {
-                const value = Math.floor((stat.base + stat.perZone * zoneLevel) * CONFIG.QUALITY_STAT_MULT[quality.id]);
+                const value = Math.floor((stat.base + stat.perZone * equipLevel) * CONFIG.QUALITY_STAT_MULT[quality.id]);
                 stats[stat.id] = value;
             });
 
@@ -1192,7 +1430,8 @@
                     const affixType = availableAffixes.splice(Math.floor(Math.random() * availableAffixes.length), 1)[0];
                     const range = CONFIG.AFFIX_RANGES[quality.id][affixType.id];
                     if (range) {
-                        affixes.push({ id: affixType.id, name: affixType.name, value: range[0] + Math.random() * (range[1] - range[0]), fmt: affixType.fmt });
+                        const value = Math.floor(range[0] + Math.random() * (range[1] - range[0]));
+                        affixes.push({ id: affixType.id, name: affixType.name, value: value, fmt: affixType.fmt });
                     }
                 }
             }
@@ -1205,7 +1444,7 @@
                 if (socketRand <= socketCum) { sockets = i + 1; break; }
             }
 
-            const equipment = { id: Date.now() + Math.floor(Math.random() * 10000), name: '[' + quality.name + ']' + slot.name, slot: slot.id, level: zoneLevel, quality: quality.id, stats: stats, affixes: affixes, sockets: Math.min(sockets, CONFIG.MAX_SOCKETS), gems: [], enhanceLevel: 0, locked: false };
+            const equipment = { id: Date.now() + Math.floor(Math.random() * 10000), name: '[' + quality.name + ']' + slot.name, slot: slot.id, level: equipLevel, quality: quality.id, stats: stats, affixes: affixes, sockets: Math.min(sockets, CONFIG.MAX_SOCKETS), gems: [], enhanceLevel: 0, locked: false };
             // 标记原本带4孔的装备
             if (sockets === 4) {
                 equipment.originalSockets = true;
@@ -1276,7 +1515,12 @@
             // 为每条属性生成值
             const affixes = selectedAffixes.map(affixType => {
                 const range = CONFIG.GEM_AFFIX_RANGES[gemQuality.id][affixType.id];
-                const value = range[0] + Math.random() * (range[1] - range[0]);
+                let value;
+                if (affixType.id === 'atk' || affixType.id === 'def' || affixType.id === 'hp') {
+                    value = Math.floor(range[0] + Math.random() * (range[1] - range[0]));
+                } else {
+                    value = range[0] + Math.random() * (range[1] - range[0]);
+                }
                 return { id: affixType.id, name: affixType.name, value: value, fmt: affixType.fmt };
             });
             
@@ -1342,7 +1586,7 @@
             return { id: Date.now() + Math.floor(Math.random() * 10000), name: '[' + quality.name + ']' + template.name, baseName: template.name, cd: template.cd, mult: Math.floor(template.mult * quality.mult), desc: template.desc, quality: quality.id, classId: classId, enhanceLevel: 0, locked: false, equipped: false };
         }
 
-        function generateNewMob() {
+        function generateNewMob(isAfterKill = false) {
             const zoneIdx = gameData.gameState.currentZone - 1;
             const zone = CONFIG.ZONES[zoneIdx];
             if (!zone) return;
@@ -1355,7 +1599,7 @@
                 if (eliteRand < 0.1) eliteType = 'gold';
                 else if (eliteRand < 0.3) eliteType = 'silver';
                 else eliteType = 'normal';
-            } else {
+            } else if (isAfterKill) {
                 gameData.gameState.eliteCount++;
                 if (gameData.gameState.eliteCount >= 3) {
                     const advBoss = CONFIG.ADVENTURE_BOSS;
@@ -1501,6 +1745,10 @@
                 mobName = "奇遇BOSS";
             }
 
+            // 限制怪物暴击率和抗暴率上限为400%
+            const cappedCrit = Math.min(extraCrit, 400);
+            const cappedAntiCrit = Math.min(extraAntiCrit, 400);
+            
             gameData.currentMob = {
                 name: mobName,
                 icon: isAdventureBoss ? "🎁" : (CONFIG.MOB_ICONS[mobType] || "👾"),
@@ -1515,8 +1763,8 @@
                 isAdventureBoss: isAdventureBoss,
                 adventureZoneLevel: isAdventureBoss ? gameData.gameState.currentZone : null,
                 skillTimer: 0,
-                crit: isAdventureBoss ? 0 : extraCrit,
-                antiCrit: isAdventureBoss ? 0 : extraAntiCrit,
+                crit: isAdventureBoss ? 0 : cappedCrit,
+                antiCrit: isAdventureBoss ? 0 : cappedAntiCrit,
                 critDmg: isAdventureBoss ? 0 : extraCritDmg,
                 antiCritDmg: isAdventureBoss ? 0 : extraAntiCritDmg
             };
@@ -1772,7 +2020,7 @@
                 if (gameData.gameState.autoElite && !gameData.gameState.inElite && gameData.player.eliteTickets > 0) {
                     enterEliteMode();
                 } else {
-                    generateNewMob();
+                    generateNewMob(true);
                 }
             } else {
                 setTimeout(() => {
@@ -1883,15 +2131,17 @@
             if (isElite) {
                 if (isAdventureBoss) {
                     if (Math.random() <= CONFIG.ADVENTURE_BOSS.dropRate) {
-                        // 奇遇BOSS固定掉落暗金及以上装备，暗金概率90%，神话概率7%，至尊概率3%
+                        // 奇遇BOSS固定掉落暗金及以上装备，暗金概率89.9%，神话概率7%，至尊概率3%，至臻概率0.1%
                         let qualityId;
                         const rand = Math.random();
-                        if (rand < 0.9) {
-                            qualityId = 'darkgold'; // 暗金 90%
-                        } else if (rand < 0.97) {
+                        if (rand < 0.899) {
+                            qualityId = 'darkgold'; // 暗金 89.9%
+                        } else if (rand < 0.969) {
                             qualityId = 'myth'; // 神话 7%
-                        } else {
+                        } else if (rand < 0.999) {
                             qualityId = 'supreme'; // 至尊 3%
+                        } else {
+                            qualityId = 'zenith'; // 至臻 0.1%
                         }
                         const equip = generateEliteEquipment(qualityId, gameData.currentMob.adventureZoneLevel);
                         if (gameData.player.inventory.length < CONFIG.MAX_INVENTORY) {
@@ -2315,10 +2565,19 @@
             const quality = CONFIG.EQUIP_QUALITIES.find(q => q.id === qualityId);
             
             const targetZone = zoneLevel || gameData.gameState.currentZone;
+            const zoneIdx = targetZone - 1;
+            const zone = CONFIG.ZONES[zoneIdx];
+            const zoneReqLv = zone ? zone.reqLv : 1;
+            
+            // 计算装备等级范围：区域reqLv上下5级，但不超过角色等级
+            const playerLevel = gameData.player.level || 1;
+            const minLevel = Math.max(1, zoneReqLv - 5);
+            const maxLevel = Math.min(zoneReqLv + 5, playerLevel);
+            const equipLevel = minLevel + Math.floor(Math.random() * (maxLevel - minLevel + 1));
             const baseStats = CONFIG.EQUIP_BASE_STATS[slot.id];
             const stats = {};
             baseStats.stats.forEach(stat => {
-                const value = Math.floor((stat.base + stat.perZone * targetZone) * CONFIG.QUALITY_STAT_MULT[quality.id]);
+                const value = Math.floor((stat.base + stat.perZone * equipLevel) * CONFIG.QUALITY_STAT_MULT[quality.id]);
                 stats[stat.id] = value;
             });
 
@@ -2330,7 +2589,8 @@
                     const affixType = availableAffixes.splice(Math.floor(Math.random() * availableAffixes.length), 1)[0];
                     const range = CONFIG.AFFIX_RANGES[quality.id][affixType.id];
                     if (range) {
-                        affixes.push({ id: affixType.id, name: affixType.name, value: range[0] + Math.random() * (range[1] - range[0]), fmt: affixType.fmt });
+                        const value = Math.floor(range[0] + Math.random() * (range[1] - range[0]));
+                        affixes.push({ id: affixType.id, name: affixType.name, value: value, fmt: affixType.fmt });
                     }
                 }
             }
@@ -2343,7 +2603,7 @@
                 if (socketRand <= socketCum) { sockets = i + 1; break; }
             }
 
-            return { id: Date.now() + Math.floor(Math.random() * 10000), name: '[' + quality.name + ']' + slot.name, slot: slot.id, level: gameData.gameState.currentZone, quality: quality.id, stats: stats, affixes: affixes, sockets: Math.min(sockets, CONFIG.MAX_SOCKETS), gems: [], enhanceLevel: 0, locked: false };
+            return { id: Date.now() + Math.floor(Math.random() * 10000), name: '[' + quality.name + ']' + slot.name, slot: slot.id, level: equipLevel, quality: quality.id, stats: stats, affixes: affixes, sockets: Math.min(sockets, CONFIG.MAX_SOCKETS), gems: [], enhanceLevel: 0, locked: false };
         }
 
         function startAutoFight() {
@@ -2641,10 +2901,10 @@
                         lifesteal: 0, penetration: 0, antiCrit: 0, antiCritDmg: 0, expBonus: 0, goldBonus: 0,
                         killCount: 0, currentZone: 1, gameId: savedGameId, vipLevel: savedVip,
                         eliteTickets: savedEliteTickets, hellTickets: savedHellTickets, fragments: 0,
-                        equipFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0, red: 0, gold: 0, platinum: 0, diamond: 0, darkgold: 0, myth: 0, supreme: 0 },
+                        equipFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0, red: 0, gold: 0, platinum: 0, diamond: 0, darkgold: 0, myth: 0, supreme: 0, zenith: 0 },
                         skillFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0 },
                         gemFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0 },
-                        autoDecompose: { equip: { gray: false, green: false, blue: false, purple: false, orange: false, red: false, gold: false, platinum: false, diamond: false, darkgold: false, myth: false, supreme: false }, skill: { gray: false, green: false, blue: false, purple: false, orange: false }, gem: { gray: false, green: false, blue: false, purple: false, orange: false } },
+                        autoDecompose: { equip: { gray: false, green: false, blue: false, purple: false, orange: false, red: false, gold: false, platinum: false, diamond: false, darkgold: false, myth: false, supreme: false, zenith: false }, skill: { gray: false, green: false, blue: false, purple: false, orange: false }, gem: { gray: false, green: false, blue: false, purple: false, orange: false } },
                         protectionScrolls: savedProtectionScrolls, gemProtectionScrolls: savedGemProtectionScrolls, skillProtectionScrolls: savedSkillProtectionScrolls,
                         equipment: {
                             weapon: { id: 1, name: "新手剑", atk: 10, level: 1, quality: "gray", sockets: 0, gems: [], enhanceLevel: 0, locked: false },
@@ -2680,7 +2940,7 @@
                 <div class="market-item">
                     <div class="market-icon">📖</div>
                     <div class="market-name">随机技能书</div>
-                    <div class="market-price">💰 ${CONFIG.BLACK_MARKET.skillPrice}</div>
+                    <div class="market-price">💰 50万金币</div>
                     <div style="font-size: 12px; color: #ccc; margin: 8px 0;">
                         <div>品质概率:</div>
                         <div>灰色: 75%</div>
@@ -2694,7 +2954,7 @@
                 <div class="market-item">
                     <div class="market-icon">💎</div>
                     <div class="market-name">随机宝石</div>
-                    <div class="market-price">💰 ${CONFIG.BLACK_MARKET.gemPrice}</div>
+                    <div class="market-price">💰 100万金币</div>
                     <div style="font-size: 12px; color: #ccc; margin: 8px 0;">
                         <div>品质概率:</div>
                         <div>灰色: 75%</div>
@@ -2866,9 +3126,18 @@
             if (gameData.player.diamonds >= 100) {
                 gameData.player.diamonds -= 100;
                 // 计算药水结束时间（12小时）
-                const endTime = Date.now() + 12 * 60 * 60 * 1000;
+                const duration = 12 * 60 * 60 * 1000;
+                let endTime;
+                if (gameData.player.potions.expPotion && gameData.player.potions.expPotion.active && gameData.player.potions.expPotion.endTime > Date.now()) {
+                    // 如果药水已经激活，叠加时长
+                    endTime = gameData.player.potions.expPotion.endTime + duration;
+                    addCombatLog('购买经验药水成功! 叠加50%经验加成，时长+12小时', 'success');
+                } else {
+                    // 否则设置新的结束时间
+                    endTime = Date.now() + duration;
+                    addCombatLog('购买经验药水成功! 获得50%经验加成，持续12小时', 'success');
+                }
                 gameData.player.potions.expPotion = { active: true, endTime: endTime };
-                addCombatLog('购买经验药水成功! 获得50%经验加成，持续12小时', 'success');
                 updateUI();
             } else {
                 addCombatLog('钻石不足!', 'danger');
@@ -2878,10 +3147,19 @@
         function buyDropPotion() {
             if (gameData.player.diamonds >= 150) {
                 gameData.player.diamonds -= 150;
-                // 计算药水结束时间（1800秒）
-                const endTime = Date.now() + 1800 * 1000;
+                // 计算药水结束时间（30分钟）
+                const duration = 30 * 60 * 1000;
+                let endTime;
+                if (gameData.player.potions.dropPotion && gameData.player.potions.dropPotion.active && gameData.player.potions.dropPotion.endTime > Date.now()) {
+                    // 如果药水已经激活，叠加时长
+                    endTime = gameData.player.potions.dropPotion.endTime + duration;
+                    addCombatLog('购买爆率药水成功! 叠加30%爆率加成，时长+30分钟', 'success');
+                } else {
+                    // 否则设置新的结束时间
+                    endTime = Date.now() + duration;
+                    addCombatLog('购买爆率药水成功! 获得30%爆率加成，持续30分钟', 'success');
+                }
                 gameData.player.potions.dropPotion = { active: true, endTime: endTime };
-                addCombatLog('购买爆率药水成功! 获得30%爆率加成，持续30分钟', 'success');
                 updateUI();
             } else {
                 addCombatLog('钻石不足!', 'danger');
@@ -2983,10 +3261,18 @@
                     if (!item.baseName) {
                         const card = document.createElement('div');
                         card.className = 'item-card' + (selectedItems.equip.includes(idx) ? ' selected' : '');
+                        if (item.locked) {
+                            card.style.opacity = '0.5';
+                            card.style.cursor = 'not-allowed';
+                        }
                         const qc = getQualityColor(item.quality);
                         const slotName = item.slot ? CONFIG.EQUIP_SLOTS.find(s => s.id === item.slot)?.name || item.slot : '技能书';
-                        card.innerHTML = `<div class="item-card-header"><span class="item-name">${item.name}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(item.quality)}</span></div><div class="item-details">${slotName}</div>`;
+                        card.innerHTML = `<div class="item-card-header"><span class="item-name">${item.name}${item.locked ? ' 🔒' : ''}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(item.quality)}</span></div><div class="item-details">${slotName}${item.level ? ' | 等级:' + item.level : ''}</div>`;
                         card.onclick = () => {
+                            if (item.locked) {
+                                addCombatLog('该装备已锁定，无法选择!', 'warning');
+                                return;
+                            }
                             if (selectedItems.equip.includes(idx)) selectedItems.equip = selectedItems.equip.filter(i => i !== idx);
                             else selectedItems.equip.push(idx);
                             renderDecomposeItems();
@@ -3006,9 +3292,17 @@
                     const idx = gameData.player.inventory.indexOf(item);
                     const card = document.createElement('div');
                     card.className = 'item-card' + (selectedItems.skill.includes(idx) ? ' selected' : '');
+                    if (item.locked) {
+                        card.style.opacity = '0.5';
+                        card.style.cursor = 'not-allowed';
+                    }
                     const qc = getQualityColor(item.quality);
-                    card.innerHTML = `<div class="item-card-header"><span class="item-name">${item.name}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(item.quality)}</span></div><div class="item-details">${item.cd}秒 | ${item.mult}%</div>`;
+                    card.innerHTML = `<div class="item-card-header"><span class="item-name">${item.name}${item.locked ? ' 🔒' : ''}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(item.quality)}</span></div><div class="item-details">${item.cd}秒 | ${item.mult}%</div>`;
                     card.onclick = () => {
+                        if (item.locked) {
+                            addCombatLog('该技能已锁定，无法选择!', 'warning');
+                            return;
+                        }
                         if (selectedItems.skill.includes(idx)) selectedItems.skill = selectedItems.skill.filter(i => i !== idx);
                         else selectedItems.skill.push(idx);
                         renderDecomposeItems();
@@ -3025,6 +3319,10 @@
                 gameData.player.gems.forEach((gem, idx) => {
                     const card = document.createElement('div');
                     card.className = 'item-card' + (selectedItems.gem.includes(idx) ? ' selected' : '');
+                    if (gem.locked) {
+                        card.style.opacity = '0.5';
+                        card.style.cursor = 'not-allowed';
+                    }
                     const qc = getQualityColor(gem.quality);
                     let affixHtml = '';
                     if (gem.affixes) {
@@ -3034,8 +3332,12 @@
                     } else if (gem.affix) {
                         affixHtml = `${gem.affix.name}:+${Math.floor(gem.affix.value)}`;
                     }
-                    card.innerHTML = `<div class="item-card-header"><span class="item-name">${gem.name}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(gem.quality)}</span></div><div class="item-details">${affixHtml}</div>`;
+                    card.innerHTML = `<div class="item-card-header"><span class="item-name">${gem.name}${gem.locked ? ' 🔒' : ''}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(gem.quality)}</span></div><div class="item-details">${affixHtml}</div>`;
                     card.onclick = () => {
+                        if (gem.locked) {
+                            addCombatLog('该宝石已锁定，无法选择!', 'warning');
+                            return;
+                        }
                         if (selectedItems.gem.includes(idx)) selectedItems.gem = selectedItems.gem.filter(i => i !== idx);
                         else selectedItems.gem.push(idx);
                         renderDecomposeItems();
@@ -3075,7 +3377,7 @@
                         // 自动分解该品质的装备
                         const toDecompose = [];
                         gameData.player.inventory.forEach((item, idx) => {
-                            if (!item.baseName && item.quality === q.id) {
+                            if (!item.baseName && item.quality === q.id && !item.locked) {
                                 toDecompose.push(idx);
                             }
                         });
@@ -3143,7 +3445,7 @@
                         // 自动分解该品质的技能书
                         const toDecompose = [];
                         gameData.player.inventory.forEach((item, idx) => {
-                            if (item.baseName && item.quality === q.id) {
+                            if (item.baseName && item.quality === q.id && !item.locked) {
                                 toDecompose.push(idx);
                             }
                         });
@@ -3202,7 +3504,7 @@
                         // 自动分解该品质的宝石
                         const toDecompose = [];
                         gameData.player.gems.forEach((gem, idx) => {
-                            if (gem.quality === q.id) {
+                            if (gem.quality === q.id && !gem.locked) {
                                 toDecompose.push(idx);
                             }
                         });
@@ -3428,49 +3730,55 @@
 
             selectedItems.equip.sort((a, b) => b - a).forEach(idx => {
                 const item = gameData.player.inventory[idx];
-                if (item.gems && item.gems.length > 0) {
-                    item.gems.forEach(gem => {
-                        if (gem && gameData.player.gems.length < 30) {
-                            gameData.player.gems.push(gem);
-                        }
-                    });
+                if (item && !item.locked) {
+                    if (item.gems && item.gems.length > 0) {
+                        item.gems.forEach(gem => {
+                            if (gem && gameData.player.gems.length < 30) {
+                                gameData.player.gems.push(gem);
+                            }
+                        });
+                    }
+                    const baseGold = (item.level || 1) * 10;
+                    const q = CONFIG.EQUIP_QUALITIES.find(x => x.id === item.quality);
+                    totalGold += Math.floor(baseGold / (q?.dropRate || 0.1) * 0.1) || 100;
+                    const fragCount = 1; // 分解后只获得对应品质的一个碎片
+                    const currentFrag = gameData.player.equipFragments[item.quality] || 0;
+                    const actualFrag = Math.min(fragCount, MAX_FRAGMENTS - currentFrag);
+                    if (actualFrag > 0) {
+                        gameData.player.equipFragments[item.quality] = currentFrag + actualFrag;
+                        totalFragments.equip[item.quality] = (totalFragments.equip[item.quality] || 0) + actualFrag;
+                    }
+                    gameData.player.inventory.splice(idx, 1);
                 }
-                const baseGold = (item.level || 1) * 10;
-                const q = CONFIG.EQUIP_QUALITIES.find(x => x.id === item.quality);
-                totalGold += Math.floor(baseGold / (q?.dropRate || 0.1) * 0.1) || 100;
-                const fragCount = 1; // 分解后只获得对应品质的一个碎片
-                const currentFrag = gameData.player.equipFragments[item.quality] || 0;
-                const actualFrag = Math.min(fragCount, MAX_FRAGMENTS - currentFrag);
-                if (actualFrag > 0) {
-                    gameData.player.equipFragments[item.quality] = currentFrag + actualFrag;
-                    totalFragments.equip[item.quality] = (totalFragments.equip[item.quality] || 0) + actualFrag;
-                }
-                gameData.player.inventory.splice(idx, 1);
             });
             selectedItems.skill.sort((a, b) => b - a).forEach(idx => {
                 const item = gameData.player.inventory[idx];
-                const qIdx = CONFIG.SKILL_QUALITIES.findIndex(x => x.id === item.quality);
-                totalGold += (qIdx + 1) * 500;
-                const fragCount = 1; // 分解后只获得对应品质的一个碎片
-                const currentFrag = gameData.player.skillFragments[item.quality] || 0;
-                const actualFrag = Math.min(fragCount, MAX_FRAGMENTS - currentFrag);
-                if (actualFrag > 0) {
-                    gameData.player.skillFragments[item.quality] = currentFrag + actualFrag;
-                    totalFragments.skill[item.quality] = (totalFragments.skill[item.quality] || 0) + actualFrag;
+                if (item && !item.locked) {
+                    const qIdx = CONFIG.SKILL_QUALITIES.findIndex(x => x.id === item.quality);
+                    totalGold += (qIdx + 1) * 500;
+                    const fragCount = 1; // 分解后只获得对应品质的一个碎片
+                    const currentFrag = gameData.player.skillFragments[item.quality] || 0;
+                    const actualFrag = Math.min(fragCount, MAX_FRAGMENTS - currentFrag);
+                    if (actualFrag > 0) {
+                        gameData.player.skillFragments[item.quality] = currentFrag + actualFrag;
+                        totalFragments.skill[item.quality] = (totalFragments.skill[item.quality] || 0) + actualFrag;
+                    }
+                    gameData.player.inventory.splice(idx, 1);
                 }
-                gameData.player.inventory.splice(idx, 1);
             });
             selectedItems.gem.sort((a, b) => b - a).forEach(idx => {
                 const gem = gameData.player.gems[idx];
-                totalGold += CONFIG.GEM_DECOMPOSE_GOLD[gem.quality] || 1000;
-                const fragCount = 1; // 分解后只获得对应品质的一个碎片
-                const currentFrag = gameData.player.gemFragments[gem.quality] || 0;
-                const actualFrag = Math.min(fragCount, MAX_FRAGMENTS - currentFrag);
-                if (actualFrag > 0) {
-                    gameData.player.gemFragments[gem.quality] = currentFrag + actualFrag;
-                    totalFragments.gem[gem.quality] = (totalFragments.gem[gem.quality] || 0) + actualFrag;
+                if (gem && !gem.locked) {
+                    totalGold += CONFIG.GEM_DECOMPOSE_GOLD[gem.quality] || 1000;
+                    const fragCount = 1; // 分解后只获得对应品质的一个碎片
+                    const currentFrag = gameData.player.gemFragments[gem.quality] || 0;
+                    const actualFrag = Math.min(fragCount, MAX_FRAGMENTS - currentFrag);
+                    if (actualFrag > 0) {
+                        gameData.player.gemFragments[gem.quality] = currentFrag + actualFrag;
+                        totalFragments.gem[gem.quality] = (totalFragments.gem[gem.quality] || 0) + actualFrag;
+                    }
+                    gameData.player.gems.splice(idx, 1);
                 }
-                gameData.player.gems.splice(idx, 1);
             });
             gameData.player.gold += totalGold;
             let fragMsg = '';
@@ -3527,7 +3835,7 @@
                 // 分解技能书，不分解已装备的
                 skillQualities.forEach(q => {
                     gameData.player.inventory.forEach((item, idx) => {
-                        if (item.baseName && item.quality === q) {
+                        if (item.baseName && item.quality === q && !item.locked) {
                             // 检查是否是已装备的技能
                             const isEquipped = gameData.player.equippedSkills.some(skill => skill && skill.id === item.id);
                             if (!isEquipped) {
@@ -3540,7 +3848,7 @@
                 // 分解背包中的宝石，不分解已镶嵌的
                 gemQualities.forEach(q => {
                     gameData.player.gems.forEach((gem, idx) => {
-                        if (gem.quality === q) {
+                        if (gem.quality === q && !gem.locked) {
                             // 检查是否是已镶嵌的宝石
                             let isSocketed = false;
                             Object.values(gameData.player.equipment).forEach(equip => {
@@ -3616,7 +3924,7 @@
                     if (equip.stats && equip.stats.hp) stats += `生命:+${equip.stats.hp} `;
                     div.innerHTML = `
                         <div class="enhance-header">
-                            <span class="enhance-name" style="color:${qc}">${equip.name} +${equip.enhanceLevel}</span>
+                            <span class="enhance-name" style="color:${qc}">${equip.name} +${equip.enhanceLevel} (等级:${equip.level || 1})</span>
                         </div>
                         <div class="enhance-stats">${stats}</div>
                         <div class="enhance-buttons">
@@ -3639,7 +3947,7 @@
                     if (equip.stats && equip.stats.hp) stats += `生命:+${equip.stats.hp} `;
                     div.innerHTML = `
                         <div class="enhance-header">
-                            <span class="enhance-name" style="color:${qc}">${equip.name} +${equip.enhanceLevel || 0}</span>
+                            <span class="enhance-name" style="color:${qc}">${equip.name} +${equip.enhanceLevel || 0} (等级:${equip.level || 1})</span>
                         </div>
                         <div class="enhance-stats">${stats}</div>
                         <div class="enhance-buttons">
@@ -3809,6 +4117,14 @@
                     } else {
                         // 没有使用保护卷，装备消失
                         addCombatLog(`${equip.name}强化失败，装备消失!`, 'danger');
+                        // 把装备上的宝石回收到宝石背包
+                        if (equip.gems && equip.gems.length > 0) {
+                            equip.gems.forEach(gem => {
+                                if (gem && gameData.player.gems.length < 30) {
+                                    gameData.player.gems.push(gem);
+                                }
+                            });
+                        }
                         delete gameData.player.equipment[slot];
                     }
                     gameData.player.titleCounters.enhance_consec_fails++;
@@ -3850,7 +4166,7 @@
                 if (isSuccess) {
                     // 强化成功
                     skill.enhanceLevel = (skill.enhanceLevel || 0) + 1;
-                    skill.mult = Math.floor(skill.mult * 1.1);
+                    skill.mult = Math.floor(skill.mult * 1.05);
                     addCombatLog(`${skill.name}强化成功! +${skill.enhanceLevel}`, 'success');
                 } else {
                     // 强化失败
@@ -3859,7 +4175,7 @@
                         const currentLevel = skill.enhanceLevel || 0;
                         if (currentLevel > 0) {
                             skill.enhanceLevel = currentLevel - 1;
-                            skill.mult = Math.floor(skill.mult / 1.1);
+                            skill.mult = Math.floor(skill.mult / 1.05);
                             addCombatLog(`${skill.name}强化失败，保护卷生效，强化等级降低一级!`, 'warning');
                         } else {
                             addCombatLog(`${skill.name}强化失败，保护卷生效!`, 'warning');
@@ -3870,6 +4186,8 @@
                         gameData.player.inventory.splice(index, 1);
                     }
                 }
+                // 实时更新界面
+                renderEnhanceBody('skill');
             } else if (type === 'gem') {
                 const gem = gameData.player.gems[index];
                 if (!gem) return;
@@ -4058,6 +4376,14 @@
                     } else {
                         // 没有使用保护卷，装备消失
                         addCombatLog(`${item.name}强化失败，装备消失!`, 'danger');
+                        // 把装备上的宝石回收到宝石背包
+                        if (item.gems && item.gems.length > 0) {
+                            item.gems.forEach(gem => {
+                                if (gem && gameData.player.gems.length < 30) {
+                                    gameData.player.gems.push(gem);
+                                }
+                            });
+                        }
                         gameData.player.inventory.splice(idx, 1);
                         return; // 立即返回，避免访问已被移除的物品
                     }
@@ -4384,6 +4710,8 @@
                         addCombatLog(`${item.name}强化失败，保护卷生效!`, 'warning');
                     }
                 }
+                // 实时更新界面
+                renderEnhanceBody('skill');
             } else if (type === 'gem') {
                 // 检查对应品质碎片
                 if (!gameData.player.gemFragments || !gameData.player.gemFragments[item.quality] || gameData.player.gemFragments[item.quality] < fragmentCost) {
@@ -4660,36 +4988,41 @@
                 if (isEquip) {
                     buttonsHtml = `
                         <button class="action-button button-blue" onclick="equipItemFromInventory(${realIdx})" style="padding: 6px 12px; font-size: 12px;">装备</button>
+                        <button class="action-button button-red" onclick="decomposeSingleItem(${realIdx})" style="padding: 6px 12px; font-size: 12px;">分解</button>
                         <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx}); console.log('强化按钮点击，索引:', ${realIdx});" style="padding: 6px 12px; font-size: 12px;">⚒️ 强化</button>
                         <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 6px 12px; font-size: 12px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
                     `;
                 } else if (isSkill) {
                     buttonsHtml = `
+                        <button class="action-button button-red" onclick="decomposeSkillItem(${realIdx})" style="padding: 6px 12px; font-size: 12px;">分解</button>
                         <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx})" style="padding: 6px 12px; font-size: 12px;">⚒️ 强化</button>
                         <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 6px 12px; font-size: 12px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
                     `;
                 } else if (isGem) {
                     buttonsHtml = `
+                        <button class="action-button button-red" onclick="decomposeGemItem(${realIdx})" style="padding: 6px 12px; font-size: 12px;">分解</button>
                         <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx})" style="padding: 6px 12px; font-size: 12px;">⚒️ 强化</button>
                         <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 6px 12px; font-size: 12px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
                     `;
                 }
                 
                 div.innerHTML = `
-                    <div class="item-card-header" style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 4px;">
-                            <span class="item-name" style="font-weight: bold; font-size: 14px;">${item.name} +${item.enhanceLevel || 0} ${betterIcon}</span>
-                            <span class="item-quality" style="background:${qc};color:#000; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${getQualityName(item.quality)}</span>
-                        </div>
-                        ${baseStats ? `<div style="font-size: 12px; color: #ffd700; width: 100%;">${baseStats}</div>` : ''}
-                        <div class="item-details" style="font-size: 12px; color: #aaa; margin-bottom: 8px;">${isEquip ? `孔数:${item.sockets || 0} | ` : ''}${isEquip ? `评分:${score}` : slotName}${isBetter ? '<span style="color: #27ae60; margin-left: 5px;">⬆️</span>' : ''}</div>
-                        <div class="item-details" style="font-size: 12px; color: #ffd700; margin-bottom: 8px;">强化成功率: ${(getEnhanceSuccessRate(item.enhanceLevel || 0) * 100).toFixed(0)}%</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px;">
+                        <span class="item-name" style="font-weight: bold; font-size: 14px;">${item.name} +${item.enhanceLevel || 0} ${betterIcon}</span>
+                        <span class="item-quality" style="background:${qc};color:#000; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${getQualityName(item.quality)}</span>
                     </div>
-                    <div style="display: flex; gap: 15px;">
-                        <div style="flex: 1;">
-                            ${statsHtml || stats}
+                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 15px; margin-bottom: 8px;">
+                        <div>
+                            ${baseStats ? `<div style="font-size: 12px; color: #ffd700; width: 100%; margin-bottom: 4px;">${baseStats}</div>` : ''}
+                            <div class="item-details" style="font-size: 12px; color: #aaa; margin-bottom: 4px;">${isEquip ? `等级:${item.level || 1} | 孔数:${item.sockets || 0} | ` : ''}${isEquip ? `评分:${score}` : slotName}${isBetter ? '<span style="color: #27ae60; margin-left: 5px;">⬆️</span>' : ''}</div>
+                            <div class="item-details" style="font-size: 12px; color: #ffd700; margin-bottom: 4px;">强化成功率: ${(getEnhanceSuccessRate(item.enhanceLevel || 0) * 100).toFixed(0)}%</div>
+                            <div style="display: flex; gap: 15px; margin-top: 8px;">
+                                <div style="flex: 1;">
+                                    ${statsHtml || stats}
+                                </div>
+                            </div>
                         </div>
-                        <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+                        <div style="display: flex; flex-direction: column; gap: 8px; min-width: 120px;">
                             ${buttonsHtml}
                         </div>
                     </div>
@@ -4753,6 +5086,75 @@
                 addCombatLog(`分解${item.name}获得: ${totalGold}金币, ${actualFrag}${item.quality}装备碎片`, 'success');
                 updateUI();
                 renderInventory(document.querySelector('#inventory-modal .sub-tab.active').dataset.tab);
+            }
+        }
+        
+        function decomposeSkillItem(idx) {
+            // 确保gameData存在
+            if (!gameData) return;
+            const item = gameData.player.inventory[idx];
+            if (!item) return;
+            
+            if (item.locked) {
+                addCombatLog('该技能已锁定，无法分解!', 'warning');
+                return;
+            }
+            
+            if (confirm(`确定要分解 ${item.name} 吗?`)) {
+                const MAX_FRAGMENTS = 3000;
+                const qIdx = CONFIG.SKILL_QUALITIES.findIndex(x => x.id === item.quality);
+                const gold = (qIdx + 1) * 500;
+                const fragCount = 1; // 分解后只获得对应品质的一个碎片
+                const currentFrag = gameData.player.skillFragments[item.quality] || 0;
+                const actualFrag = Math.min(fragCount, MAX_FRAGMENTS - currentFrag);
+                
+                if (actualFrag > 0) {
+                    gameData.player.skillFragments[item.quality] = currentFrag + actualFrag;
+                }
+                
+                gameData.player.gold += gold;
+                gameData.player.inventory.splice(idx, 1);
+                
+                addCombatLog(`分解${item.name}获得: ${gold}金币, ${actualFrag}${item.quality}技能碎片`, 'success');
+                updateUI();
+                renderInventory(document.querySelector('#inventory-modal .sub-tab.active').dataset.tab);
+            }
+        }
+        
+        function decomposeGemItem(idx, isFromGemModal = false) {
+            // 确保gameData存在
+            if (!gameData) return;
+            const item = isFromGemModal ? gameData.player.gems[idx] : gameData.player.inventory[idx];
+            if (!item) return;
+            
+            if (item.locked) {
+                addCombatLog('该宝石已锁定，无法分解!', 'warning');
+                return;
+            }
+            
+            if (confirm(`确定要分解 ${item.name} 吗?`)) {
+                const MAX_FRAGMENTS = 3000;
+                const gold = CONFIG.GEM_DECOMPOSE_GOLD[item.quality] || 1000;
+                const fragCount = 1; // 分解后只获得对应品质的一个碎片
+                const currentFrag = gameData.player.gemFragments[item.quality] || 0;
+                const actualFrag = Math.min(fragCount, MAX_FRAGMENTS - currentFrag);
+                
+                if (actualFrag > 0) {
+                    gameData.player.gemFragments[item.quality] = currentFrag + actualFrag;
+                }
+                
+                gameData.player.gold += gold;
+                if (isFromGemModal) {
+                    gameData.player.gems.splice(idx, 1);
+                } else {
+                    gameData.player.inventory.splice(idx, 1);
+                }
+                
+                addCombatLog(`分解${item.name}获得: ${gold}金币, ${actualFrag}${item.quality}宝石碎片`, 'success');
+                updateUI();
+                if (!isFromGemModal) {
+                    renderInventory(document.querySelector('#inventory-modal .sub-tab.active').dataset.tab);
+                }
             }
         }
         
@@ -4965,10 +5367,13 @@
                     const realIdx = gameData.player.inventory.indexOf(skill);
                     const div = document.createElement('div');
                     div.className = 'item-card';
+                    div.style.display = 'flex';
+                    div.style.flexDirection = 'column';
+                    div.style.minHeight = 'auto';
                     const qc = getQualityColor(skill.quality);
                     const enhanceLevel = skill.enhanceLevel || 0;
                     const successRate = getEnhanceSuccessRate(enhanceLevel);
-                    div.innerHTML = `<div class="item-card-header"><span class="item-name">${skill.name} +${enhanceLevel}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(skill.quality)}</span></div><div class="item-details">${skill.desc} | ${skill.cd}秒 | ${skill.mult}%</div><div class="item-details">强化概率: ${(successRate * 100).toFixed(1)}%</div><button class="action-button button-purple" style="margin-top: 10px; width: 100%" onclick="enhanceItemFromInventory(${realIdx})">⚒️ 强化</button>`;
+                    div.innerHTML = `<div class="item-card-header"><span class="item-name">${skill.name} +${enhanceLevel}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(skill.quality)}</span></div><div class="item-details">${skill.desc} | ${skill.cd}秒 | ${skill.mult}%</div><div class="item-details">强化概率: ${(successRate * 100).toFixed(1)}%</div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: auto; padding-top: 8px;"><button class="action-button button-red" onclick="decomposeSkillItem(${realIdx}); renderSkillModal();">分解</button><button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx}); renderSkillModal();">⚒️ 强化</button></div>`;
                     div.onclick = () => {
                         if (gameData.player.equippedSkills.length >= CONFIG.MAX_EQUIPPED_SKILLS) {
                             addCombatLog('已装备4个技能!', 'warning');
@@ -5002,36 +5407,6 @@
         document.getElementById('close-gem').onclick = () => document.getElementById('gem-modal').classList.remove('active');
 
         function renderGemModal() {
-            const slotsDiv = document.getElementById('gem-equip-slots');
-            slotsDiv.innerHTML = '';
-            CONFIG.EQUIP_SLOTS.forEach(slot => {
-                const equip = gameData.player.equipment[slot.id];
-                const div = document.createElement('div');
-                div.className = 'equip-slot' + (equip ? ' filled' : '') + (gameData.selectedEquipSlot === slot.id ? ' selected' : '');
-                div.innerHTML = `<span class="equip-slot-icon">${slot.icon}</span><span class="equip-slot-name">${slot.name}</span>`;
-                if (equip && equip.sockets > 0) {
-                    let gemsHtml = '<div class="gem-slots">';
-                    for (let i = 0; i < equip.sockets; i++) {
-                        const gem = equip.gems && equip.gems[i];
-                        if (gem) {
-                            gemsHtml += `<div class="gem-slot filled" style="position: relative;">
-                                <div onclick="event.stopPropagation();socketGem('${slot.id}',${i})" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">💎</div>
-                                <button onclick="event.stopPropagation();enhanceSocketedGem('${slot.id}',${i})" style="position: absolute; bottom: -5px; right: -5px; width: 16px; height: 16px; font-size: 10px; padding: 0; background: #ff9800; color: #fff; border: none; border-radius: 50%; cursor: pointer;">+</button>
-                            </div>`;
-                        } else {
-                            gemsHtml += `<div class="gem-slot" onclick="event.stopPropagation();socketGem('${slot.id}',${i})">+</div>`;
-                        }
-                    }
-                    gemsHtml += '</div>';
-                    div.innerHTML += gemsHtml;
-                }
-                div.onclick = () => {
-                    gameData.selectedEquipSlot = slot.id;
-                    renderGemModal();
-                };
-                slotsDiv.appendChild(div);
-            });
-
             const listDiv = document.getElementById('gem-list');
             listDiv.innerHTML = '';
             if (gameData.player.gems.length === 0) {
@@ -5040,6 +5415,9 @@
                 gameData.player.gems.forEach((gem, idx) => {
                     const div = document.createElement('div');
                     div.className = 'item-card';
+                    div.style.display = 'flex';
+                    div.style.flexDirection = 'column';
+                    div.style.minHeight = 'auto';
                     const qc = getQualityColor(gem.quality);
                     let affixHtml = '';
                     if (gem.affixes && gem.affixes.length > 0) {
@@ -5054,34 +5432,7 @@
                     }
                     const enhanceLevel = gem.enhanceLevel || 0;
                     const successRate = getEnhanceSuccessRate(enhanceLevel);
-                    div.innerHTML = `<div class="item-card-header"><span class="item-name">${gem.name} +${enhanceLevel}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(gem.quality)}</span></div><div class="item-details">${affixHtml}</div><div class="item-details">强化概率: ${(successRate * 100).toFixed(1)}%</div><button class="action-button button-purple" style="margin-top: 10px; width: 100%" onclick="enhanceGemFromModal(${idx})">⚒️ 强化</button>`;
-                    div.onclick = () => {
-                        if (!gameData.selectedEquipSlot) {
-                            addCombatLog('请先选择装备槽位!', 'warning');
-                            return;
-                        }
-                        const equip = gameData.player.equipment[gameData.selectedEquipSlot];
-                        if (!equip) {
-                            addCombatLog('该槽位没有装备!', 'warning');
-                            return;
-                        }
-                        if (!equip.gems) equip.gems = [];
-                        const emptySlot = equip.gems.findIndex(g => !g);
-                        if (emptySlot === -1) {
-                            if (equip.sockets < CONFIG.MAX_SOCKETS) {
-                                equip.sockets++;
-                                emptySlot = equip.sockets - 1;
-                            } else {
-                                addCombatLog('孔位已满!', 'warning');
-                                return;
-                            }
-                        }
-                        equip.gems[emptySlot] = gem;
-                        gameData.player.gems.splice(idx, 1);
-                        addCombatLog(`镶嵌${gem.name}成功!`, 'success');
-                        renderGemModal();
-                        updateUI();
-                    };
+                    div.innerHTML = `<div class="item-card-header"><span class="item-name">${gem.name} +${enhanceLevel}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(gem.quality)}</span></div><div class="item-details">${affixHtml}</div><div class="item-details">强化概率: ${(successRate * 100).toFixed(1)}%</div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: auto; padding-top: 8px;"><button class="action-button button-red" onclick="decomposeGemItem(${idx}, true); renderGemModal();">分解</button><button class="action-button button-purple" onclick="enhanceGemFromModal(${idx}); renderGemModal();">⚒️ 强化</button></div>`;
                     listDiv.appendChild(div);
                 });
             }
@@ -5182,7 +5533,7 @@
             if (isSuccess) {
                 // 强化成功
                 skill.enhanceLevel = (skill.enhanceLevel || 0) + 1;
-                skill.mult = Math.floor(skill.mult * 1.1);
+                skill.mult = Math.floor(skill.mult * 1.05);
                 addCombatLog(`${skill.name}强化成功! +${skill.enhanceLevel}`, 'success');
             } else {
                 // 强化失败
@@ -5222,6 +5573,7 @@
             gameData.gameState.showFloatingText = false;
             const modal = document.getElementById('daily-modal');
             const body = document.getElementById('daily-tasks');
+            if (!body) return; // 检查元素是否存在
             body.innerHTML = '';
             
             // 检查日常任务是否需要重置
@@ -5418,65 +5770,101 @@
                 div.style.minHeight = '150px';
                 div.style.display = 'flex';
                 div.style.flexDirection = 'column';
+                div.style.fontSize = '12px';
                 if (equip) {
                     const qc = getQualityColor(equip.quality);
                     div.className += ' ' + equip.quality;
-                    let statsHtml = '';
+                    
+                    // 构建基础属性
+                    let baseStatsHtml = '';
                     if (equip.stats) {
                         for (const [key, value] of Object.entries(equip.stats)) {
-                            if (key === 'atk') statsHtml += `攻击: +${value}<br>`;
-                            else if (key === 'def') statsHtml += `防御: +${value}<br>`;
-                            else if (key === 'hp') statsHtml += `生命: +${value}<br>`;
+                            if (key === 'atk') baseStatsHtml += `攻击: +${value}<br>`;
+                            else if (key === 'def') baseStatsHtml += `防御: +${value}<br>`;
+                            else if (key === 'hp') baseStatsHtml += `生命: +${value}<br>`;
                         }
                     }
-                    if (equip.affixes) {
-                        equip.affixes.forEach(affix => {
+                    
+                    // 构建附加属性（两列布局）
+                    let affixesHtml = '';
+                    if (equip.affixes && equip.affixes.length > 0) {
+                        const affixList = equip.affixes.map(affix => {
                             if (affix.id === 'critDmg') {
-                                statsHtml += `${affix.name}: ${Math.floor(affix.value)}<br>`;
+                                return `${affix.name}: ${Math.floor(affix.value)}`;
                             } else {
-                                statsHtml += `${affix.name}: ${affix.value.toFixed(1)}<br>`;
+                                return `${affix.name}: ${affix.value.toFixed(1)}`;
                             }
                         });
+                        const col1 = affixList.slice(0, Math.ceil(affixList.length / 2));
+                        const col2 = affixList.slice(Math.ceil(affixList.length / 2));
+                        affixesHtml = `
+                            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                                <div style="flex: 1;">
+                                    ${col1.map(affix => `<div>${affix}</div>`).join('')}
+                                </div>
+                                <div style="flex: 1;">
+                                    ${col2.map(affix => `<div>${affix}</div>`).join('')}
+                                </div>
+                            </div>
+                        `;
                     }
+                    
+                    // 构建宝石信息（简化显示）
+                    let gemsHtml = '';
                     if (equip.sockets > 0) {
                         const gemCount = equip.gems ? equip.gems.filter(g => g).length : 0;
-                        statsHtml += `宝石: ${gemCount}/${equip.sockets}<br>`;
+                        gemsHtml += `宝石: ${gemCount}/${equip.sockets}<br>`;
                         if (equip.gems && equip.gems.length > 0) {
                             equip.gems.forEach((gem, index) => {
                                 if (gem) {
-                                    const gemQuality = getQualityName(gem.quality);
                                     const gemColor = getQualityColor(gem.quality);
-                                    if (gem.affixes) {
-                                        statsHtml += `<span style="color:${gemColor}">${index + 1}: ${gem.name}</span><br>`;
-                                        gem.affixes.forEach(affix => {
-                                            statsHtml += `<span style="color:${gemColor}">  ${affix.name} +${Math.floor(affix.value)}</span><br>`;
-                                        });
+                                    if (gem.affixes && gem.affixes.length > 0) {
+                                        const mainAffix = gem.affixes[0];
+                                        gemsHtml += `<span style="color:${gemColor}">${index + 1}: ${mainAffix.name} +${Math.floor(mainAffix.value)}</span><br>`;
                                     } else if (gem.affix) {
-                                        statsHtml += `<span style="color:${gemColor}">${index + 1}: ${gem.affix.name} +${Math.floor(gem.affix.value)}</span><br>`;
+                                        gemsHtml += `<span style="color:${gemColor}">${index + 1}: ${gem.affix.name} +${Math.floor(gem.affix.value)}</span><br>`;
                                     }
                                 }
                             });
                         }
                     }
+                    
+                    // 构建强化信息
+                    let enhanceHtml = '';
                     if (equip.enhanceLevel > 0) {
-                        statsHtml += `强化: +${equip.enhanceLevel}<br>`;
+                        enhanceHtml += `强化: +${equip.enhanceLevel}<br>`;
                     }
-                    // 添加强化成功率
                     const successRate = getEnhanceSuccessRate(equip.enhanceLevel || 0);
-                    statsHtml += `强化成功率: ${(successRate * 100).toFixed(0)}%<br>`;
+                    enhanceHtml += `强化成功率: ${(successRate * 100).toFixed(0)}%`;
+                    
                     div.innerHTML = `
-                        <div class="item-card-header">
-                            <span class="item-name">${equip.name} +${equip.enhanceLevel || 0}</span>
-                            <span class="item-quality" style="background:${qc};color:#000">${getQualityName(equip.quality)}</span>
+                        <div class="item-card-header" style="margin-bottom: 5px;">
+                            <span class="item-name" style="font-size: 13px;">${equip.name} +${equip.enhanceLevel || 0} (等级:${equip.level || 1})</span>
+                            <span class="item-quality" style="background:${qc};color:#000; font-size: 11px;">${getQualityName(equip.quality)}</span>
                         </div>
-                        <div class="item-details">${slot.name}</div>
-                        <div class="item-stats" style="flex: 1;">${statsHtml}</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px;">
-                            <button class="action-button button-blue" onclick="showGemSocketModal('${slot.id}')">镶嵌宝石</button>
-                            ${equip.sockets < CONFIG.MAX_SOCKETS ? `<button class="action-button button-purple" onclick="drillSocket('${slot.id}')">开孔</button>` : '<button class="action-button" disabled style="background: #666; cursor: not-allowed;">已满孔</button>'}
-                            <button class="action-button button-yellow" onclick="enhanceItem('equip','${slot.id}'); renderEquipmentModal();">强化</button>
+                        <div class="item-details" style="margin-bottom: 5px;">${slot.name}</div>
+                        <div style="flex: 1; overflow-y: auto; margin-bottom: 8px;">
+                            ${baseStatsHtml}
+                            ${affixesHtml}
+                            ${gemsHtml}
+                            ${enhanceHtml}
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3px; margin-top: auto;">
+                            <button class="action-button button-blue" style="font-size: 11px; padding: 4px;">镶嵌宝石</button>
+                            ${equip.sockets < CONFIG.MAX_SOCKETS ? `<button class="action-button button-purple" style="font-size: 11px; padding: 4px;">开孔</button>` : '<button class="action-button" disabled style="background: #666; cursor: not-allowed; font-size: 11px; padding: 4px;">已满孔</button>'}
+                            <button class="action-button button-yellow" style="font-size: 11px; padding: 4px;">强化</button>
                         </div>
                     `;
+                    
+                    // 添加事件监听器
+                    div.querySelector('.button-blue').onclick = () => showGemSocketModal(slot.id);
+                    if (equip.sockets < CONFIG.MAX_SOCKETS) {
+                        div.querySelector('.button-purple').onclick = () => drillSocket(slot.id);
+                    }
+                    div.querySelector('.button-yellow').onclick = () => {
+                        enhanceItem('equip', slot.id);
+                        renderEquipmentModal();
+                    };
                 } else {
                     div.innerHTML = `
                         <div class="item-card-header">
@@ -5948,26 +6336,94 @@
             });
         }
 
-        function init() {
-            // 检查是否有存档
-            const save = localStorage.getItem('d2game_save');
-            if (save) {
-                gameData = JSON.parse(save);
-                addCombatLog('加载存档成功!', 'success');
-                generateZoneList();
-                generateEliteZoneList();
-                generateHellZoneList();
-                updateUI();
-                startAutoFight();
-                addCombatLog('游戏开始! 暗黑魔兽文字挂机 v' + CONFIG.GAME_VERSION, 'info');
-                // 添加药水倒计时定时器
-                setInterval(() => {
-                    updatePotionTimers();
-                }, 1000);
-            } else {
-                // 显示职业选择界面
-                showClassSelection();
+
+
+
+        // 计算装备评分
+        function calculateEquipmentScore(equip) {
+            let score = 0;
+            if (equip.stats) {
+                for (const stat in equip.stats) {
+                    score += equip.stats[stat];
+                }
             }
+            if (equip.affixes) {
+                equip.affixes.forEach(affix => {
+                    score += Math.floor(affix.value);
+                });
+            }
+            return score;
+        }
+
+        // 获取最高装备品质
+        function getMaxEquipmentQuality() {
+            const qualityOrder = ['gray', 'green', 'blue', 'purple', 'orange', 'red', 'gold', 'platinum', 'diamond', 'darkgold', 'myth', 'supreme', 'zenith'];
+            let maxQuality = 0;
+            
+            for (const slot in gameData.player.equipment) {
+                const equip = gameData.player.equipment[slot];
+                if (equip) {
+                    const qualityIndex = qualityOrder.indexOf(equip.quality);
+                    if (qualityIndex > maxQuality) {
+                        maxQuality = qualityIndex;
+                    }
+                }
+            }
+            
+            return qualityOrder[maxQuality];
+        }
+
+
+
+
+
+        function init() {
+            const save = localStorage.getItem('d2game_save');
+            let needReset = false;
+            
+            if (save) {
+                try {
+                    const savedData = JSON.parse(save);
+                    const savedVersion = savedData.gameVersion || '0.0.0';
+                    // 只在1.0.1版本时对老版本数据进行重置，后续版本保留玩家数据
+                    if (CONFIG.GAME_VERSION === '1.0.1') {
+                        needReset = savedVersion !== '1.0.1';
+                    } else {
+                        // 后续版本更新，直接加载存档，不重置
+                        needReset = false;
+                    }
+                } catch (e) {
+                    needReset = true;
+                }
+            } else {
+                needReset = true;
+            }
+            
+            if (needReset) {
+                localStorage.removeItem('d2game_save');
+                localStorage.removeItem('autoDecompose');
+                showClassSelection();
+                return;
+            }
+            
+            gameData = JSON.parse(save);
+            // 更新存档中的gameVersion为当前版本
+            gameData.gameVersion = CONFIG.GAME_VERSION;
+            
+            addCombatLog('加载存档成功!', 'success');
+            generateZoneList();
+            generateEliteZoneList();
+            generateHellZoneList();
+            updateUI();
+            startAutoFight();
+            addCombatLog('游戏开始! 暗黑魔兽文字挂机 v' + CONFIG.GAME_VERSION, 'info');
+            
+
+            
+            // 添加药水倒计时定时器
+            setInterval(() => {
+                updatePotionTimers();
+            }, 1000);
         }
 
         function showClassSelection() {
@@ -6022,6 +6478,7 @@
 
         function selectClass(classId) {
             const cls = CONFIG.CLASSES[classId];
+            gameData.gameVersion = "1.0.1";
             gameData.player.classId = classId;
             gameData.player.className = cls.name;
             gameData.player.hp = cls.baseHp;
@@ -6042,6 +6499,8 @@
             startAutoFight();
             addCombatLog(`选择职业: ${cls.name}`, 'success');
             addCombatLog('游戏开始! 暗黑魔兽文字挂机 v' + CONFIG.GAME_VERSION, 'info');
+            
+
             
             // 添加药水倒计时定时器
             setInterval(() => {
@@ -6085,7 +6544,26 @@
             const loadBtn = document.getElementById('load-game');
             if (saveBtn) saveBtn.style.display = 'none';
             if (loadBtn) loadBtn.style.display = 'none';
+            
+
         });
     </script>
+<!--客服 开始-->
+<script src="//g8hh.github.io/static/js/jquery.min.js"></script>
+<link rel="stylesheet" href="//g8hh.github.io/static/css/kf.css" type="text/css" media="screen" charset="utf-8">
+<script src="//g8hh.github.io/static/js/kf.js"></script>
+<!-- 客服 结束 -->
+<!--站长统计-->
+    <div style="display: none">
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?6581389daf4dd6fe7dbb4d20fdcb52a6";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+    </div>
 </body>
 </html>
