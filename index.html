@@ -25,9 +25,10 @@
         .resource-item:hover { background: rgba(0,0,0,0.5); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
         .resource-icon { font-size: 18px; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
         .resource-value { color: #ffd700; font-weight: bold; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
-        .game-container { display: grid; grid-template-columns: 30% 40% 30%; gap: 10px; padding: 10px; min-height: calc(100vh - 60px); overflow-y: auto; }
-        .player-status, .right-panel { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); overflow-y: auto; max-height: 100%; }
-        .combat-area { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex: 1; }
+        .game-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 10px; min-height: calc(100vh - 60px); overflow-y: auto; }
+        .player-status, .right-panel { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); height: 100%; overflow: hidden; }
+        .combat-area { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex: 1; } 
+        .combat-area.minimized { min-height: 60px; }
         h2 { color: #ffd700; font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .status-item { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .status-value { background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%); padding: 6px; border-radius: 8px; text-align: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.1); }
@@ -80,14 +81,13 @@
         .log-entry.danger { color: #e74c3c; border-left: 3px solid #e74c3c; }
         .log-entry.info { color: #3498db; border-left: 3px solid #3498db; }
         .log-entry.warning { color: #f39c12; border-left: 3px solid #f39c12; }
-        .zone-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         .zone-item { background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%); padding: 10px; border-radius: 8px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.1); }
         .zone-item:hover { background: linear-gradient(145deg, #4a4d58 0%, #3a3d48 100%); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
         .zone-item.active { border: 2px solid #ffd700; box-shadow: 0 0 15px rgba(255,215,0,0.3); }
         .zone-name { font-weight: bold; font-size: 13px; margin-bottom: 3px; }
         .zone-level { font-size: 11px; color: #ccc; }
         .zone-icons { font-size: 12px; margin-top: 5px; }
-        .setting-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+        .setting-buttons { display: flex; flex-direction: column; gap: 8px; }
         .setting-button { padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); position: relative; overflow: hidden; background: linear-gradient(135deg, #3a3d48 0%, #2f323a 100%); color: #fff; }
         .setting-button:hover, .setting-button:active { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
         .setting-button::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
@@ -100,7 +100,8 @@
         .panel-tab:hover { background-color: #4a4d58; }
         .panel-tab.active { background-color: #ffd700; color: #000; }
         .panel-content { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-        .panel-tab-content { display: none; flex: 1; overflow-y: auto; }
+        .panel-tab-content { display: none; flex: 1; overflow-y: auto; height: 400px; width: 100%; }
+        .zone-list { height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; width: 100%; }
         .panel-tab-content.active { display: flex; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .modal-title { font-size: 18px; font-weight: bold; color: #ffd700; }
@@ -219,6 +220,7 @@
                 transform: none;
                 overflow-y: auto;
                 padding-bottom: 20px;
+                touch-action: manipulation;
             }
             .top-bar { 
                 padding: 6px 8px; 
@@ -226,18 +228,20 @@
                 height: auto;
             } 
             .top-bar-left { 
-                gap: 6px; 
+                gap: 4px; 
                 overflow-x: auto;
                 white-space: nowrap;
                 scrollbar-width: none;
+                -webkit-overflow-scrolling: touch;
             } 
             .top-bar-left::-webkit-scrollbar { 
                 display: none;
             }
             .resource-item { 
                 font-size: 10px; 
-                padding: 3px 6px;
+                padding: 4px 8px;
                 border-radius: 12px;
+                min-width: 80px;
             } 
             .resource-icon { 
                 font-size: 12px; 
@@ -248,13 +252,13 @@
                 gap: 6px; 
                 min-height: calc(100dvh - 40px);
                 overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             } 
             .player-status, .combat-area, .right-panel { 
                 padding: 8px; 
                 gap: 6px; 
                 max-height: none;
-                min-height: 250px;
-                overflow-y: auto;
+                min-height: 200px;
             } 
             .combat-area {
                 overflow: visible;
@@ -268,128 +272,28 @@
             } 
             .status-label { 
                 font-size: 8px; 
+                margin-bottom: 1px;
             } 
             .status-number { 
                 font-size: 10px; 
             } 
+            .action-buttons {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 4px;
+            }
             .action-button { 
-                padding: 5px; 
+                padding: 6px;
                 font-size: 9px; 
+                min-height: 35px;
+                min-width: 60px;
+                touch-action: manipulation;
             } 
             .mob-info {
-                padding: 8px;
+                padding: 6px;
+                min-height: 120px;
             }
             .mob-icon { 
                 font-size: 24px; 
-                margin-bottom: 6px; 
-            } 
-            .mob-name { 
-                font-size: 14px; 
-                margin-bottom: 8px; 
-            } 
-            .mob-stats { 
-                gap: 4px;
-                grid-template-columns: repeat(3, 1fr);
-            } 
-            .stat-card { 
-                padding: 4px;
-                min-height: 50px;
-            } 
-            .stat-card-label { 
-                font-size: 8px; 
-            } 
-            .stat-card-value { 
-                font-size: 10px; 
-            } 
-            .combat-button { 
-                padding: 6px; 
-                font-size: 10px; 
-            } 
-            .combat-log { 
-                max-height: 100px; 
-                font-size: 8px; 
-                padding: 6px;
-            } 
-            .zone-item { 
-                padding: 5px; 
-            } 
-            .zone-name { 
-                font-size: 10px; 
-            } 
-            .zone-level { 
-                font-size: 8px; 
-            } 
-            .setting-button { 
-                padding: 5px; 
-                font-size: 9px; 
-            } 
-            .modal-content { 
-                padding: 10px; 
-                max-height: 95dvh; 
-                width: 98%;
-                margin-top: 15px;
-            } 
-            .modal-title { 
-                font-size: 14px; 
-            } 
-            .modal-body { 
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
-                gap: 6px; 
-            } 
-            .item-card { 
-                padding: 10px; 
-                min-height: 90px; 
-            } 
-            .item-name { 
-                font-size: 13px; 
-            } 
-            .item-quality { 
-                font-size: 10px; 
-                padding: 1px 4px; 
-            } 
-            .item-details, .item-stats { 
-                font-size: 10px; 
-            } 
-        }
-        
-        @media (max-width: 480px) {
-            .top-bar-left { 
-                gap: 4px; 
-            } 
-            .resource-item { 
-                font-size: 9px; 
-                padding: 2px 4px;
-                border-radius: 10px;
-            } 
-            .resource-icon { 
-                font-size: 10px; 
-            } 
-            .game-container { 
-                padding: 4px; 
-                gap: 4px; 
-                min-height: calc(100dvh - 30px);
-            } 
-            .player-status, .combat-area, .right-panel { 
-                padding: 6px; 
-                gap: 4px; 
-                min-height: 180px;
-            } 
-            h2 { 
-                font-size: 11px; 
-                margin-bottom: 3px;
-            } 
-            .action-buttons { 
-                gap: 3px; 
-            } 
-            .action-button { 
-                padding: 4px; 
-                font-size: 8px; 
-            } 
-            .mob-info {
-                padding: 6px;
-            }
-            .mob-icon { 
-                font-size: 20px; 
                 margin-bottom: 4px; 
             } 
             .mob-name { 
@@ -397,68 +301,223 @@
                 margin-bottom: 6px; 
             } 
             .mob-stats { 
-                grid-template-columns: repeat(3, 1fr); 
                 gap: 3px;
+                grid-template-columns: repeat(3, 1fr);
             } 
             .stat-card { 
-                padding: 3px;
+                padding: 4px;
                 min-height: 40px;
             } 
             .stat-card-label { 
-                font-size: 7px;
+                font-size: 8px; 
             } 
             .stat-card-value { 
-                font-size: 9px;
+                font-size: 10px; 
             } 
             .combat-button { 
-                padding: 5px; 
+                padding: 6px; 
                 font-size: 9px; 
+                min-height: 30px;
+                touch-action: manipulation;
             } 
             .combat-log { 
-                max-height: 80px; 
-                font-size: 7px;
-                padding: 4px;
+                max-height: 60px; 
+                font-size: 7px; 
+                padding: 3px;
+                line-height: 1.1;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .log-entry {
+                margin-bottom: 2px;
+                padding: 1px 3px;
             } 
             .zone-item { 
-                padding: 4px;
+                padding: 6px; 
+                min-height: 60px;
+                touch-action: manipulation;
             } 
             .zone-name { 
-                font-size: 9px;
+                font-size: 10px; 
             } 
             .zone-level { 
-                font-size: 7px;
+                font-size: 8px; 
             } 
             .setting-button { 
-                padding: 4px; 
-                font-size: 8px;
+                padding: 8px; 
+                font-size: 10px; 
+                touch-action: manipulation;
             } 
             .modal-content { 
                 padding: 8px; 
-                max-height: 95dvh;
-                width: 99%;
+                max-height: 95dvh; 
+                width: 98%;
                 margin-top: 10px;
+                touch-action: manipulation;
             } 
             .modal-title { 
-                font-size: 13px;
+                font-size: 12px; 
             } 
             .modal-body { 
-                grid-template-columns: 1fr; 
-                gap: 4px;
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+                gap: 4px; 
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             } 
             .item-card { 
                 padding: 8px; 
-                min-height: 80px;
+                min-height: 80px; 
+                touch-action: manipulation;
             } 
             .item-name { 
-                font-size: 12px;
+                font-size: 11px; 
             } 
             .item-quality { 
-                font-size: 9px; 
-                padding: 1px 3px;
+                font-size: 8px; 
+                padding: 1px 3px; 
             } 
             .item-details, .item-stats { 
-                font-size: 9px;
+                font-size: 8px; 
             } 
+            .zone-list { 
+                height: 300px; 
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .top-bar-left { 
+                gap: 3px; 
+                -webkit-overflow-scrolling: touch;
+            } 
+            .resource-item { 
+                font-size: 8px; 
+                padding: 2px 4px;
+                border-radius: 8px;
+                min-width: 70px;
+            } 
+            .resource-icon { 
+                font-size: 10px; 
+            } 
+            .game-container { 
+                padding: 3px; 
+                gap: 3px; 
+                min-height: calc(100dvh - 25px);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            } 
+            .player-status, .combat-area, .right-panel { 
+                padding: 5px; 
+                gap: 3px; 
+                min-height: 150px;
+            } 
+            h2 { 
+                font-size: 10px; 
+                margin-bottom: 2px;
+            } 
+            .action-buttons { 
+                grid-template-columns: repeat(4, 1fr);
+                gap: 2px; 
+            } 
+            .action-button { 
+                padding: 3px;
+                font-size: 7px; 
+                min-height: 25px;
+                min-width: 50px;
+                touch-action: manipulation;
+            } 
+            .mob-info {
+                padding: 4px;
+                min-height: 100px;
+            }
+            .mob-icon { 
+                font-size: 18px; 
+                margin-bottom: 3px; 
+            } 
+            .mob-name { 
+                font-size: 10px; 
+                margin-bottom: 4px; 
+            } 
+            .mob-stats { 
+                grid-template-columns: repeat(3, 1fr); 
+                gap: 2px;
+            } 
+            .stat-card { 
+                padding: 2px;
+                min-height: 35px;
+            } 
+            .stat-card-label { 
+                font-size: 6px;
+            } 
+            .stat-card-value { 
+                font-size: 8px;
+            } 
+            .combat-button { 
+                padding: 4px; 
+                font-size: 8px; 
+                min-height: 25px;
+                touch-action: manipulation;
+            } 
+            .combat-log { 
+                max-height: 50px; 
+                font-size: 6px;
+                padding: 3px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            } 
+            .zone-item { 
+                padding: 3px;
+                min-height: 50px;
+                touch-action: manipulation;
+            } 
+            .zone-name { 
+                font-size: 8px;
+            } 
+            .zone-level { 
+                font-size: 6px;
+            } 
+            .setting-button { 
+                padding: 6px; 
+                font-size: 8px;
+                touch-action: manipulation;
+            } 
+            .modal-content { 
+                padding: 6px; 
+                max-height: 95dvh;
+                width: 99%;
+                margin-top: 8px;
+                touch-action: manipulation;
+            } 
+            .modal-title { 
+                font-size: 11px;
+            } 
+            .modal-body { 
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); 
+                gap: 3px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            } 
+            .item-card { 
+                padding: 6px; 
+                min-height: 70px;
+                touch-action: manipulation;
+            } 
+            .item-name { 
+                font-size: 10px;
+            } 
+            .item-quality { 
+                font-size: 7px; 
+                padding: 1px 2px;
+            } 
+            .item-details, .item-stats { 
+                font-size: 7px;
+            } 
+            .zone-list { 
+                height: 250px; 
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
         }
     </style>
 </head>
@@ -480,7 +539,11 @@
         <div class="game-container">
         <div class="player-status">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h2>👤 玩家状态</h2>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h2>👤 玩家状态</h2>
+                    <button class="action-button button-blue" id="cdk" onclick="gameData.gameState.showFloatingText = false; document.getElementById('cdk-modal').classList.add('active');" style="padding: 4px 8px; font-size: 10px;">🎁 兑换</button>
+                    <button class="action-button button-yellow" id="toggle-combat-panel" style="padding: 4px 8px; font-size: 10px;" onclick="toggleCombatPanel();">📦 简化</button>
+                </div>
                 <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
                     <div class="player-id-display">
                         <span class="id-label">ID:</span>
@@ -518,8 +581,11 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本1.02</div>
-                    <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
+                    <div class="panel-title">📊 角色属性 版本1.03</div>
+                    <div style="display: flex; gap: 25px; align-items: center;">
+                        <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
+                        <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
+                    </div>
                 </div>
                 <div class="quick-stats">
                     <div class="quick-stat"><div class="quick-stat-label">吸血</div><div class="quick-stat-value" id="stat-lifesteal">0%</div></div>
@@ -553,9 +619,7 @@
                     <div class="stat-card"><div class="stat-card-label">抗暴击</div><div class="stat-card-value" id="mob-antiCrit">0%</div></div>
                     <div class="stat-card"><div class="stat-card-label">暴击伤害</div><div class="stat-card-value" id="mob-critDmg">0%</div></div>
                 </div>
-                <div class="combat-buttons">
-                    <button class="combat-button button-blue" id="cdk" onclick="gameData.gameState.showFloatingText = false; document.getElementById('cdk-modal').classList.add('active');">🎁 兑换</button>
-                </div>
+
             </div>
             <div class="combat-log" id="combat-log">
                 <div class="log-entry info">📜 战斗日志</div>
@@ -564,10 +628,7 @@
                 <h2>⚔️ 战斗区域</h2>
             </div>
 
-            <div class="elite-ticket-display" style="margin-top: 5px;">
-                <div class="ticket-item"><span class="ticket-icon">🎫</span><span class="ticket-count" id="elite-tickets">0</span></div>
-                <div class="ticket-item"><span class="ticket-icon">🔥</span><span class="ticket-count" id="hell-tickets">0</span></div>
-            </div>
+
         </div>
         <div class="right-panel">
             <div class="panel-tabs">
@@ -587,11 +648,7 @@
                 </div>
             </div>
 
-            <div class="setting-buttons">
-                <button class="setting-button button-teal" id="save-game">💾 保存</button>
-                <button class="setting-button button-orange" id="load-game">📂 加载</button>
-                <button class="setting-button" id="rebirth" style="background: linear-gradient(135deg, #ff4757 0%, #e84118 100%); color: #fff;">🔄 重生</button>
-            </div>
+
         </div>
         </div>
 
@@ -890,7 +947,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.02",
+            GAME_VERSION: "1.03",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1091,7 +1148,7 @@
         }
 
         let gameData = {
-            gameVersion: "1.0.1",
+            gameVersion: "1.03",
             player: {
                 level: 1, exp: 0, expNext: 100, gold: 0, diamonds: 0,
                 classId: "warrior", className: "战士",
@@ -1306,8 +1363,15 @@
             // 更新药水倒计时
             updatePotionTimers();
             
-            document.getElementById('elite-tickets').textContent = gameData.player.eliteTickets;
-            document.getElementById('hell-tickets').textContent = gameData.player.hellTickets;
+            // 只在元素存在时更新门票数量
+            const eliteTicketsElement = document.getElementById('elite-tickets');
+            if (eliteTicketsElement) {
+                eliteTicketsElement.textContent = gameData.player.eliteTickets;
+            }
+            const hellTicketsElement = document.getElementById('hell-tickets');
+            if (hellTicketsElement) {
+                hellTicketsElement.textContent = gameData.player.hellTickets;
+            }
             document.getElementById('gameId').textContent = gameData.player.gameId;
             document.getElementById('mob-hp').textContent = gameData.currentMob.hp + '/' + gameData.currentMob.maxHp;
             document.getElementById('mob-atk').textContent = gameData.currentMob.atk;
@@ -1364,6 +1428,126 @@
                 dropPotionTimer.style.display = 'flex';
             } else {
                 dropPotionTimer.style.display = 'none';
+            }
+        }
+        
+        function toggleCombatPanel() {
+            const combatArea = document.querySelector('.combat-area');
+            const mobInfo = document.querySelector('.mob-info');
+            const combatLog = document.getElementById('combat-log');
+            const toggleButton = document.getElementById('toggle-combat-panel');
+            
+            if (!combatArea) return;
+            
+            // 检查当前状态
+            const isMinimized = combatArea.classList.contains('minimized');
+            
+            if (isMinimized) {
+                // 恢复正常状态
+                combatArea.classList.remove('minimized');
+                if (mobInfo) mobInfo.style.display = 'flex';
+                if (combatLog) combatLog.style.display = 'block';
+                if (toggleButton) toggleButton.textContent = '📦 简化';
+                // 恢复飘血功能
+                gameData.gameState.showFloatingText = true;
+                // 移除简化血条
+                const simplifiedHealth = document.getElementById('simplified-health');
+                if (simplifiedHealth) simplifiedHealth.remove();
+            } else {
+                // 最小化状态
+                combatArea.classList.add('minimized');
+                if (mobInfo) mobInfo.style.display = 'none';
+                if (combatLog) combatLog.style.display = 'none';
+                if (toggleButton) toggleButton.textContent = '📋 展开';
+                // 暂停飘血功能
+                gameData.gameState.showFloatingText = false;
+                // 添加简化的怪物血条
+                addSimplifiedHealthBar();
+            }
+        }
+        
+        function addSimplifiedHealthBar() {
+            const combatArea = document.querySelector('.combat-area');
+            if (!combatArea) return;
+            
+            // 检查是否已经存在简化血条
+            const existingHealth = document.getElementById('simplified-health');
+            if (existingHealth) return;
+            
+            const healthBar = document.createElement('div');
+            healthBar.id = 'simplified-health';
+            healthBar.style.cssText = `
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                border: 2px solid #16213e;
+                border-radius: 10px;
+                padding: 10px;
+                text-align: center;
+                margin-top: 5px;
+            `;
+            
+            const mobName = document.createElement('div');
+            mobName.style.cssText = `
+                color: #ffd700;
+                font-weight: bold;
+                margin-bottom: 5px;
+                font-size: 14px;
+            `;
+            mobName.textContent = gameData.currentMob.name;
+            
+            const healthContainer = document.createElement('div');
+            healthContainer.style.cssText = `
+                width: 100%;
+                height: 20px;
+                background: #333;
+                border-radius: 10px;
+                overflow: hidden;
+            `;
+            
+            const healthBarFill = document.createElement('div');
+            healthBarFill.id = 'simplified-health-fill';
+            healthBarFill.style.cssText = `
+                height: 100%;
+                background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+                border-radius: 10px;
+                transition: width 0.3s ease;
+            `;
+            
+            const healthText = document.createElement('div');
+            healthText.id = 'simplified-health-text';
+            healthText.style.cssText = `
+                color: #fff;
+                font-size: 12px;
+                margin-top: 5px;
+            `;
+            
+            healthContainer.appendChild(healthBarFill);
+            healthBar.appendChild(mobName);
+            healthBar.appendChild(healthContainer);
+            healthBar.appendChild(healthText);
+            
+            // 插入到战斗区域的合适位置
+            const combatHeader = combatArea.querySelector('.combat-header');
+            if (combatHeader) {
+                combatHeader.after(healthBar);
+            } else {
+                combatArea.appendChild(healthBar);
+            }
+            
+            // 更新血条状态
+            updateSimplifiedHealthBar();
+        }
+        
+        function updateSimplifiedHealthBar() {
+            const healthFill = document.getElementById('simplified-health-fill');
+            const healthText = document.getElementById('simplified-health-text');
+            
+            if (healthFill && healthText) {
+                const currentHp = gameData.currentMob.hp;
+                const maxHp = gameData.currentMob.maxHp;
+                const percentage = (currentHp / maxHp) * 100;
+                
+                healthFill.style.width = percentage + '%';
+                healthText.textContent = `${Math.floor(currentHp)}/${maxHp}`;
             }
         }
 
@@ -1523,7 +1707,14 @@
                     const affixType = availableAffixes.splice(Math.floor(Math.random() * availableAffixes.length), 1)[0];
                     const range = CONFIG.AFFIX_RANGES[quality.id][affixType.id];
                     if (range) {
-                        const value = Math.floor(range[0] + Math.random() * (range[1] - range[0]));
+                        let value;
+                        if (affixType.id === 'lifesteal') {
+                            // 吸血属性保留两位小数
+                            value = Math.round((range[0] + Math.random() * (range[1] - range[0])) * 100) / 100;
+                        } else {
+                            // 其他属性取整
+                            value = Math.floor(range[0] + Math.random() * (range[1] - range[0]));
+                        }
                         affixes.push({ id: affixType.id, name: affixType.name, value: value, fmt: affixType.fmt });
                     }
                 }
@@ -1892,10 +2083,14 @@
                     }, 1500);
                 }
             }
+            
+            // 更新简化血条
+            updateSimplifiedHealthBar();
         }
 
         function showFloatingDamage(damage, isCrit, isPlayer) {
             if (document.querySelector('.modal-overlay.active')) return;
+            if (!gameData.gameState.showFloatingText) return;
             
             const mobIcon = document.getElementById('mob-icon');
             if (!mobIcon) return;
@@ -1964,6 +2159,8 @@
 
             gameData.currentMob.hp -= finalDmg;
             showFloatingDamage(finalDmg, isCrit, true);
+            // 更新简化血条
+            updateSimplifiedHealthBar();
 
             // 吸血效果
             if (gameData.player.lifesteal > 0) {
@@ -2117,7 +2314,7 @@
                 }
             } else {
                 setTimeout(() => {
-                    const mobDmg = Math.max(1, gameData.currentMob.atk - gameData.player.def * 0.6);
+                    const mobDmg = Math.max(1, Math.floor(gameData.currentMob.atk - gameData.player.def * 0.6));
                     gameData.player.hp = Math.max(0, gameData.player.hp - mobDmg);
                     if (!quick) addCombatLog(`${gameData.currentMob.name}对你造成${mobDmg}伤害`, 'danger');
 
@@ -2125,7 +2322,7 @@
                         gameData.currentMob.skillTimer = (gameData.currentMob.skillTimer || 0) + 1;
                         if (gameData.currentMob.skillTimer >= CONFIG.ELITE_SKILL.cooldown) {
                             const skillMult = CONFIG.ELITE_SKILL.minMult + Math.random() * (CONFIG.ELITE_SKILL.maxMult - CONFIG.ELITE_SKILL.minMult);
-                            const skillDmg = Math.floor(gameData.player.atk * skillMult / 100);
+                            const skillDmg = Math.floor(gameData.currentMob.atk * skillMult / 100);
                             gameData.player.hp = Math.max(0, gameData.player.hp - skillDmg);
                             gameData.currentMob.skillTimer = 0;
                             if (!quick) addCombatLog(`${gameData.currentMob.name}释放精英技能! 造成${skillDmg}伤害!`, 'warning');
@@ -2682,7 +2879,14 @@
                     const affixType = availableAffixes.splice(Math.floor(Math.random() * availableAffixes.length), 1)[0];
                     const range = CONFIG.AFFIX_RANGES[quality.id][affixType.id];
                     if (range) {
-                        const value = Math.floor(range[0] + Math.random() * (range[1] - range[0]));
+                        let value;
+                        if (affixType.id === 'lifesteal') {
+                            // 吸血属性保留两位小数
+                            value = Math.round((range[0] + Math.random() * (range[1] - range[0])) * 100) / 100;
+                        } else {
+                            // 其他属性取整
+                            value = Math.floor(range[0] + Math.random() * (range[1] - range[0]));
+                        }
                         affixes.push({ id: affixType.id, name: affixType.name, value: value, fmt: affixType.fmt });
                     }
                 }
@@ -4180,9 +4384,9 @@
                     
                     // 增加装备基础属性
                     if (equip.stats) {
-                        if (equip.stats.atk) equip.stats.atk = Math.floor(equip.stats.atk * 1.5);
-                        if (equip.stats.def) equip.stats.def = Math.floor(equip.stats.def * 1.5);
-                        if (equip.stats.hp) equip.stats.hp = Math.floor(equip.stats.hp * 1.5);
+                        if (equip.stats.atk) equip.stats.atk = Math.floor(equip.stats.atk * 1.2);
+                        if (equip.stats.def) equip.stats.def = Math.floor(equip.stats.def * 1.2);
+                        if (equip.stats.hp) equip.stats.hp = Math.floor(equip.stats.hp * 1.2);
                     }
                     
                     addCombatLog(`${equip.name}强化成功! +${equip.enhanceLevel}`, 'success');
@@ -4198,9 +4402,9 @@
                         if (equip.enhanceLevel > 0) {
                             // 降低装备基础属性
                             if (equip.stats) {
-                                if (equip.stats.atk) equip.stats.atk = Math.floor(equip.stats.atk / 1.5);
-                                if (equip.stats.def) equip.stats.def = Math.floor(equip.stats.def / 1.5);
-                                if (equip.stats.hp) equip.stats.hp = Math.floor(equip.stats.hp / 1.5);
+                                if (equip.stats.atk) equip.stats.atk = Math.floor(equip.stats.atk / 1.2);
+                                if (equip.stats.def) equip.stats.def = Math.floor(equip.stats.def / 1.2);
+                                if (equip.stats.hp) equip.stats.hp = Math.floor(equip.stats.hp / 1.2);
                             }
                             equip.enhanceLevel--;
                             addCombatLog(`${equip.name}强化失败，保护卷生效，强化等级降低一级!`, 'warning');
@@ -4277,6 +4481,12 @@
                         // 没有使用保护卷，技能消失
                         addCombatLog(`${skill.name}强化失败，技能消失!`, 'danger');
                         gameData.player.inventory.splice(index, 1);
+                        // 检查背包界面是否打开，如果打开则更新显示
+                        const inventoryModal = document.getElementById('inventory-modal');
+                        if (inventoryModal && inventoryModal.classList.contains('active')) {
+                            const activeFilter = document.querySelector('#inventory-modal .sub-tab.active').dataset.tab;
+                            renderInventory(activeFilter);
+                        }
                     }
                 }
                 // 实时更新界面
@@ -4349,6 +4559,11 @@
                         // 没有使用保护卷，宝石消失
                         addCombatLog(`${gem.name}强化失败，宝石消失!`, 'danger');
                         gameData.player.gems.splice(index, 1);
+                        // 检查宝石界面是否打开，如果打开则更新显示
+                        const gemModal = document.getElementById('gem-modal');
+                        if (gemModal && gemModal.classList.contains('active')) {
+                            renderGemModal();
+                        }
                     }
                 }
             }
@@ -4444,9 +4659,9 @@
                     
                     // 增加装备基础属性
                     if (item.stats) {
-                        if (item.stats.atk) item.stats.atk = Math.floor(item.stats.atk * 1.5);
-                        if (item.stats.def) item.stats.def = Math.floor(item.stats.def * 1.5);
-                        if (item.stats.hp) item.stats.hp = Math.floor(item.stats.hp * 1.5);
+                        if (item.stats.atk) item.stats.atk = Math.floor(item.stats.atk * 1.2);
+                        if (item.stats.def) item.stats.def = Math.floor(item.stats.def * 1.2);
+                        if (item.stats.hp) item.stats.hp = Math.floor(item.stats.hp * 1.2);
                     }
                     
                     addCombatLog(`${item.name}强化成功! +${item.enhanceLevel}`, 'success');
@@ -4457,9 +4672,9 @@
                         if (item.enhanceLevel > 0) {
                             // 降低装备基础属性
                             if (item.stats) {
-                                if (item.stats.atk) item.stats.atk = Math.floor(item.stats.atk / 1.5);
-                                if (item.stats.def) item.stats.def = Math.floor(item.stats.def / 1.5);
-                                if (item.stats.hp) item.stats.hp = Math.floor(item.stats.hp / 1.5);
+                                if (item.stats.atk) item.stats.atk = Math.floor(item.stats.atk / 1.2);
+                                if (item.stats.def) item.stats.def = Math.floor(item.stats.def / 1.2);
+                                if (item.stats.hp) item.stats.hp = Math.floor(item.stats.hp / 1.2);
                             }
                             item.enhanceLevel--;
                             addCombatLog(`${item.name}强化失败，保护卷生效，强化等级降低一级!`, 'warning');
@@ -4478,6 +4693,12 @@
                             });
                         }
                         gameData.player.inventory.splice(idx, 1);
+                        // 检查背包界面是否打开，如果打开则更新显示
+                        const inventoryModal = document.getElementById('inventory-modal');
+                        if (inventoryModal && inventoryModal.classList.contains('active')) {
+                            const activeFilter = document.querySelector('#inventory-modal .sub-tab.active').dataset.tab;
+                            renderInventory(activeFilter);
+                        }
                         return; // 立即返回，避免访问已被移除的物品
                     }
                 }
@@ -4522,6 +4743,12 @@
                         // 没有使用保护卷，技能消失
                         addCombatLog(`${item.name}强化失败，技能消失!`, 'danger');
                         gameData.player.inventory.splice(idx, 1);
+                        // 检查背包界面是否打开，如果打开则更新显示
+                        const inventoryModal = document.getElementById('inventory-modal');
+                        if (inventoryModal && inventoryModal.classList.contains('active')) {
+                            const activeFilter = document.querySelector('#inventory-modal .sub-tab.active').dataset.tab;
+                            renderInventory(activeFilter);
+                        }
                         return; // 立即返回，避免访问已被移除的物品
                     }
                 }
@@ -4580,6 +4807,12 @@
                         // 没有使用保护卷，宝石消失
                         addCombatLog(`${item.name}强化失败，宝石消失!`, 'danger');
                         gameData.player.inventory.splice(idx, 1);
+                        // 检查背包界面是否打开，如果打开则更新显示
+                        const inventoryModal = document.getElementById('inventory-modal');
+                        if (inventoryModal && inventoryModal.classList.contains('active')) {
+                            const activeFilter = document.querySelector('#inventory-modal .sub-tab.active').dataset.tab;
+                            renderInventory(activeFilter);
+                        }
                         return; // 立即返回，避免访问已被移除的物品
                     }
                 }
@@ -4750,9 +4983,9 @@
                     
                     // 增加装备基础属性
                     if (item.stats) {
-                        if (item.stats.atk) item.stats.atk = Math.floor(item.stats.atk * 1.5);
-                        if (item.stats.def) item.stats.def = Math.floor(item.stats.def * 1.5);
-                        if (item.stats.hp) item.stats.hp = Math.floor(item.stats.hp * 1.5);
+                        if (item.stats.atk) item.stats.atk = Math.floor(item.stats.atk * 1.2);
+                        if (item.stats.def) item.stats.def = Math.floor(item.stats.def * 1.2);
+                        if (item.stats.hp) item.stats.hp = Math.floor(item.stats.hp * 1.2);
                     }
                     
                     addCombatLog(`${item.name}强化成功! +${item.enhanceLevel}`, 'success');
@@ -6503,6 +6736,9 @@
             // 更新存档中的gameVersion为当前版本
             gameData.gameVersion = CONFIG.GAME_VERSION;
             
+            // 更新老版本强化装备的属性为新的强化规则
+            updateOldEnhancedEquipment();
+            
             addCombatLog('加载存档成功!', 'success');
             generateZoneList();
             generateEliteZoneList();
@@ -6569,6 +6805,54 @@
             document.body.appendChild(modal);
         }
 
+        function updateOldEnhancedEquipment() {
+            // 更新身上穿戴的装备
+            for (const slot in gameData.player.equipment) {
+                const equip = gameData.player.equipment[slot];
+                if (equip && equip.enhanceLevel > 0 && equip.stats) {
+                    updateEquipmentStats(equip);
+                }
+            }
+            
+            // 更新背包里的装备
+            if (gameData.player.inventory) {
+                gameData.player.inventory.forEach(item => {
+                    if (item && item.enhanceLevel > 0 && item.stats) {
+                        updateEquipmentStats(item);
+                    }
+                });
+            }
+        }
+        
+        function updateEquipmentStats(equip) {
+            if (!equip || !equip.enhanceLevel || equip.enhanceLevel === 0 || !equip.stats) return;
+            
+            const level = equip.enhanceLevel;
+            
+            // 计算原始属性（反推老规则的基础属性）
+            const originalStats = {};
+            if (equip.stats.atk) {
+                originalStats.atk = equip.stats.atk / Math.pow(1.5, level);
+            }
+            if (equip.stats.def) {
+                originalStats.def = equip.stats.def / Math.pow(1.5, level);
+            }
+            if (equip.stats.hp) {
+                originalStats.hp = equip.stats.hp / Math.pow(1.5, level);
+            }
+            
+            // 使用新规则重新计算属性
+            if (originalStats.atk) {
+                equip.stats.atk = Math.floor(originalStats.atk * Math.pow(1.2, level));
+            }
+            if (originalStats.def) {
+                equip.stats.def = Math.floor(originalStats.def * Math.pow(1.2, level));
+            }
+            if (originalStats.hp) {
+                equip.stats.hp = Math.floor(originalStats.hp * Math.pow(1.2, level));
+            }
+        }
+        
         function selectClass(classId) {
             const cls = CONFIG.CLASSES[classId];
             gameData.gameVersion = "1.0.1";
@@ -6658,5 +6942,6 @@ var _hmt = _hmt || [];
 })();
 </script>
     </div>
+
 </body>
 </html>
