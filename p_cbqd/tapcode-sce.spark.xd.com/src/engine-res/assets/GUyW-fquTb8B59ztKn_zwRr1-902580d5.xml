@@ -1,0 +1,63 @@
+<renderpath>
+    <rendertarget name="SrcTarget" tag="src target" sizedivisor="1 1" format="rgba32f" filter="true" />
+    <rendertarget name="BloomTarget" tag="bloom target" sizedivisor="1 1" format="rgba32f" filter="true" />
+    <rendertarget name="Bloom1" tag="" sizedivisor="  2 2" format="rgba32f" filter="true" />
+    <rendertarget name="Bloom2" tag="" sizedivisor="  4 4" format="rgba32f" filter="true" />
+    <rendertarget name="Bloom3" tag="" sizedivisor="  8 8" format="rgba32f" filter="true" />
+    <rendertarget name="Bloom4" tag="" sizedivisor="16 16" format="rgba32f" filter="true" />
+    
+    <!-- 正常前向渲染流程，渲染到双RenderTarget上 -->
+    <command type="clear" color="fog" depth="1.0" stencil="0">
+        <output index="0" name="SrcTarget" />
+        <output index="1" name="BloomTarget" />
+    </command>
+    <command type="scenepass" pass="base" vertexlights="true" metadata="base">
+        <output index="0" name="SrcTarget" />
+        <output index="1" name="BloomTarget" />
+    </command>
+    <command type="forwardlights" pass="light">
+        <output index="0" name="SrcTarget" />
+        <output index="1" name="BloomTarget" />
+    </command>
+    <command type="scenepass" pass="postopaque" output="SrcTarget" />
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" output="SrcTarget" />
+    <command type="scenepass" pass="postalpha" sort="backtofront" output="SrcTarget" />
+
+    <!-- 对BloomTarget纹理做双滤波 -->
+    <command type="quad" tag="downsample" workflow="true" workflowdata="2" vs="BLOOM/vs_fullscreen" ps="BLOOM/fs_downsample" output="Bloom1">
+        <texture unit="0" name="BloomTarget" />
+    </command>
+    <command type="quad" tag="downsample" workflow="true" workflowdata="4" vs="BLOOM/vs_fullscreen" ps="BLOOM/fs_downsample" output="Bloom2">
+        <texture unit="0" name="Bloom1" />
+    </command>
+    <command type="quad" tag="downsample" workflow="true" workflowdata="8" vs="BLOOM/vs_fullscreen" ps="BLOOM/fs_downsample" output="Bloom3">
+        <texture unit="0" name="Bloom2" />
+    </command>
+    <command type="quad" tag="downsample" workflow="true" workflowdata="16" vs="BLOOM/vs_fullscreen" ps="BLOOM/fs_downsample" output="Bloom4">
+        <texture unit="0" name="Bloom3" />
+    </command>
+
+    <command type="quad" tag="upsample" workflow="true" workflowdata="8" vs="BLOOM/vs_fullscreen" ps="BLOOM/fs_upsample" blend="add" output="Bloom3">
+        <texture unit="0" name="Bloom4" />
+        <parameter name="intensity" value="1" />
+    </command>
+    <command type="quad" tag="upsample" workflow="true" workflowdata="4" vs="BLOOM/vs_fullscreen" ps="BLOOM/fs_upsample" blend="add" output="Bloom2">
+        <texture unit="0" name="Bloom3" />
+        <parameter name="intensity" value="1" />
+    </command>
+    <command type="quad" tag="upsample" workflow="true" workflowdata="2" vs="BLOOM/vs_fullscreen" ps="BLOOM/fs_upsample" blend="add" output="Bloom1">
+        <texture unit="0" name="Bloom2" />
+        <parameter name="intensity" value="1" />
+    </command>
+    <command type="quad" tag="upsample" workflow="true" workflowdata="1" vs="BLOOM/vs_fullscreen" ps="BLOOM/fs_upsample" blend="add" output="BloomTarget">
+        <texture unit="0" name="Bloom1" />
+        <parameter name="intensity" value="1" />
+    </command>
+
+    <!-- Bloom Combine -->
+    <command type="quad" tag="Bloom Combine" vs="BLOOM/vs_fullscreen" ps="BLOOM/fs_bloom_combine">
+        <texture unit="0" name="SrcTarget" />
+        <texture unit="1" name="BloomTarget" />
+        <parameter name="BloomThreshold" value="4" />
+    </command>
+</renderpath>

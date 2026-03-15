@@ -1,0 +1,26 @@
+<renderpath finalCopy="false" >
+		<rendertarget name="depth" sizedivisor="1 1" format="lineardepth" />
+    <command type="clear" color="1 1 1 1" depth="1.0" stencil="0" output="depth" />
+    <command type="scenepass" pass="depth" output="depth" />
+    
+    <command type="scenepass" pass="base" vertexlights="true" metadata="base" psdefines=""/>
+    <command type="forwardlights" pass="light" psdefines=""/>
+    <!--command type="scenepass" pass="postopaque" />
+    <command type="scenepass" pass="refract">
+        <texture unit="env" name="viewport" />
+    </command-->
+    
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" vsdefines="CLOSESOFT" psdefines="CLOSESOFT" >
+    		<texture unit="normal" name="depth" />
+    </command>
+    
+    <!--command type="scenepass" pass="postalpha" sort="backtofront" /-->
+    
+    <!-- 现在没用先注释了-->
+		<!--postprocess name="PostProcess/Outline.xml"/-->
+		
+		<!-- <postprocess name="PostProcess/BloomHDR.xml"/>
+		<postprocess name="PostProcess/FXAA2.xml"/> -->
+    
+    <postprocess name="EngineRes/PostProcess/GamePostProcess.xml" />
+</renderpath>

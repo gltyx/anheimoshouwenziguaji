@@ -1,0 +1,39 @@
+{
+	"files": [
+		{
+			"name": "diff",
+			"type": 2
+		},
+		{
+			"name": "diffmask",
+			"type": 2
+		},
+		{
+			"name": "purecolor",
+			"type": 2
+		},
+		{
+			"name": "diffalphatranslucent",
+			"type": 2
+		},
+        {
+			// 材质默认 technique
+			"name": "notexture",
+			"type": 3
+        },
+		{
+			// DebugDrawActor
+			"name": "basicnotexturevcolunlitalpha",
+			"type": 1
+		},
+		{
+			// Text3D
+			"name": "textalphamap",
+			"type": 1
+		},
+		{
+			"name": "notextureoverlay",
+			"type": 1
+		}
+	]
+}

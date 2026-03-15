@@ -1,0 +1,3 @@
+<technique vs="UnlitParticle" ps="UnlitParticle" vsdefines="VERTEXCOLOR UE3SOFTPARTICLE" psdefines="DIFFMAP VERTEXCOLOR ADDITIVE UE3SOFTPARTICLE">
+    <pass name="alpha" depthwrite="false" blend="addalpha" />
+</technique>

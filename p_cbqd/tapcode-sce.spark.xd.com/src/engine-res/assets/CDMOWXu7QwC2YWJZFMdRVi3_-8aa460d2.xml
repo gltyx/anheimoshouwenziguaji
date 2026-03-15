@@ -1,0 +1,3 @@
+<technique vs="Transparent" ps="Transparent" vsdefines="VERTEXCOLOR" psdefines="VERTEXCOLOR">
+    <pass name="alpha" depthtest="false" depthwrite="false" blend="alpha" />
+</technique>

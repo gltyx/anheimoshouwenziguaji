@@ -1,0 +1,10 @@
+<renderpath>
+	<rendertarget name="CustomDepth" sizedivisor="1 1"  format="lineardepth"/>
+	
+	<command type="outline" color="1 0 0 0" depth="1.0" output="CustomDepth" vs="Outline" ps="Outline">
+		<parameter name="Color" value="0 1.0 0" />
+		<parameter name="Thickness" value="5.0" />
+		<texture unit="diffuse" name="viewport" />
+		<texture unit="normal" name="CustomDepth" />
+	</command>
+</renderpath>

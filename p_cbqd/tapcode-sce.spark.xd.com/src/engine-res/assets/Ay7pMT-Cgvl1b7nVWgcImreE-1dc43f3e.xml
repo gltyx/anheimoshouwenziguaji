@@ -1,0 +1,3 @@
+<technique vs="UnLitLightMap" ps="UnLitLightMap" psdefines="DIFFMAP ALPHAMASK">
+    <pass name="base" vsdefines="LIGHTMAP" psdefines="LIGHTMAP" />
+</technique>

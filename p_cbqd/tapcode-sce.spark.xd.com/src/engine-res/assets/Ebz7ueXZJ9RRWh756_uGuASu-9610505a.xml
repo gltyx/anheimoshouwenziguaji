@@ -1,0 +1,4 @@
+<technique vs="Translucent/Water" ps="Translucent/Water" vsdefines="TERRAIN_TILE" psdefines="DIFFMAP WORLD_UV WATER PBR METALLIC_WORKFLOW BAKE_REFRACTION" shadingmodel="bakewater">
+    <!-- alphatest == true是为了让水排序在半透物体之前 -->
+    <pass name="litalpha" depthwrite="write" psdefines="SPECMAP AMBIENT" alphatest="true" srgbsoftresolve="true" />
+</technique>

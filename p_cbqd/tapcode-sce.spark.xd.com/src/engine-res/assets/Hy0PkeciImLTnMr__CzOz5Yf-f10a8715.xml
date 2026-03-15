@@ -1,0 +1,8 @@
+<technique vs="TerrainBlend" ps="TerrainBlend">
+    <pass name="base" vsdefines="NORMALMAP AO" psdefines="NORMALMAP PACKEDNORMAL AMBIENT AO" srgbsoftresolve="true" />
+    <pass name="litbase" vsdefines="NORMALMAP AO" psdefines="NORMALMAP PACKEDNORMAL AMBIENT AO" srgbsoftresolve="true" />
+    <pass name="material" psdefines="MATERIAL" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" psdefines="DEFERRED" />
+    <pass name="depth" vs="Depth" ps="Depth" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

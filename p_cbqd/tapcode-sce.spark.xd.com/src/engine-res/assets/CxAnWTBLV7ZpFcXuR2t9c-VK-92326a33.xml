@@ -1,0 +1,3 @@
+<technique vs="IBL/vs_ibl_skybox" ps="IBL/fs_ibl_skybox">
+    <pass name="postopaque" depthwrite="false" />
+</technique>

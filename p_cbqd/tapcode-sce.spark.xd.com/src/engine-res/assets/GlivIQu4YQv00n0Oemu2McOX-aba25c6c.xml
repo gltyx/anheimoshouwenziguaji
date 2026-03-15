@@ -1,0 +1,36 @@
+<!-- ColorGrading Post Process Effect -->
+<!-- Place this AFTER Tonemapping and BEFORE GammaCorrection in your post-process chain -->
+<renderpath>
+    <command type="quad" tag="ColorGrading" vs="ColorGrading" ps="ColorGrading" output="viewport">
+        <texture unit="diffuse" name="viewport" />
+        <!-- LUT texture will be bound programmatically by ColorGrading component -->
+        <!-- <texture unit="volume" name="LUT/YourLUT.cube" /> -->
+
+        <!-- Default parameters (identity values - no effect) -->
+        <!-- Global: exposure, temperature, tint, lutIntensity -->
+        <parameter name="ColorGradingGlobal1" value="0.0 0.0 0.0 0.0" />
+        <!-- Global2: lutSize, lutBlendFactor, shadowsMax, highlightsMin -->
+        <parameter name="ColorGradingGlobal2" value="32.0 0.0 0.3 0.7" />
+
+        <!-- Global Range: saturation, contrast, gamma, gain -->
+        <parameter name="ColorGradingGlobalRange1" value="1.0 1.0 1.0 1.0" />
+        <!-- Global Range2: offset, tintIntensity, 0, 0 -->
+        <parameter name="ColorGradingGlobalRange2" value="0.0 0.0 0.0 0.0" />
+        <parameter name="ColorGradingGlobalTint" value="1.0 1.0 1.0 1.0" />
+
+        <!-- Shadows: saturation, contrast, gamma, gain -->
+        <parameter name="ColorGradingShadows1" value="1.0 1.0 1.0 1.0" />
+        <parameter name="ColorGradingShadows2" value="0.0 0.0 0.0 0.0" />
+        <parameter name="ColorGradingShadowsTint" value="1.0 1.0 1.0 1.0" />
+
+        <!-- Midtones: saturation, contrast, gamma, gain -->
+        <parameter name="ColorGradingMidtones1" value="1.0 1.0 1.0 1.0" />
+        <parameter name="ColorGradingMidtones2" value="0.0 0.0 0.0 0.0" />
+        <parameter name="ColorGradingMidtonesTint" value="1.0 1.0 1.0 1.0" />
+
+        <!-- Highlights: saturation, contrast, gamma, gain -->
+        <parameter name="ColorGradingHighlights1" value="1.0 1.0 1.0 1.0" />
+        <parameter name="ColorGradingHighlights2" value="0.0 0.0 0.0 0.0" />
+        <parameter name="ColorGradingHighlightsTint" value="1.0 1.0 1.0 1.0" />
+    </command>
+</renderpath>

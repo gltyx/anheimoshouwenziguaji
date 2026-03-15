@@ -1,0 +1,13 @@
+<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP">
+    <pass name="base" vsdefines="NORMALMAP ENVCUBEMAP" psdefines="NORMALMAP ENVCUBEMAP" srgbsoftresolve="true" />
+    <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP" depthtest="equal" depthwrite="false" blend="add" srgbsoftresolve="true" />
+    <pass name="prepass" vsdefines="NORMALMAP" psdefines="PREPASS NORMALMAP" />
+    <pass name="material" vsdefines="NORMALMAP ENVCUBEMAP" psdefines="MATERIAL NORMALMAP ENVCUBEMAP" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vsdefines="NORMALMAP ENVCUBEMAP" psdefines="DEFERRED NORMALMAP ENVCUBEMAP" />
+    <pass name="depth" vs="Depth" ps="Depth" psexcludes="PACKEDNORMAL" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" psexcludes="PACKEDNORMAL" />
+    <parameter name="MatDiffColor" value="0.6 0.6 0.6 1" />
+    <parameter name="MatSpecColor" value="0 0 0 1" />
+    <parameter name="MatEmissiveColor" value="0 0 0" />
+    <parameter name="MatEnvMapColor" value="1 1 1" />
+</technique>

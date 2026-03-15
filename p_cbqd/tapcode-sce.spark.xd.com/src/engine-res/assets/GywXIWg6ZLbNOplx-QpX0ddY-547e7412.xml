@@ -1,0 +1,5 @@
+<technique vs="UnlitParticle" ps="UnlitParticle" vsdefines="VERTEXCOLOR SOFTPARTICLES" psdefines="DIFFMAP VERTEXCOLOR SOFTPARTICLES EXPAND">
+    <pass name="alpha" depthwrite="false" depthtest="false" blend="alpha" srgbsoftresolve="true" />
+    <parameter name="MatDiffColor" value="0.6 0.6 0.6 1" />
+    <parameter name="SoftParticleFadeScale" value="0.5" />
+</technique>

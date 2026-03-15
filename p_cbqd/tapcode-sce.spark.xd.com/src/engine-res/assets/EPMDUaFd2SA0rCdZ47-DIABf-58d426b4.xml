@@ -1,0 +1,3 @@
+<technique>
+    <pass name="customDepth" vs="ShaderLab/InternalPass/Depth" ps="ShaderLab/InternalPass/Depth" />
+</technique>

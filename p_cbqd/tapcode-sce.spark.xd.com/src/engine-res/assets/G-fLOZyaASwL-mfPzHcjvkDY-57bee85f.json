@@ -1,0 +1,42 @@
+[
+    {
+        "FileName": "defaultlambert.xml",
+        "Name": "兰伯特",
+        "ImagePath": "editor/techniques/base_material.png"
+    },
+    {
+        "FileName": "particlelambert.xml",
+        "Name": "粒子兰伯特",
+        "ImagePath": "editor/techniques/base_material.png"
+    },
+    {
+        "FileName": "unlitstealth.xml",
+        "Name": "隐身",
+        "ImagePath": "editor/techniques/base_material.png"
+    },
+    {
+        "FileName": "defaultmetallicroughness.xml",
+        "Name": "PBR",
+        "ImagePath": "editor/techniques/base_material.png"
+    },
+    {
+        "FileName": "graylevelfive.xml",
+        "Name": "5种变色",
+        "ImagePath": "editor/techniques/base_material.png"
+    },
+    {
+        "FileName": "grayleveltwo.xml",
+        "Name": "2种变色",
+        "ImagePath": "editor/techniques/base_material.png"
+    },
+    {
+        "FileName": "hairsimulation.xml",
+        "Name": "头发",
+        "ImagePath": "editor/techniques/base_material.png"
+    },
+    {
+        "FileName": "staticobject.xml",
+        "Name": "变色",
+        "ImagePath": "editor/techniques/base_material.png"
+    }
+]

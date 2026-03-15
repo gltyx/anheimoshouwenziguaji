@@ -1,0 +1,40 @@
+{
+  "project_id": "p_cbqd",
+  "version": "1.0.8",
+  "author": {
+    "id": "1039494835"
+  },
+  "taptap_publish": {
+    "title": "暗黑魔兽文字挂机",
+    "description": "不好玩都不可能的游戏！根本停不下来",
+    "category": "rpg",
+    "screen_orientation": "portrait",
+    "collection_type": "sce",
+    "trial_note": "前期玩刺客，开荒更快，记得拿CDK助力开荒！",
+    "app_platforms": "1,2",
+    "app_id": 825938,
+    "miniapp_id": "tapmcqqc5rbmxogj2d",
+    "developer_id": 386796,
+    "icon": "https://package-pd.tapsce.cn/minigame/a87849d5a1405542f6d28bdf07cec25fe26e6775.png"
+  },
+  "assets": {
+    "icon": "./game_material/ICON_2026-03-08T20-19-45_01.png",
+    "screenshots": [
+      "./game_material/SCREENSHOT_2026-03-08T20-19-45_01.png",
+      "./game_material/SCREENSHOT_2026-03-08T20-19-45_02.png",
+      "./game_material/SCREENSHOT_2026-03-08T21-52-03_01.png"
+    ],
+    "promotional_image": "./game_material/PROMO_2026-03-08T20-19-45_01.png",
+    "icon_url": "https://tapcode-sce.spark.xd.com/assets/game_material/暗黑魔兽文字挂机/ICON_2026-03-08T20-19-45_01.png",
+    "promotional_image_url": "https://tapcode-sce.spark.xd.com/assets/game_material/p_cbqd/PROMO_2026-03-08T20-19-45_01.png",
+    "screenshot_urls": [
+      "https://tapcode-sce.spark.xd.com/assets/game_material/暗黑魔兽文字挂机/SCREENSHOT_2026-03-08T20-19-45_01.png",
+      "https://tapcode-sce.spark.xd.com/assets/game_material/暗黑魔兽文字挂机/SCREENSHOT_2026-03-08T20-19-45_02.png",
+      "https://tapcode-sce.spark.xd.com/assets/game_material/暗黑魔兽文字挂机/SCREENSHOT_2026-03-08T21-52-03_01.png"
+    ]
+  },
+  "test_qrcode": {
+    "url": "https://tapcode-sce.spark.xd.com/qrcode/p_cbqd_1773006025482.png",
+    "generated_at": "2026-03-08T21:40:25.614Z"
+  }
+}

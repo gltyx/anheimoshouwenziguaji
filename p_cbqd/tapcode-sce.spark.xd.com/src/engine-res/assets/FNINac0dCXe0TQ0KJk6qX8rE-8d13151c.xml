@@ -1,0 +1,15 @@
+<!-- 
+    从DiffLitLightMap.xml改的，注意用的shader
+    效果是(场景)本身不受光照影响，没有自投影，但是其它单位可以投影到他上面
+-->
+<technique vs="LitLightMap" ps="LitLightMap" vsdefines="" psdefines="DIFFMAP">
+    <pass name="base"/>
+    <pass name="litbase" vsdefines="" psdefines=""/>
+    <pass name="light" depthtest="equal" depthwrite="false" blend="add" />
+    <!--pass name="prepass" psdefines="PREPASS" />
+    <pass name="material" psdefines="MATERIAL" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" psdefines="DEFERRED" />
+    <pass name="depth" /-->
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+
+</technique>

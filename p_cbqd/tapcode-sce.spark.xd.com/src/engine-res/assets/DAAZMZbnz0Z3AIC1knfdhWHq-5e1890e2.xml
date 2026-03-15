@@ -1,0 +1,7 @@
+<technique vs="IBL/vs_ibl_mesh" ps="IBL/fs_ibl_mesh" vsdefines="NORMALMAP" psdefines="DIFFMAP NORMALMAP AOGLOSSMETALMAP">
+    <pass name="base" />
+    <pass name="light" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="material" psdefines="MATERIAL" depthtest="equal" depthwrite="false" />
+    <pass name="depth" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

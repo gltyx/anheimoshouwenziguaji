@@ -1,0 +1,11 @@
+<renderpath substitute="true">
+    <command type="clear" depth="1.0" stencil="0" />
+    <command type="quad" tag="Background" vs="CopyFramebufferScale" ps="CopyFramebufferScale">
+    	<texture unit="diffuse" name="tiles/MapTexture/AutoChess/map.png" />
+    	<parameter name="Scale" value="1.0" />
+    	<parameter name="UV" value="0 0 0.9375 0.52734375" />
+    </command>
+    <command type="scenepass" pass="base" vertexlights="true" metadata="base" psdefines=""/>
+    <command type="forwardlights" pass="light" psdefines=""/>
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" psdefines="CLOSESOFT" />
+</renderpath>

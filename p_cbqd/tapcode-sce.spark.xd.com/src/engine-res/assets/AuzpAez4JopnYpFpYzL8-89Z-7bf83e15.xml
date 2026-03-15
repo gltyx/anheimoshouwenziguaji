@@ -1,0 +1,370 @@
+<renderpath>
+    <!-- ==================== RenderTarget 定义 ==================== -->
+    <!-- 可读深度缓冲 (用于屏幕空间效果) -->
+    <rendertarget name="depth" sizedivisor="1 1" format="readabledepth" />
+
+    <rendertarget name="GBufferA" sizedivisor="1 1" format="rgba" />
+    <rendertarget name="GBufferB" sizedivisor="1 1" format="rgba" />
+    <rendertarget name="GBufferC" sizedivisor="1 1" format="rgba" />
+    <rendertarget name="GBufferD" sizedivisor="1 1" format="rgba" />
+
+    <!-- HiZ 独立生成 RT (用于降采样链) -->
+    <rendertarget name="ClosestHiZ_Mip0" sizedivisor="1 1" format="r32f" />
+    <rendertarget name="ClosestHiZ_Mip1" sizedivisor="2 2" format="r32f" />
+    <rendertarget name="ClosestHiZ_Mip2" sizedivisor="4 4" format="r32f" />
+    <rendertarget name="ClosestHiZ_Mip3" sizedivisor="8 8" format="r32f" />
+    <rendertarget name="ClosestHiZ_Mip4" sizedivisor="16 16" format="r32f" />
+    <rendertarget name="FarthestHiZ_Mip0" sizedivisor="1 1" format="r32f" />
+    <rendertarget name="FarthestHiZ_Mip1" sizedivisor="2 2" format="r32f" />
+    <rendertarget name="FarthestHiZ_Mip2" sizedivisor="4 4" format="r32f" />
+    <rendertarget name="FarthestHiZ_Mip3" sizedivisor="8 8" format="r32f" />
+    <rendertarget name="FarthestHiZ_Mip4" sizedivisor="16 16" format="r32f" />
+
+    <!-- HiZ 最终 mipmapped 纹理 (默认 point sampling; 需要 bilinear 的 pass 在 <texture> 标签加 filter="true") -->
+    <rendertarget name="ClosestHiZ" sizedivisor="1 1" format="r32f" miplevels="5" />
+    <rendertarget name="FarthestHiZ" sizedivisor="1 1" format="r32f" miplevels="5" />
+
+    <!-- SSAO (half resolution + bilateral upsample, matching UE4/UE5 default) -->
+    <rendertarget name="SSAOBuffer" sizedivisor="2 2" format="r8" />
+    <rendertarget name="SSAOBlurred" sizedivisor="2 2" format="r8" />
+    <rendertarget name="SSAOHistory" sizedivisor="2 2" format="r8" persistent="true" />
+    <rendertarget name="SSAOUpscaled" sizedivisor="1 1" format="r8" />
+
+    <!-- Split Lighting 输出 (用于反射层级系统) -->
+    <!-- SceneLighting = direct_all + IBL_diffuse + emissive -->
+    <!-- EnvSpecular = IBL_specular only (SSR fallback) -->
+    <rendertarget name="SceneLighting" sizedivisor="1 1" format="rgba16f" />
+    <rendertarget name="EnvSpecular" sizedivisor="1 1" format="rgba16f" />
+
+    <!-- Motion Vectors (RG16F: horizontal + vertical motion per pixel) -->
+    <rendertarget name="MotionVector" sizedivisor="1 1" format="rg16f" />
+
+    <!-- SSR (half resolution trace + temporal, bilateral upscale to full res) -->
+    <rendertarget name="SSRBuffer" sizedivisor="2 2" format="rgba16f" />
+    <rendertarget name="SSRFiltered" sizedivisor="2 2" format="rgba16f" />
+    <rendertarget name="SSRHistory" sizedivisor="2 2" format="rgba16f" persistent="true" />
+    <rendertarget name="SSRUpscaled" sizedivisor="1 1" format="rgba16f" />
+
+    <!-- Depth buffer copy (R32F, for passes that need depth sampling + depth test simultaneously) -->
+    <rendertarget name="depth_buffer" sizedivisor="1 1" format="r32f" />
+
+    <!-- TAA (Temporal Anti-Aliasing) -->
+    <!-- SceneColor: HDR scene before TAA (SSR composite + alpha passes render here) -->
+    <rendertarget name="SceneColor" sizedivisor="1 1" format="rgba16f" />
+    <!-- TAAHistory: previous frame's TAA resolved output -->
+    <rendertarget name="TAAHistory" sizedivisor="1 1" format="rgba16f" persistent="true" />
+
+    <!-- ==================== 1. Pre-Z Pass ==================== -->
+    <command type="clear" depth="1.0" stencil="0" depthstencil="depth" />
+    <command type="scenepass" pass="depth" jitter="true" depthstencil="depth" />
+
+    <!-- ==================== 2. GBuffer Pass ==================== -->
+    <command type="clear" color="0 0 0 0">
+        <output index="0" name="GBufferA" />
+        <output index="1" name="GBufferB" />
+        <output index="2" name="GBufferC" />
+        <output index="3" name="GBufferD" />
+    </command>
+    <command type="scenepass" pass="deferred" jitter="true" vertexlights="true" metadata="gbuffer" highPriorityDepthTest="equal" depthstencil="depth">
+        <output index="0" name="GBufferA" />
+        <output index="1" name="GBufferB" />
+        <output index="2" name="GBufferC" />
+        <output index="3" name="GBufferD" />
+    </command>
+	
+	<!-- 关闭自动适配深度模板，下面的RenderQuad都不需要深度模板 -->
+	<command type="gfx" autoGenDepthStencil="false" />
+
+    <!-- ==================== 3. HiZ Generation ==================== -->
+    <!-- 3.1 降采样链 (独立 RT，避免同纹理不同 mip 读写的 API 限制) -->
+    <!-- Mip 0: depth → 独立 RT -->
+    <command type="quad" tag="HiZ Init" vs="ScreenSpace/HiZ/HiZInit" ps="ScreenSpace/HiZ/HiZInit">
+        <texture unit="0" name="depth" />
+        <output index="0" name="ClosestHiZ_Mip0" />
+        <output index="1" name="FarthestHiZ_Mip0" />
+    </command>
+
+    <!-- Mip 0 → Mip 1 -->
+    <command type="quad" tag="HiZ Downsample" vs="ScreenSpace/HiZ/HiZDownsample" ps="ScreenSpace/HiZ/HiZDownsample">
+        <texture unit="0" name="ClosestHiZ_Mip0" />
+        <texture unit="1" name="FarthestHiZ_Mip0" />
+        <output index="0" name="ClosestHiZ_Mip1" />
+        <output index="1" name="FarthestHiZ_Mip1" />
+    </command>
+
+    <!-- Mip 1 → Mip 2 -->
+    <command type="quad" tag="HiZ Downsample" vs="ScreenSpace/HiZ/HiZDownsample" ps="ScreenSpace/HiZ/HiZDownsample">
+        <texture unit="0" name="ClosestHiZ_Mip1" />
+        <texture unit="1" name="FarthestHiZ_Mip1" />
+        <output index="0" name="ClosestHiZ_Mip2" />
+        <output index="1" name="FarthestHiZ_Mip2" />
+    </command>
+
+    <!-- Mip 2 → Mip 3 -->
+    <command type="quad" tag="HiZ Downsample" vs="ScreenSpace/HiZ/HiZDownsample" ps="ScreenSpace/HiZ/HiZDownsample">
+        <texture unit="0" name="ClosestHiZ_Mip2" />
+        <texture unit="1" name="FarthestHiZ_Mip2" />
+        <output index="0" name="ClosestHiZ_Mip3" />
+        <output index="1" name="FarthestHiZ_Mip3" />
+    </command>
+
+    <!-- Mip 3 → Mip 4 -->
+    <command type="quad" tag="HiZ Downsample" vs="ScreenSpace/HiZ/HiZDownsample" ps="ScreenSpace/HiZ/HiZDownsample">
+        <texture unit="0" name="ClosestHiZ_Mip3" />
+        <texture unit="1" name="FarthestHiZ_Mip3" />
+        <output index="0" name="ClosestHiZ_Mip4" />
+        <output index="1" name="FarthestHiZ_Mip4" />
+    </command>
+
+    <!-- 3.2 拷贝到 mipmapped 纹理 (供 SSAO/SSR 用 texture2DLod 采样) -->
+    <command type="quad" tag="HiZ Mip0" vs="ScreenSpace/HiZ/HiZCopy" ps="ScreenSpace/HiZ/HiZCopy">
+        <texture unit="0" name="ClosestHiZ_Mip0" />
+        <texture unit="1" name="FarthestHiZ_Mip0" />
+        <output index="0" name="ClosestHiZ" mip="0" />
+        <output index="1" name="FarthestHiZ" mip="0" />
+    </command>
+
+    <command type="quad" tag="HiZ Mip1" vs="ScreenSpace/HiZ/HiZCopy" ps="ScreenSpace/HiZ/HiZCopy">
+        <texture unit="0" name="ClosestHiZ_Mip1" />
+        <texture unit="1" name="FarthestHiZ_Mip1" />
+        <output index="0" name="ClosestHiZ" mip="1" />
+        <output index="1" name="FarthestHiZ" mip="1" />
+    </command>
+
+    <command type="quad" tag="HiZ Mip2" vs="ScreenSpace/HiZ/HiZCopy" ps="ScreenSpace/HiZ/HiZCopy">
+        <texture unit="0" name="ClosestHiZ_Mip2" />
+        <texture unit="1" name="FarthestHiZ_Mip2" />
+        <output index="0" name="ClosestHiZ" mip="2" />
+        <output index="1" name="FarthestHiZ" mip="2" />
+    </command>
+
+    <command type="quad" tag="HiZ Mip3" vs="ScreenSpace/HiZ/HiZCopy" ps="ScreenSpace/HiZ/HiZCopy">
+        <texture unit="0" name="ClosestHiZ_Mip3" />
+        <texture unit="1" name="FarthestHiZ_Mip3" />
+        <output index="0" name="ClosestHiZ" mip="3" />
+        <output index="1" name="FarthestHiZ" mip="3" />
+    </command>
+
+    <command type="quad" tag="HiZ Mip4" vs="ScreenSpace/HiZ/HiZCopy" ps="ScreenSpace/HiZ/HiZCopy">
+        <texture unit="0" name="ClosestHiZ_Mip4" />
+        <texture unit="1" name="FarthestHiZ_Mip4" />
+        <output index="0" name="ClosestHiZ" mip="4" />
+        <output index="1" name="FarthestHiZ" mip="4" />
+    </command>
+
+    <!-- ==================== 3.5. Motion Vector Generation ==================== -->
+    <!-- Moved before GTAO: temporal filter needs motion vectors. -->
+    <!-- Depth reprojection: current inverse ViewProj × previous ViewProj. -->
+    <command type="quad" tag="Motion Vector" vs="ScreenSpace/MotionVector/MotionVector" ps="ScreenSpace/MotionVector/MotionVector">
+        <texture unit="0" name="depth" />
+        <output index="0" name="MotionVector" />
+        <execution name="ApplyMotionVectorParameters" />
+    </command>
+
+    <!-- ==================== 4. SSAO (GTAO) ==================== -->
+    <command type="quad" tag="GTAO" jitter="true" vs="ScreenSpace/SSAO/GTAO" ps="ScreenSpace/SSAO/GTAO">
+        <texture unit="0" name="GBufferA" />
+        <texture unit="1" name="ClosestHiZ" />
+        <output index="0" name="SSAOBuffer" />
+        <parameter name="AORadius" value="0.5" />
+        <parameter name="AOIntensity" value="2.2" />
+        <parameter name="AOBias" value="0.0" />
+        <parameter name="FrameIndex" value="0" />
+        <execution name="ApplySSRTraceParameters" />
+    </command>
+
+    <!-- XeGTAO Denoise: spatial filter, disabled by default (temporal filter alone is sufficient, matches UE4/UE5) -->
+    <command type="quad" tag="GTAO Denoise 1" enabled="false" vs="ScreenSpace/SSAO/GTAODenoise" ps="ScreenSpace/SSAO/GTAODenoise">
+        <texture unit="0" name="SSAOBuffer" />
+        <texture unit="1" name="depth" />
+        <output index="0" name="SSAOBlurred" />
+        <parameter name="BlurParams" value="0.24 0.0 0.0 0.0" />
+    </command>
+    <command type="quad" tag="GTAO Denoise 2" enabled="false" vs="ScreenSpace/SSAO/GTAODenoise" ps="ScreenSpace/SSAO/GTAODenoise">
+        <texture unit="0" name="SSAOBlurred" />
+        <texture unit="1" name="depth" />
+        <output index="0" name="SSAOBuffer" />
+        <parameter name="BlurParams" value="1.2 0.0 0.0 0.0" />
+    </command>
+
+    <!-- GTAO Temporal Filter (half-res): accumulate AO across frames via motion vector reprojection -->
+    <command type="quad" tag="GTAO Temporal" vs="ScreenSpace/SSAO/GTAOTemporal" ps="ScreenSpace/SSAO/GTAOTemporal">
+        <texture unit="0" name="SSAOBuffer" />
+        <texture unit="1" name="SSAOHistory" filter="true" />
+        <texture unit="2" name="MotionVector" filter="true" />
+        <output index="0" name="SSAOBlurred" />
+        <parameter name="TemporalParams" value="0.1 0.0 0.0 0.0" />
+    </command>
+
+    <!-- Copy temporally filtered AO to history for next frame -->
+    <command type="quad" tag="GTAO Copy" vs="ScreenSpace/CopyTexture" ps="ScreenSpace/CopyTexture">
+        <texture unit="0" name="SSAOBlurred" />
+        <output index="0" name="SSAOHistory" />
+    </command>
+
+    <!-- Bilateral Upsample: half-res AO → full-res (depth-aware, no halo bleeding) -->
+    <command type="quad" tag="GTAO Upsample" vs="ScreenSpace/SSAO/GTAOBilateralUpscale" ps="ScreenSpace/SSAO/GTAOBilateralUpscale">
+        <texture unit="0" name="SSAOBlurred" />
+        <texture unit="1" name="depth" />
+        <output index="0" name="SSAOUpscaled" />
+    </command>
+
+	<!-- 绑定SSAOBuffer到引擎管线，这样shader采样的时候可以获取到 -->
+	<command type="gfx" bindSSAOBuffer="SSAOUpscaled" />
+
+    <!-- ==================== 5. Deferred Lighting (分离输出) ==================== -->
+    <!--
+        注意：lightvolumes 命令会自动覆盖 slot 5 绑定 IBL specular cubemap (TU_ENVSPECULAR)
+        Slot 4 在 Desktop 上不会被覆盖（只有 OpenGL ES 会）
+        AO 使用 slot 14 (TU_AOMAP) 避免冲突
+    -->
+    <command type="lightvolumes" jitter="true" vs="PBR/StandardPBRDeferred" ps="PBR/StandardPBRDeferred" psdefines="AMBIENT AO DEFERRED SPLIT_LIGHTING">
+        <texture unit="0" name="GBufferA" />
+        <texture unit="1" name="GBufferB" />
+        <texture unit="2" name="GBufferC" />
+        <texture unit="3" name="GBufferD" />
+        <texture unit="4" name="depth" />
+        <output index="0" name="SceneLighting" />
+        <output index="1" name="EnvSpecular" />
+    </command>
+
+    <!-- ==================== 6. SSR ==================== -->
+    <!-- SSR Trace: HiZ-accelerated with GGX importance sampling (disabled, pending HiZ fix) -->
+    <command type="quad" tag="SSR HiZ Trace" jitter="true" enabled="false" vs="ScreenSpace/SSR/SSRHiZTrace" ps="ScreenSpace/SSR/SSRHiZTrace">
+        <texture unit="0" name="depth" />
+        <texture unit="1" name="GBufferA" />
+        <texture unit="2" name="GBufferB" />
+        <texture unit="3" name="ClosestHiZ" />
+        <texture unit="5" name="SceneLighting" filter="true" />
+        <output index="0" name="SSRBuffer" />
+        <parameter name="MaxDistance" value="15.0" />
+        <parameter name="MaxSteps" value="64" />
+        <parameter name="Thickness" value="1.0" />
+        <parameter name="FrameIndex" value="0" />
+        <parameter name="ScreenSize" value="0 0" />
+        <execution name="ApplySSRTraceParameters" />
+    </command>
+
+    <!-- SSR Trace: Linear march -->
+    <command type="quad" tag="SSR Linear Trace" jitter="true" vs="ScreenSpace/SSR/SSRLinearTrace" ps="ScreenSpace/SSR/SSRLinearTrace">
+        <texture unit="0" name="depth" />
+        <texture unit="1" name="GBufferA" />
+        <texture unit="2" name="GBufferB" />
+        <texture unit="5" name="SceneLighting" filter="true" />
+        <output index="0" name="SSRBuffer" />
+        <parameter name="MaxDistance" value="15.0" />
+        <parameter name="MaxSteps" value="64" />
+        <parameter name="Thickness" value="1.0" />
+        <parameter name="FrameIndex" value="0" />
+        <execution name="ApplySSRTraceParameters" />
+    </command>
+
+    <!-- SSR Temporal Denoise (UE4 SSRTemporalAAPS): simple min/max clamp + lerp blend.
+         Denoises stochastic importance-sampled SSR. Main TAA handles edge AA separately. -->
+    <command type="quad" tag="SSR Temporal" vs="ScreenSpace/SSR/SSRTemporal" ps="ScreenSpace/SSR/SSRTemporal">
+        <texture unit="0" name="SSRBuffer" />
+        <texture unit="1" name="SSRHistory" filter="true" />
+        <texture unit="2" name="MotionVector" filter="true" />
+        <output index="0" name="SSRFiltered" />
+        <parameter name="TemporalBlend" value="0.125" />
+        <parameter name="JitterOffset" value="0 0" />
+        <parameter name="SSRTexelSize" value="0 0" />
+        <execution name="ApplySSRTemporalParameters" />
+    </command>
+
+    <!-- Copy denoised SSR to history for next frame -->
+    <command type="quad" tag="SSR Copy" vs="ScreenSpace/CopyTexture" ps="ScreenSpace/CopyTexture">
+        <texture unit="0" name="SSRFiltered" />
+        <output index="0" name="SSRHistory" />
+    </command>
+
+    <!-- Bilateral upscale: half-res SSR → full-res (depth + normal edge-aware) -->
+    <command type="quad" tag="SSR Upscale" vs="ScreenSpace/SSR/SSRBilateralUpscale" ps="ScreenSpace/SSR/SSRBilateralUpscale">
+        <texture unit="0" name="SSRFiltered" />
+        <texture unit="1" name="depth" />
+        <texture unit="2" name="GBufferA" />
+        <output index="0" name="SSRUpscaled" />
+    </command>
+
+    <!-- Reflection Composite: upscaled SSR + IBL fallback → SceneColor -->
+    <command type="quad" tag="SSR Composite" vs="ScreenSpace/SSR/SSRComposite" ps="ScreenSpace/SSR/SSRComposite">
+        <texture unit="0" name="SceneLighting" />
+        <texture unit="1" name="EnvSpecular" />
+        <texture unit="2" name="SSRUpscaled" />
+        <output index="0" name="SceneColor" />
+        <parameter name="SSRIntensity" value="1.0" />
+    </command>
+	
+	<!-- 恢复自动适配深度模板 -->
+	<command type="gfx" autoGenDepthStencil="true" />
+
+    <!-- ==================== 7. Alpha Pass (→ SceneColor, TAA 之前) ==================== -->
+    <command type="scenepass" pass="postopaque" jitter="true" depthstencil="depth">
+        <output index="0" name="SceneColor" />
+    </command>
+    <command type="scenepass" pass="alpha" jitter="true" vertexlights="true" sort="backtofront" metadata="alpha" depthstencil="depth">
+        <output index="0" name="SceneColor" />
+    </command>
+    <command type="scenepass" pass="postalpha" jitter="true" sort="backtofront" depthstencil="depth">
+        <output index="0" name="SceneColor" />
+    </command>
+
+    <!-- Copy depth to R32F (resolve read-write hazard: depth as depthstencil + texture sampling) -->
+    <command type="quad" tag="CopyDepth" vs="ScreenSpace/CopyTexture" ps="ScreenSpace/CopyTexture" disableDepthStencilRT="true">
+        <texture unit="0" name="depth" />
+        <output index="0" name="depth_buffer" />
+    </command>
+
+    <!-- single layer water (scene effect, benefits from TAA) -->
+    <command type="scenepass" pass="singlelayerwater" jitter="true" psdefines="SSR_WATER" depthstencil="depth">
+		<texture unit="3" name="depth_buffer" />
+        <output index="0" name="SceneColor" />
+        <parameter name="SSRWaterIntensity" value="1.0" />
+    </command>
+
+    <!-- volumetric light (scene effect, benefits from TAA) -->
+    <command type="volumetriclight" jitter="true" vs="Volumetric/VolumetricLight" ps="Volumetric/VolumetricLight" vsdefines="BILLBOARD" psdefines="" blend="addalpha" depthstencil="depth">
+        <texture unit="diffuse" name="depth_buffer" />
+        <output index="0" name="SceneColor" />
+    </command>
+
+	<command type="gfx" autoGenDepthStencil="false" />
+	
+    <!-- ==================== 8. TAA (Temporal Anti-Aliasing) ==================== -->
+    <!-- TAA Resolve: accumulate jittered frames into anti-aliased result.
+         Camera projection jitter is applied by C++ View::Render() each frame. -->
+    <command type="quad" tag="TAA Resolve" vs="ScreenSpace/TAA/TAAResolve" ps="ScreenSpace/TAA/TAAResolve">
+        <texture unit="0" name="SceneColor" />
+        <texture unit="1" name="TAAHistory" filter="true" />
+        <texture unit="2" name="MotionVector" />
+        <texture unit="3" name="depth" />
+        <output index="0" name="viewport" />
+        <parameter name="TAABlendFactor" value="0.04" />
+        <execution name="ApplyTAAResolveParameters" />
+    </command>
+
+    <!-- Copy TAA result to history for next frame -->
+    <command type="quad" tag="TAA Copy" vs="ScreenSpace/CopyTexture" ps="ScreenSpace/CopyTexture">
+        <texture unit="0" name="viewport" />
+        <output index="0" name="TAAHistory" />
+    </command>
+	
+	<command type="gfx" autoGenDepthStencil="true" />
+
+    <!-- ==================== 9. Special Effects (after TAA, editor overlays) ==================== -->
+    <!-- highlight -->
+    <command type="scenepass" pass="outsurface" renderMask="7" depthstencil="depth" />
+
+    <!-- innerstroke -->
+    <command type="scenepass" pass="innerstroke" renderMask="7" depthstencil="depth">
+        <parameter name="StrokeWidth" value="2" />
+    </command>
+
+    <!-- outstroke -->
+    <command type="scenepass" pass="outstroke" renderMask="7" depthstencil="depth">
+        <parameter name="StrokeWidth" value="7" />
+    </command>
+
+    <!-- ==================== 10. Post Process ==================== -->
+    <postprocess type="postprocess" name="EngineRes/PostProcess/GamePostProcess.xml" />
+</renderpath>

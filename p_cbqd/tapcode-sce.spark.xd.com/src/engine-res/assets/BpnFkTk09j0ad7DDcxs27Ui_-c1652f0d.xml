@@ -1,0 +1,3 @@
+<technique vs="Transparent" ps="Transparent" psdefines="DIFFMAP ALPHAMASK">
+    <pass name="alpha" psdefines="EMISSIVEMAP" depthwrite="true" blend="alpha" />
+</technique>

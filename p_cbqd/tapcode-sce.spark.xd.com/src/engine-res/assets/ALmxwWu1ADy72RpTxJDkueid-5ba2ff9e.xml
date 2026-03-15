@@ -1,0 +1,3 @@
+<technique vs="Unlit" ps="Unlit" psdefines="DIFFMAP DISAPPEAR">
+    <pass name="alpha" depthwrite="false" depthtest="true" blend="alpha" />
+</technique>

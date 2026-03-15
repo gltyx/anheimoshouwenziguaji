@@ -1,0 +1,134 @@
+{
+    "Startup Failed": {
+        "zh_CN": "启动失败"
+    },
+    "Warning": {
+        "zh_CN": "提示"
+    },
+    "Loading Failed": {
+        "zh_CN": "加载失败"
+    },
+    "OK": {
+        "zh_CN": "确定"
+    },
+    "Retry": {
+        "zh_CN": "重试"
+    },
+    "Exit": {
+        "zh_CN": "退出"
+    },
+    "Preparing direct connection...": {
+        "zh_CN": "准备直连..."
+    },
+    "Connecting to server...": {
+        "zh_CN": "连接服务器..."
+    },
+    "Connected!": {
+        "zh_CN": "已连接!"
+    },
+    "Retrying connection...": {
+        "zh_CN": "正在重试连接..."
+    },
+    "Initializing...": {
+        "zh_CN": "正在初始化..."
+    },
+    "Verifying account...": {
+        "zh_CN": "正在验证账号..."
+    },
+    "Connection lost, reconnecting...": {
+        "zh_CN": "连接断开，正在重连..."
+    },
+    "Connection failed, retrying...": {
+        "zh_CN": "连接失败，正在重试..."
+    },
+    "Login successful!": {
+        "zh_CN": "登录成功!"
+    },
+    "Refreshing login...": {
+        "zh_CN": "正在刷新登录..."
+    },
+    "Please scan QR code...": {
+        "zh_CN": "请扫描二维码..."
+    },
+    "Authenticating...": {
+        "zh_CN": "正在认证..."
+    },
+    "Waiting for login...": {
+        "zh_CN": "等待登录..."
+    },
+    "Checking version...": {
+        "zh_CN": "检查版本..."
+    },
+    "Loading resources...": {
+        "zh_CN": "加载资源..."
+    },
+    "Login verification...": {
+        "zh_CN": "登录验证..."
+    },
+    "Ready...": {
+        "zh_CN": "准备就绪..."
+    },
+    "Parsing version...": {
+        "zh_CN": "正在解析版本..."
+    },
+    "Loading manifest...": {
+        "zh_CN": "正在加载清单..."
+    },
+    "Parsing manifest...": {
+        "zh_CN": "正在解析清单..."
+    },
+    "Initializing resource system...": {
+        "zh_CN": "正在初始化资源系统..."
+    },
+    "Creating resource router...": {
+        "zh_CN": "正在创建资源路由..."
+    },
+    "Adding cache directory...": {
+        "zh_CN": "正在添加缓存目录..."
+    },
+    "Downloading project.json...": {
+        "zh_CN": "正在下载项目信息..."
+    },
+    "Checking project info...": {
+        "zh_CN": "正在检查项目信息..."
+    },
+    "Fetching minigame data...": {
+        "zh_CN": "正在获取游戏数据..."
+    },
+    "Preparing package download...": {
+        "zh_CN": "正在准备下载..."
+    },
+    "Downloading": {
+        "zh_CN": "正在下载"
+    },
+    "Extracting": {
+        "zh_CN": "正在解压"
+    },
+    "Checking resources...": {
+        "zh_CN": "正在检查资源..."
+    },
+    "Calculating project size...": {
+        "zh_CN": "正在计算项目大小..."
+    },
+    "Calculating size": {
+        "zh_CN": "正在计算大小"
+    },
+    "Cleaning up...": {
+        "zh_CN": "正在清理..."
+    },
+    "Cleaning": {
+        "zh_CN": "正在清理"
+    },
+    "Loading": {
+        "zh_CN": "正在加载"
+    },
+    "Ready": {
+        "zh_CN": "准备就绪"
+    },
+    "Completed": {
+        "zh_CN": "完成"
+    },
+    "Your account has logged in elsewhere.\nThis session will exit.": {
+        "zh_CN": "您的账号已在其他地方登录。\n当前会话将退出。"
+    }
+}

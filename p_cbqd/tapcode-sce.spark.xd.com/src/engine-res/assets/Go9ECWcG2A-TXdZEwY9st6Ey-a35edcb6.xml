@@ -1,0 +1,3 @@
+<technique vs="HDR/vs_hdr_skybox" ps="HDR/fs_hdr_skybox">
+    <pass name="postopaque" depthwrite="false" />
+</technique>

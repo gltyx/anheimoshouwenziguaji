@@ -1,0 +1,7 @@
+<renderpath>
+    <command type="quad" tag="ACESApprox" vs="Tonemap" ps="Tonemap" psdefines="ACES_APPROX" output="viewport">
+        <parameter name="TonemapExposureBias" value="1.0" />
+        <parameter name="TonemapMaxWhite" value="4.0" />
+        <texture unit="diffuse" name="viewport" />
+    </command>
+</renderpath>

@@ -1,0 +1,3 @@
+<technique vs="BLOOM/vs_albedo_output" ps="BLOOM/fs_albedo_output">
+    <pass name="base" />
+</technique>

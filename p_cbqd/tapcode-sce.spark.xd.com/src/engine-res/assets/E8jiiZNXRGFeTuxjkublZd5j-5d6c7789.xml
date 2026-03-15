@@ -1,0 +1,58 @@
+<renderpath>
+    <!-- 定义一些必要的rendertarget -->
+    <rendertarget name="fbtexture" tag="fbtexture" sizedivisor="1 1" format="rgba16f" filter="true" />
+
+    <rendertarget name="Luminance0" tag="Downscale luminance 0" size="128 128" format="r16f" filter="true" />
+    <rendertarget name="Luminance1" tag="Downscale luminance 1" size="  64 64" format="r16f" filter="true" />
+    <rendertarget name="Luminance2" tag="Downscale luminance 2" size="  16 16" format="r16f" filter="true" />
+    <rendertarget name="Luminance3" tag="Downscale luminance 3" size="    4 4" format="r16f" filter="true" />
+    <rendertarget name="Luminance4" tag="Downscale luminance 4" size="    1 1" format="r16f" filter="true" />
+
+    <rendertarget name="Brightness" tag="Brightness" sizedivisor="2 2" format="rgba" filter="true" />
+    <rendertarget name="Blur" tag="Blur" sizedivisor="8 8" format="rgba" filter="true" />
+  
+    <command type="clear" color="fog" depth="1.0" stencil="0" output="fbtexture" />
+
+    <!-- 处理模型的HDR -->
+    <command type="scenepass" pass="base" vsdefines="HDR" psdefines="HDR" output="fbtexture" />
+    <command type="forwardlights" pass="light" vsdefines="HDR" psdefines="HDR" output="fbtexture" />
+    <!-- 处理SkyBox的HDR -->
+    <command type="scenepass" pass="postopaque" vsdefines="HDR" psdefines="HDR" output="fbtexture" />
+
+    <!-- Luminace -->
+    <command type="quad" tag="luminance" vs="HDR/vs_hdr_lum" ps="HDR/fs_hdr_lum" workflow="true" output="Luminance0">
+        <texture unit="0" name="fbtexture" />
+    </command>
+    <command type="quad" tag="luminance0" vs="HDR/vs_hdr_lumavg" ps="HDR/fs_hdr_lumavg" workflow="true" output="Luminance1">
+        <texture unit="0" name="Luminance0" />
+    </command>
+    <command type="quad" tag="luminance1" vs="HDR/vs_hdr_lumavg" ps="HDR/fs_hdr_lumavg" workflow="true" output="Luminance2">
+        <texture unit="0" name="Luminance1" />
+    </command>
+    <command type="quad" tag="luminance2" vs="HDR/vs_hdr_lumavg" ps="HDR/fs_hdr_lumavg" workflow="true" output="Luminance3">
+        <texture unit="0" name="Luminance2" />
+    </command>
+    <command type="quad" tag="luminance3" vs="HDR/vs_hdr_lumavg" ps="HDR/fs_hdr_lumavg" workflow="true" output="Luminance4">
+        <texture unit="0" name="Luminance3" />
+    </command>
+
+    <!-- Brightness -->
+    <command type="quad" tag="brightness" vs="HDR/vs_hdr_bright" ps="HDR/fs_hdr_bright" workflow="true" output="Brightness">
+        <texture unit="0" name="fbtexture" />
+        <texture unit="1" name="Luminance4" />
+        <parameter name="tonemap" value="0.18 1.21 1.5 0" />
+    </command>
+
+    <!-- 模糊Brightness -->
+    <command type="quad" tag="blur vertical brightness" vs="HDR/vs_hdr_blur" ps="HDR/fs_hdr_blur" output="Blur">
+        <texture unit="0" name="Brightness" />
+    </command>
+
+    <!-- Blur horizontal + tonemap -->
+    <command type="quad" tag="blur horizontal + tonemap" vs="HDR/vs_hdr_tonemap" ps="HDR/fs_hdr_tonemap">
+        <texture unit="0" name="fbtexture" />
+        <texture unit="1" name="Luminance4" />
+        <texture unit="2" name="Blur" />
+        <parameter name="tonemap" value="0.18 1.21 1.5 0" />
+    </command>
+</renderpath>

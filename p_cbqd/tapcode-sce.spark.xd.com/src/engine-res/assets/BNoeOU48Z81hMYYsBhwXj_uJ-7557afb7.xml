@@ -1,0 +1,38 @@
+<renderpath>
+    <!-- DOF 景深 -->
+    <postprocess name="EngineRes/PostProcess/DOF.xml">
+        <condition name="IsPostProcessEnabled" type="Bool" value="true" />
+        <condition name="IsDOFEnabled" type="Bool" value="true" />
+        <execution name="ApplyDOFParameters" />
+    </postprocess>
+    <!-- FXAA -->
+    <postprocess name="EngineRes/PostProcess/FXAA2.xml">
+        <condition name="IsPostProcessEnabled" type="Bool" value="true" />
+        <condition name="IsPostProcessFXAA" type="Bool" value="true" />
+    </postprocess>
+    <!-- 优化版本BloomHDR -->
+    <postprocess name="EngineRes/PostProcess/GameBloomHDR.xml">
+        <condition name="IsPostProcessEnabled" type="Bool" value="true" />
+        <condition name="IsPostProcessBloomEnabled" type="Bool" value="true" />
+        <condition name="IsPostProcessBloomPlusEnabled" type="Bool" value="false" />
+        <execution name="ApplyBloomHDRParameters" />
+    </postprocess>
+    <!-- 高质量版本BloomHDR -->
+    <postprocess name="EngineRes/PostProcess/GameBloomHDRPlus.xml">
+        <condition name="IsPostProcessEnabled" type="Bool" value="true" />
+        <condition name="IsPostProcessBloomEnabled" type="Bool" value="true" />
+        <condition name="IsPostProcessBloomPlusEnabled" type="Bool" value="true" />
+        <execution name="ApplyBloomHDRParameters" />
+    </postprocess>
+    <!-- ColorGrading 调色 -->
+    <postprocess name="EngineRes/PostProcess/ColorGrading.xml">
+        <condition name="IsPostProcessEnabled" type="Bool" value="true" />
+        <condition name="IsColorGradingEnabled" type="Bool" value="true" />
+        <execution name="ApplyColorGradingParameters" />
+    </postprocess>
+    <!-- 高斯模拟 -->
+    <postprocess name="EngineRes/PostProcess/GuassianBlur.xml">
+        <condition name="IsPostProcessEnabled" type="Bool" value="true" />
+        <condition name="IsPostProcessGaussianBlurEnabled" type="Bool" value="true" />
+    </postprocess>
+</renderpath>

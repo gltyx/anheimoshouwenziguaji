@@ -1,0 +1,3 @@
+<technique vs="UnlitGrass" ps="UnlitGrass" psdefines="DIFFMAP">
+    <pass name="alpha" depthwrite="true" dethtext="true" blend="alpha" />
+</technique>

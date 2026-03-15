@@ -1,0 +1,7 @@
+<technique vs="Mobile/vs_dirlight_and_ib_mesh" ps="Mobile/fs_dirlight_and_ibl_mesh" vsdefines="NORMALMAP" psdefines="DIFFMAP NORMALMAP AOGLOSSMETALMAP">
+	<pass name="base" />
+	<pass name="litbase" psdefines="IBL"/>
+	<pass name="light" depthtest="equal" depthwrite="false" blend="add" />
+	<pass name="depth" />
+	<pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>
