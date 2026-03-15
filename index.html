@@ -218,13 +218,15 @@
                 min-height: 100dvh;
                 transform: none;
                 overflow-y: auto;
+                padding-bottom: 20px;
             }
             .top-bar { 
-                padding: 8px 12px; 
+                padding: 6px 8px; 
                 flex-shrink: 0;
+                height: auto;
             } 
             .top-bar-left { 
-                gap: 8px; 
+                gap: 6px; 
                 overflow-x: auto;
                 white-space: nowrap;
                 scrollbar-width: none;
@@ -233,142 +235,52 @@
                 display: none;
             }
             .resource-item { 
-                font-size: 11px; 
-                padding: 4px 8px;
+                font-size: 10px; 
+                padding: 3px 6px;
+                border-radius: 12px;
             } 
             .resource-icon { 
-                font-size: 14px; 
+                font-size: 12px; 
             } 
             .game-container { 
                 grid-template-columns: 1fr;
-                padding: 8px; 
-                gap: 8px; 
-                min-height: calc(100dvh - 50px);
+                padding: 6px; 
+                gap: 6px; 
+                min-height: calc(100dvh - 40px);
                 overflow-y: auto;
             } 
             .player-status, .combat-area, .right-panel { 
-                padding: 10px; 
-                gap: 8px; 
+                padding: 8px; 
+                gap: 6px; 
                 max-height: none;
                 min-height: 250px;
+                overflow-y: auto;
             } 
+            .combat-area {
+                overflow: visible;
+            }
             h2 { 
-                font-size: 13px; 
+                font-size: 12px; 
+                margin-bottom: 4px;
             } 
             .status-value { 
-                padding: 4px; 
+                padding: 3px;
             } 
             .status-label { 
-                font-size: 9px; 
+                font-size: 8px; 
             } 
             .status-number { 
-                font-size: 11px; 
-            } 
-            .action-button { 
-                padding: 6px; 
                 font-size: 10px; 
-            } 
-            .mob-icon { 
-                font-size: 32px; 
-                margin-bottom: 8px; 
-            } 
-            .mob-name { 
-                font-size: 16px; 
-                margin-bottom: 10px; 
-            } 
-            .mob-stats { 
-                gap: 6px; 
-            } 
-            .stat-card { 
-                padding: 6px; 
-            } 
-            .stat-card-label { 
-                font-size: 9px; 
-            } 
-            .stat-card-value { 
-                font-size: 12px; 
-            } 
-            .combat-button { 
-                padding: 8px; 
-                font-size: 11px; 
-            } 
-            .combat-log { 
-                max-height: 120px; 
-                font-size: 9px; 
-            } 
-            .zone-item { 
-                padding: 6px; 
-            } 
-            .zone-name { 
-                font-size: 11px; 
-            } 
-            .zone-level { 
-                font-size: 9px; 
-            } 
-            .setting-button { 
-                padding: 6px; 
-                font-size: 10px; 
-            } 
-            .modal-content { 
-                padding: 12px; 
-                max-height: 95dvh; 
-                width: 98%;
-                margin-top: 20px;
-            } 
-            .modal-title { 
-                font-size: 15px; 
-            } 
-            .modal-body { 
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-                gap: 8px; 
-            } 
-            .item-card { 
-                padding: 12px; 
-                min-height: 100px; 
-            } 
-            .item-name { 
-                font-size: 14px; 
-            } 
-            .item-quality { 
-                font-size: 11px; 
-                padding: 2px 6px; 
-            } 
-            .item-details, .item-stats { 
-                font-size: 11px; 
-            } 
-        }
-        
-        @media (max-width: 480px) {
-            .top-bar-left { 
-                gap: 6px; 
-            } 
-            .resource-item { 
-                font-size: 10px; 
-                padding: 3px 6px;
-            } 
-            .resource-icon { 
-                font-size: 12px; 
-            } 
-            .game-container { 
-                padding: 6px; 
-                gap: 6px; 
-            } 
-            .player-status, .combat-area, .right-panel { 
-                padding: 8px; 
-                gap: 6px; 
-            } 
-            h2 { 
-                font-size: 12px; 
-            } 
-            .action-buttons { 
-                gap: 4px; 
             } 
             .action-button { 
                 padding: 5px; 
                 font-size: 9px; 
             } 
+            .mob-info {
+                padding: 8px;
+            }
             .mob-icon { 
-                font-size: 28px; 
+                font-size: 24px; 
                 margin-bottom: 6px; 
             } 
             .mob-name { 
@@ -376,60 +288,176 @@
                 margin-bottom: 8px; 
             } 
             .mob-stats { 
-                grid-template-columns: repeat(2, 1fr); 
+                gap: 4px;
+                grid-template-columns: repeat(3, 1fr);
             } 
             .stat-card { 
                 padding: 4px;
+                min-height: 50px;
             } 
             .stat-card-label { 
-                font-size: 8px;
+                font-size: 8px; 
             } 
             .stat-card-value { 
-                font-size: 10px;
+                font-size: 10px; 
+            } 
+            .combat-button { 
+                padding: 6px; 
+                font-size: 10px; 
             } 
             .combat-log { 
                 max-height: 100px; 
-                font-size: 8px;
-            } 
-            .zone-item { 
+                font-size: 8px; 
                 padding: 6px;
             } 
+            .zone-item { 
+                padding: 5px; 
+            } 
             .zone-name { 
-                font-size: 11px;
+                font-size: 10px; 
             } 
             .zone-level { 
-                font-size: 9px;
+                font-size: 8px; 
             } 
             .setting-button { 
                 padding: 5px; 
-                font-size: 9px;
+                font-size: 9px; 
             } 
             .modal-content { 
                 padding: 10px; 
-                max-height: 95dvh;
-                width: 99%;
+                max-height: 95dvh; 
+                width: 98%;
                 margin-top: 15px;
             } 
             .modal-title { 
-                font-size: 14px;
+                font-size: 14px; 
             } 
             .modal-body { 
-                grid-template-columns: 1fr; 
-                gap: 6px;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+                gap: 6px; 
             } 
             .item-card { 
                 padding: 10px; 
-                min-height: 90px;
+                min-height: 90px; 
             } 
             .item-name { 
-                font-size: 13px;
+                font-size: 13px; 
             } 
             .item-quality { 
                 font-size: 10px; 
-                padding: 1px 4px;
+                padding: 1px 4px; 
             } 
             .item-details, .item-stats { 
-                font-size: 10px;
+                font-size: 10px; 
+            } 
+        }
+        
+        @media (max-width: 480px) {
+            .top-bar-left { 
+                gap: 4px; 
+            } 
+            .resource-item { 
+                font-size: 9px; 
+                padding: 2px 4px;
+                border-radius: 10px;
+            } 
+            .resource-icon { 
+                font-size: 10px; 
+            } 
+            .game-container { 
+                padding: 4px; 
+                gap: 4px; 
+                min-height: calc(100dvh - 30px);
+            } 
+            .player-status, .combat-area, .right-panel { 
+                padding: 6px; 
+                gap: 4px; 
+                min-height: 180px;
+            } 
+            h2 { 
+                font-size: 11px; 
+                margin-bottom: 3px;
+            } 
+            .action-buttons { 
+                gap: 3px; 
+            } 
+            .action-button { 
+                padding: 4px; 
+                font-size: 8px; 
+            } 
+            .mob-info {
+                padding: 6px;
+            }
+            .mob-icon { 
+                font-size: 20px; 
+                margin-bottom: 4px; 
+            } 
+            .mob-name { 
+                font-size: 12px; 
+                margin-bottom: 6px; 
+            } 
+            .mob-stats { 
+                grid-template-columns: repeat(3, 1fr); 
+                gap: 3px;
+            } 
+            .stat-card { 
+                padding: 3px;
+                min-height: 40px;
+            } 
+            .stat-card-label { 
+                font-size: 7px;
+            } 
+            .stat-card-value { 
+                font-size: 9px;
+            } 
+            .combat-button { 
+                padding: 5px; 
+                font-size: 9px; 
+            } 
+            .combat-log { 
+                max-height: 80px; 
+                font-size: 7px;
+                padding: 4px;
+            } 
+            .zone-item { 
+                padding: 4px;
+            } 
+            .zone-name { 
+                font-size: 9px;
+            } 
+            .zone-level { 
+                font-size: 7px;
+            } 
+            .setting-button { 
+                padding: 4px; 
+                font-size: 8px;
+            } 
+            .modal-content { 
+                padding: 8px; 
+                max-height: 95dvh;
+                width: 99%;
+                margin-top: 10px;
+            } 
+            .modal-title { 
+                font-size: 13px;
+            } 
+            .modal-body { 
+                grid-template-columns: 1fr; 
+                gap: 4px;
+            } 
+            .item-card { 
+                padding: 8px; 
+                min-height: 80px;
+            } 
+            .item-name { 
+                font-size: 12px;
+            } 
+            .item-quality { 
+                font-size: 9px; 
+                padding: 1px 3px;
+            } 
+            .item-details, .item-stats { 
+                font-size: 9px;
             } 
         }
     </style>
@@ -490,7 +518,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本1.01</div>
+                    <div class="panel-title">📊 角色属性 版本1.02</div>
                     <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                 </div>
                 <div class="quick-stats">
@@ -862,7 +890,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.0.1",
+            GAME_VERSION: "1.02",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
