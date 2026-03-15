@@ -16,6 +16,8 @@
                 transform-origin: top left;
                 width: 100vw;
                 height: calc(100vw * 1334 / 750);
+                max-height: 100dvh;
+                overflow-y: auto;
             }
         }
         .top-bar { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffd700; box-shadow: 0 4px 12px rgba(0,0,0,0.3); position: relative; z-index: 100; }
@@ -215,144 +217,55 @@
         @media (max-width: 768px) {
             .game-canvas {
                 width: 100vw;
-                height: 100vh;
+                height: 100dvh;
                 transform: none;
+                overflow-y: auto;
             }
             .top-bar { 
                 padding: 8px 12px; 
+                flex-shrink: 0;
             } 
             .top-bar-left { 
-                gap: 10px; 
+                gap: 8px; 
                 overflow-x: auto;
                 white-space: nowrap;
+                scrollbar-width: none;
             } 
+            .top-bar-left::-webkit-scrollbar { 
+                display: none;
+            }
             .resource-item { 
-                font-size: 12px; 
+                font-size: 11px; 
+                padding: 4px 8px;
             } 
             .resource-icon { 
-                font-size: 16px; 
+                font-size: 14px; 
             } 
             .game-container { 
-                padding: 10px; 
-                gap: 10px; 
-                height: calc(100vh - 60px);
+                padding: 8px; 
+                gap: 8px; 
+                height: calc(100dvh - 50px);
                 overflow-y: auto;
             } 
             .player-status, .combat-area, .right-panel { 
-                padding: 12px; 
-                gap: 10px; 
+                padding: 10px; 
+                gap: 8px; 
                 max-height: none;
-            } 
-            h2 { 
-                font-size: 14px; 
-            } 
-            .status-value { 
-                padding: 6px; 
-            } 
-            .status-label { 
-                font-size: 10px; 
-            } 
-            .status-number { 
-                font-size: 12px; 
-            } 
-            .action-button { 
-                padding: 8px; 
-                font-size: 11px; 
-            } 
-            .mob-icon { 
-                font-size: 40px; 
-                margin-bottom: 10px; 
-            } 
-            .mob-name { 
-                font-size: 18px; 
-                margin-bottom: 15px; 
-            } 
-            .mob-stats { 
-                gap: 8px; 
-            } 
-            .stat-card { 
-                padding: 8px; 
-            } 
-            .stat-card-label { 
-                font-size: 10px; 
-            } 
-            .stat-card-value { 
-                font-size: 14px; 
-            } 
-            .combat-button { 
-                padding: 10px; 
-                font-size: 12px; 
-            } 
-            .combat-log { 
-                max-height: 150px; 
-                font-size: 10px; 
-            } 
-            .zone-item { 
-                padding: 8px; 
-            } 
-            .zone-name { 
-                font-size: 12px; 
-            } 
-            .zone-level { 
-                font-size: 10px; 
-            } 
-            .setting-button { 
-                padding: 8px; 
-                font-size: 11px; 
-            } 
-            .modal-content { 
-                padding: 15px; 
-                max-height: 90vh; 
-            } 
-            .modal-title { 
-                font-size: 16px; 
-            } 
-            .modal-body { 
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-                gap: 10px; 
-            } 
-            .item-card { 
-                padding: 15px; 
-                min-height: 120px; 
-            } 
-            .item-name { 
-                font-size: 16px; 
-            } 
-            .item-quality { 
-                font-size: 12px; 
-                padding: 3px 8px; 
-            } 
-            .item-details, .item-stats { 
-                font-size: 12px; 
-            } 
-        }
-        
-        @media (max-width: 480px) {
-            .top-bar-left { 
-                gap: 8px; 
-            } 
-            .resource-item { 
-                font-size: 11px; 
-            } 
-            .resource-icon { 
-                font-size: 14px; 
-            } 
-            .game-container { 
-                padding: 8px; 
-                gap: 8px; 
-            } 
-            .player-status, .combat-area, .right-panel { 
-                padding: 10px; 
-                gap: 8px; 
             } 
             h2 { 
                 font-size: 13px; 
             } 
-            .action-buttons { 
-                gap: 6px; 
+            .status-value { 
+                padding: 4px; 
+            } 
+            .status-label { 
+                font-size: 9px; 
+            } 
+            .status-number { 
+                font-size: 11px; 
             } 
             .action-button { 
-                padding: 7px; 
+                padding: 6px; 
                 font-size: 10px; 
             } 
             .mob-icon { 
@@ -361,13 +274,164 @@
             } 
             .mob-name { 
                 font-size: 16px; 
-                margin-bottom: 12px; 
+                margin-bottom: 10px; 
+            } 
+            .mob-stats { 
+                gap: 6px; 
+            } 
+            .stat-card { 
+                padding: 6px; 
+            } 
+            .stat-card-label { 
+                font-size: 9px; 
+            } 
+            .stat-card-value { 
+                font-size: 12px; 
+            } 
+            .combat-button { 
+                padding: 8px; 
+                font-size: 11px; 
+            } 
+            .combat-log { 
+                max-height: 120px; 
+                font-size: 9px; 
+            } 
+            .zone-item { 
+                padding: 6px; 
+            } 
+            .zone-name { 
+                font-size: 11px; 
+            } 
+            .zone-level { 
+                font-size: 9px; 
+            } 
+            .setting-button { 
+                padding: 6px; 
+                font-size: 10px; 
+            } 
+            .modal-content { 
+                padding: 12px; 
+                max-height: 95dvh; 
+                width: 98%;
+                margin-top: 20px;
+            } 
+            .modal-title { 
+                font-size: 15px; 
+            } 
+            .modal-body { 
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+                gap: 8px; 
+            } 
+            .item-card { 
+                padding: 12px; 
+                min-height: 100px; 
+            } 
+            .item-name { 
+                font-size: 14px; 
+            } 
+            .item-quality { 
+                font-size: 11px; 
+                padding: 2px 6px; 
+            } 
+            .item-details, .item-stats { 
+                font-size: 11px; 
+            } 
+        }
+        
+        @media (max-width: 480px) {
+            .top-bar-left { 
+                gap: 6px; 
+            } 
+            .resource-item { 
+                font-size: 10px; 
+                padding: 3px 6px;
+            } 
+            .resource-icon { 
+                font-size: 12px; 
+            } 
+            .game-container { 
+                padding: 6px; 
+                gap: 6px; 
+            } 
+            .player-status, .combat-area, .right-panel { 
+                padding: 8px; 
+                gap: 6px; 
+            } 
+            h2 { 
+                font-size: 12px; 
+            } 
+            .action-buttons { 
+                gap: 4px; 
+            } 
+            .action-button { 
+                padding: 5px; 
+                font-size: 9px; 
+            } 
+            .mob-icon { 
+                font-size: 28px; 
+                margin-bottom: 6px; 
+            } 
+            .mob-name { 
+                font-size: 14px; 
+                margin-bottom: 8px; 
             } 
             .mob-stats { 
                 grid-template-columns: repeat(2, 1fr); 
             } 
             .stat-card { 
-                padding: 6px; } .stat-card-label { font-size: 9px; } .stat-card-value { font-size: 12px; } .combat-log { max-height: 120px; font-size: 10px; } .zone-item { padding: 8px; } .zone-name { font-size: 12px; } .zone-level { font-size: 10px; } .setting-button { padding: 8px; font-size: 11px; } .modal-content { padding: 15px; max-height: 90vh; } .modal-title { font-size: 16px; } .modal-body { grid-template-columns: 1fr; gap: 8px; } .item-card { padding: 12px; min-height: 100px; } .item-name { font-size: 14px; } .item-quality { font-size: 11px; padding: 2px 6px; } .item-details, .item-stats { font-size: 11px; } }
+                padding: 4px;
+            } 
+            .stat-card-label { 
+                font-size: 8px;
+            } 
+            .stat-card-value { 
+                font-size: 10px;
+            } 
+            .combat-log { 
+                max-height: 100px; 
+                font-size: 8px;
+            } 
+            .zone-item { 
+                padding: 6px;
+            } 
+            .zone-name { 
+                font-size: 11px;
+            } 
+            .zone-level { 
+                font-size: 9px;
+            } 
+            .setting-button { 
+                padding: 5px; 
+                font-size: 9px;
+            } 
+            .modal-content { 
+                padding: 10px; 
+                max-height: 95dvh;
+                width: 99%;
+                margin-top: 15px;
+            } 
+            .modal-title { 
+                font-size: 14px;
+            } 
+            .modal-body { 
+                grid-template-columns: 1fr; 
+                gap: 6px;
+            } 
+            .item-card { 
+                padding: 10px; 
+                min-height: 90px;
+            } 
+            .item-name { 
+                font-size: 13px;
+            } 
+            .item-quality { 
+                font-size: 10px; 
+                padding: 1px 4px;
+            } 
+            .item-details, .item-stats { 
+                font-size: 10px;
+            } 
+        }
     </style>
 </head>
 <body>
@@ -749,14 +813,15 @@
                     <div style="margin-bottom: 15px;">
                         <div>最多装备 4个技能，自动按CD释放</div>
                         <div>技能有5个品质：灰/绿/蓝/紫/橙，伤害倍率 1.0x ~ 1.6x</div>
-                        <div>技能可强化至 +15，每级+10%伤害</div>
-                        <div>各职业专属技能 + 通用技能池，例如法师有"灭天火（700%）"，战士有"裂天斩（600%）"</div>
+                        <div>技能可强化至 +15，每级+5%伤害</div>
+                        <div>各职业专属技能 + 通用技能池，例如法师有灭天火，战士有裂天斩！</div>
                     </div>
                     
                     <h4 style="color: #ffd700; margin: 15px 0 10px 0;">装备系统（核心玩法）</h4>
                     <div style="margin-bottom: 15px;">
                         <div>6个槽位：武器、头盔、铠甲、靴子、戒指、项链</div>
-                        <div>12种品质：灰→绿→蓝→紫→橙→红→黄金→铂金→钻石→暗金→神话→至尊（后续待定）</div>
+                        <div>12种品质：灰→绿→蓝→紫→橙→红→黄金→铂金→钻石→暗金→神话→至尊→至臻</div>
+                        <div>！！！黄金以上精英副本和奇遇产出 终极装备地狱副本和奇遇BOSS产出！！</div>
                         <div>9种词缀：攻速、暴击、爆伤、抗暴、抗爆、吸血、穿透、经验加成、金币加成（后续待定）</div>
                         <div>装备强化：最高+15，失败装备消失（可用保护卷）</div>
                         <div>孔位镶嵌：天然1~4孔，可花钻石开孔，最高5孔</div>
@@ -1647,7 +1712,7 @@
                 
                 // 计算额外属性
                 const tier = Math.floor((eliteLevel - 25) / 10);
-                const attributeMultiplier = Math.pow(1.2, tier);
+                const attributeMultiplier = Math.pow(1.5, tier);
                 extraCrit = Math.floor(70 * attributeMultiplier);
                 extraAntiCrit = Math.floor(70 * attributeMultiplier);
                 extraCritDmg = Math.floor(500 * attributeMultiplier);
@@ -1673,7 +1738,7 @@
                 
                 // 计算额外属性（与对应精英副本相同）
                 const tier = Math.floor((eliteLevel - 25) / 10);
-                const attributeMultiplier = Math.pow(1.2, tier);
+                const attributeMultiplier = Math.pow(1.5, tier);
                 extraCrit = Math.floor(70 * attributeMultiplier);
                 extraAntiCrit = Math.floor(70 * attributeMultiplier);
                 extraCritDmg = Math.floor(500 * attributeMultiplier);
