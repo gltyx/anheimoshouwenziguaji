@@ -265,12 +265,29 @@
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
             } 
-            .player-status, .combat-area, .right-panel { 
+            .player-status { 
                 padding: 8px; 
                 gap: 6px; 
                 max-height: none;
+                min-height: 350px;
+                touch-action: manipulation;
+                order: 1;
+            } 
+            .combat-area { 
+                padding: 8px; 
+                gap: 6px; 
+                max-height: 200px;
+                min-height: 150px;
+                touch-action: manipulation;
+                order: 2;
+            } 
+            .right-panel { 
+                padding: 8px; 
+                gap: 6px; 
+                max-height: 250px;
                 min-height: 200px;
                 touch-action: manipulation;
+                order: 3;
             } 
             .combat-area {
                 overflow: visible;
@@ -503,11 +520,28 @@
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
             } 
-            .player-status, .combat-area, .right-panel { 
+            .player-status { 
                 padding: 5px; 
                 gap: 3px; 
+                min-height: 300px;
+                touch-action: manipulation;
+                order: 1;
+            } 
+            .combat-area { 
+                padding: 5px; 
+                gap: 3px; 
+                max-height: 180px;
+                min-height: 120px;
+                touch-action: manipulation;
+                order: 2;
+            } 
+            .right-panel { 
+                padding: 5px; 
+                gap: 3px; 
+                max-height: 200px;
                 min-height: 150px;
                 touch-action: manipulation;
+                order: 3;
             } 
             h2 { 
                 font-size: 10px; 
