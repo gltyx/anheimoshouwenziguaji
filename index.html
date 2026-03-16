@@ -35,26 +35,17 @@
         .resource-icon { font-size: 18px; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
         .resource-value { color: #ffd700; font-weight: bold; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
         .game-container { display: flex; flex-direction: column; gap: 10px; padding: 10px 10px 40px 10px; min-height: calc(100vh - 100px); overflow-y: auto; }
-        @media (min-width: 1200px) {
-            .game-container { 
-                display: grid;
-                grid-template-columns: 1fr 1fr 1fr; 
-                height: calc(100vh - 60px); 
-                padding: 10px;
-                overflow: hidden;
-            } 
-            
-            .right-panel {
-                height: calc(100vh - 80px);
-                overflow-y: auto;
+        @media (min-width: 768px) {
+            .game-container {
+                padding: 20px;
             }
             
-            .zone-list {
-                height: calc(100% - 40px);
-                overflow-y: auto;
+            .player-status {
+                max-width: 1200px;
+                margin: 0 auto;
             }
         }
-        .player-status, .right-panel { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; transform: translateZ(0); will-change: transform; }
+        .player-status { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); overflow-y: auto; -webkit-overflow-scrolling: touch; transform: translateZ(0); will-change: transform; }
         .combat-area { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex: 1; transform: translateZ(0); will-change: transform; } 
         .combat-area.minimized { min-height: 60px; }
         
@@ -157,7 +148,7 @@
         .setting-button:hover::before { left: 100%; }
         .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background-color: #2a2d38; border-radius: 10px; padding: 20px; width: 95%; max-width: 900px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; align-self: flex-start; margin-top: 50px; }
+        .modal-content { background-color: #2a2d38; border-radius: 10px; padding: 20px; width: 95%; max-width: 900px; max-height: 95vh; display: flex; flex-direction: column; overflow: hidden; align-self: center; margin-top: 0; }
         .panel-tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 2px solid #3a3d48; padding-bottom: 5px; }
         .panel-tab { padding: 8px 16px; border: none; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 12px; font-weight: bold; background-color: #3a3d48; color: #ccc; transition: all 0.3s ease; }
         .panel-tab:hover { background-color: #4a4d58; }
@@ -820,7 +811,8 @@
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <h2>👤 玩家状态</h2>
                     <button class="action-button button-blue" id="cdk" onclick="gameData.gameState.showFloatingText = false; document.getElementById('cdk-modal').classList.add('active');" style="padding: 4px 8px; font-size: 10px;">🎁 兑换</button>
-                    <button class="action-button button-yellow" id="toggle-combat-panel" style="padding: 4px 8px; font-size: 10px;" onclick="toggleCombatPanel();">📦 简化</button>
+                    <button class="action-button button-yellow" id="toggle-combat-panel" style="padding: 4px 8px; font-size: 10px;" onclick="toggleCombatPanel();">⚔️ 战斗区域</button>
+                    <button class="action-button button-green" id="toggle-combat-view" style="padding: 4px 8px; font-size: 10px;" onclick="toggleCombatView();">🎮 战斗画面</button>
                 </div>
                 <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
                     <div class="player-id-display">
@@ -884,67 +876,6 @@
                 <button class="action-button button-green" id="daily">📅 日常</button>
 
             </div>
-        </div>
-        <div class="combat-area">
-            <div class="mob-info">
-                <div class="mob-icon" id="mob-icon">🟢</div>
-                <div class="mob-name" id="mob-name">史莱姆</div>
-                <div class="mob-stats">
-                    <div class="stat-card"><div class="stat-card-label">生命</div><div class="stat-card-value" id="mob-hp">60/60</div></div>
-                    <div class="stat-card"><div class="stat-card-label">攻击</div><div class="stat-card-value" id="mob-atk">10</div></div>
-                    <div class="stat-card"><div class="stat-card-label">防御</div><div class="stat-card-value" id="mob-def">5</div></div>
-                    <div class="stat-card"><div class="stat-card-label">暴击</div><div class="stat-card-value" id="mob-crit">0%</div></div>
-                    <div class="stat-card"><div class="stat-card-label">抗暴击</div><div class="stat-card-value" id="mob-antiCrit">0%</div></div>
-                    <div class="stat-card"><div class="stat-card-label">暴击伤害</div><div class="stat-card-value" id="mob-critDmg">0%</div></div>
-                </div>
-
-            </div>
-            <div class="combat-log" id="combat-log">
-                <div class="log-entry info">📜 战斗日志</div>
-            </div>
-            <div class="combat-header">
-                <h2>⚔️ 战斗区域</h2>
-            </div>
-
-
-        </div>
-        <div class="right-panel">
-            <!-- 桌面端区域选择 -->
-            <div class="desktop-zone-select">
-                <div class="panel-tabs">
-                    <button class="panel-tab active" data-tab="zone">🌍 挂机区域</button>
-                    <button class="panel-tab" data-tab="elite">⚔️ 精英副本</button>
-                    <button class="panel-tab" data-tab="hell">🔥 地狱副本</button>
-                </div>
-                <div class="panel-content">
-                    <div class="panel-tab-content active" id="zone-tab">
-                        <div class="zone-list" id="zone-list"></div>
-                    </div>
-                    <div class="panel-tab-content" id="elite-tab">
-                        <div class="zone-list" id="elite-zone-list"></div>
-                    </div>
-                    <div class="panel-tab-content" id="hell-tab">
-                        <div class="zone-list" id="hell-zone-list"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 手机端区域选择按钮 -->
-            <div class="mobile-zone-buttons">
-                <div style="position: relative; z-index: 2000;">
-                    <button class="action-button button-green" id="mobile-zone-btn">🌍 挂机区域</button>
-                    <div id="zone-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 2000; max-height: 300px; overflow-y: auto;"></div>
-                </div>
-                <div style="position: relative; z-index: 2000;">
-                    <button class="action-button button-yellow" id="mobile-elite-btn">⚔️ 精英副本</button>
-                    <div id="elite-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 2000; max-height: 300px; overflow-y: auto;"></div>
-                </div>
-                <div style="position: relative; z-index: 2000;">
-                    <button class="action-button button-red" id="mobile-hell-btn">🔥 地狱副本</button>
-                    <div id="hell-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 2000; max-height: 300px; overflow-y: auto;"></div>
-                </div>
-            </div>
-
         </div>
         </div>
 
@@ -1276,7 +1207,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.07",
+            GAME_VERSION: "1.13",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1794,16 +1725,26 @@
                 hellTicketsElement.textContent = gameData.player.hellTickets;
             }
             document.getElementById('gameId').textContent = gameData.player.gameId;
-            document.getElementById('mob-hp').textContent = gameData.currentMob.hp + '/' + gameData.currentMob.maxHp;
-            document.getElementById('mob-atk').textContent = gameData.currentMob.atk;
-            document.getElementById('mob-def').textContent = gameData.currentMob.def;
-            document.getElementById('mob-icon').textContent = gameData.currentMob.icon;
-            document.getElementById('mob-name').textContent = gameData.currentMob.name;
-            document.getElementById('mob-crit').textContent = (gameData.currentMob.crit || 0) + '%';
-            document.getElementById('mob-antiCrit').textContent = (gameData.currentMob.antiCrit || 0) + '%';
-            document.getElementById('mob-critDmg').textContent = (gameData.currentMob.critDmg || 0) + '%';
-            document.getElementById('stat-lifesteal').textContent = gameData.player.lifesteal.toFixed(1) + '%';
-            document.getElementById('stat-penetration').textContent = gameData.player.penetration.toFixed(1) + '%';
+            const mobHpElement = document.getElementById('mob-hp');
+            if (mobHpElement) mobHpElement.textContent = gameData.currentMob.hp + '/' + gameData.currentMob.maxHp;
+            const mobAtkElement = document.getElementById('mob-atk');
+            if (mobAtkElement) mobAtkElement.textContent = gameData.currentMob.atk;
+            const mobDefElement = document.getElementById('mob-def');
+            if (mobDefElement) mobDefElement.textContent = gameData.currentMob.def;
+            const mobIconElement = document.getElementById('mob-icon');
+            if (mobIconElement) mobIconElement.textContent = gameData.currentMob.icon;
+            const mobNameElement = document.getElementById('mob-name');
+            if (mobNameElement) mobNameElement.textContent = gameData.currentMob.name;
+            const mobCritElement = document.getElementById('mob-crit');
+            if (mobCritElement) mobCritElement.textContent = (gameData.currentMob.crit || 0) + '%';
+            const mobAntiCritElement = document.getElementById('mob-antiCrit');
+            if (mobAntiCritElement) mobAntiCritElement.textContent = (gameData.currentMob.antiCrit || 0) + '%';
+            const mobCritDmgElement = document.getElementById('mob-critDmg');
+            if (mobCritDmgElement) mobCritDmgElement.textContent = (gameData.currentMob.critDmg || 0) + '%';
+            const statLifestealElement = document.getElementById('stat-lifesteal');
+            if (statLifestealElement) statLifestealElement.textContent = gameData.player.lifesteal.toFixed(1) + '%';
+            const statPenetrationElement = document.getElementById('stat-penetration');
+            if (statPenetrationElement) statPenetrationElement.textContent = gameData.player.penetration.toFixed(1) + '%';
             
             // 计算当前爆率、VIP加成和称号加成
             let dropRate = 0;
@@ -1817,12 +1758,15 @@
             // 显示包含VIP加成的经验和金币加成
             const totalExpBonus = gameData.player.expBonus + vipBonus.expBonus;
             const totalGoldBonus = gameData.player.goldBonus + vipBonus.goldBonus;
-            document.getElementById('stat-expBonus').textContent = totalExpBonus.toFixed(1) + '%';
-            document.getElementById('stat-goldBonus').textContent = totalGoldBonus.toFixed(1) + '%';
+            const statExpBonusElement = document.getElementById('stat-expBonus');
+            if (statExpBonusElement) statExpBonusElement.textContent = totalExpBonus.toFixed(1) + '%';
+            const statGoldBonusElement = document.getElementById('stat-goldBonus');
+            if (statGoldBonusElement) statGoldBonusElement.textContent = totalGoldBonus.toFixed(1) + '%';
             if (gameData.player.potions && gameData.player.potions.dropPotion && gameData.player.potions.dropPotion.active) {
                 dropRate += 30; // 爆率药水30%
             }
-            document.getElementById('stat-dropRate').textContent = dropRate.toFixed(1) + '%';
+            const statDropRateElement = document.getElementById('stat-dropRate');
+            if (statDropRateElement) statDropRateElement.textContent = dropRate.toFixed(1) + '%';
 
             renderEquipSlots();
             renderEquippedSkills();
@@ -1857,49 +1801,214 @@
         }
         
         function toggleCombatPanel() {
-            const combatArea = document.querySelector('.combat-area');
-            const toggleButton = document.getElementById('toggle-combat-panel');
-            const playerStatus = document.querySelector('.player-status');
-            const gameContainer = document.querySelector('.game-container');
+            // 显示战斗区域选择弹窗
+            const modal = document.getElementById('zone-select-modal');
+            const title = document.getElementById('zone-select-title');
+            const body = document.getElementById('zone-select-body');
             
-            if (!combatArea) return;
+            title.textContent = '⚔️ 战斗区域选择';
+            body.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button class="action-button button-green" onclick="showZoneSelection('zone');" style="padding: 15px; font-size: 14px;">🌍 挂机区域</button>
+                    <button class="action-button button-yellow" onclick="showZoneSelection('elite');" style="padding: 15px; font-size: 14px;">⚔️ 精英副本</button>
+                    <button class="action-button button-red" onclick="showZoneSelection('hell');" style="padding: 15px; font-size: 14px;">🔥 地狱副本</button>
+                </div>
+            `;
             
-            // 检查当前状态
-            const isHidden = combatArea.style.display === 'none';
+            modal.classList.add('active');
+        }
+        
+        function toggleCombatView() {
+            // 显示战斗实时画面弹窗
+            const modal = document.getElementById('zone-select-modal');
+            const title = document.getElementById('zone-select-title');
+            const body = document.getElementById('zone-select-body');
             
-            if (isHidden) {
-                // 恢复正常状态
-                combatArea.style.display = 'flex';
-                if (toggleButton) toggleButton.textContent = '📦 简化';
-                // 恢复飘血功能
-                gameData.gameState.showFloatingText = true;
-                // 恢复角色属性面板的原始样式
-                if (playerStatus) {
-                    playerStatus.style.flex = '0 0 auto';
-                    playerStatus.style.minHeight = '550px';
-                }
-                // 恢复游戏容器布局
-                if (gameContainer) {
-                    gameContainer.style.minHeight = 'calc(100dvh - 40px)';
-                }
-            } else {
-                // 隐藏战斗区域
-                combatArea.style.display = 'none';
-                if (toggleButton) toggleButton.textContent = '📋 展开';
-                // 暂停飘血功能
-                gameData.gameState.showFloatingText = false;
-                // 确保角色属性面板下方的按钮可见
-                if (playerStatus) {
-                    playerStatus.style.flex = '1 1 auto';
-                    playerStatus.style.minHeight = 'auto';
-                    playerStatus.style.maxHeight = 'none';
-                }
-                // 调整游戏容器布局，确保所有内容可见
-                if (gameContainer) {
-                    gameContainer.style.minHeight = 'calc(100dvh - 40px)';
-                    gameContainer.style.overflowY = 'auto';
-                }
+            title.textContent = '🎮 战斗画面';
+            // 设置body样式，确保铺满弹窗
+            body.style.display = 'flex';
+            body.style.flexDirection = 'column';
+            body.style.height = '100%';
+            body.style.width = '100%';
+            body.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 10px; height: 100%; width: 100%;">
+                    <div class="mob-info" style="flex-shrink: 0; width: 100%;">
+                        <div class="mob-icon" id="combat-mob-icon">${gameData.currentMob.icon}</div>
+                        <div class="mob-name" id="combat-mob-name">${gameData.currentMob.name}</div>
+                        <div class="mob-stats" style="width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                            <div class="stat-card"><div class="stat-card-label">生命</div><div class="stat-card-value" id="combat-mob-hp">${gameData.currentMob.hp}/${gameData.currentMob.maxHp}</div></div>
+                            <div class="stat-card"><div class="stat-card-label">攻击</div><div class="stat-card-value" id="combat-mob-atk">${gameData.currentMob.atk}</div></div>
+                            <div class="stat-card"><div class="stat-card-label">防御</div><div class="stat-card-value" id="combat-mob-def">${gameData.currentMob.def}</div></div>
+                            <div class="stat-card"><div class="stat-card-label">暴击</div><div class="stat-card-value" id="combat-mob-crit">${gameData.currentMob.crit || 0}%</div></div>
+                            <div class="stat-card"><div class="stat-card-label">抗暴击</div><div class="stat-card-value" id="combat-mob-antiCrit">${gameData.currentMob.antiCrit || 0}%</div></div>
+                            <div class="stat-card"><div class="stat-card-label">暴击伤害</div><div class="stat-card-value" id="combat-mob-critDmg">${gameData.currentMob.critDmg || 0}%</div></div>
+                        </div>
+                    </div>
+                    <div class="combat-log" id="combat-log-view" style="flex: 1; overflow-y: auto; width: 100%;">
+                        <div class="log-entry info">📜 战斗日志</div>
+                    </div>
+                </div>
+            `;
+            
+            // 从游戏数据中获取战斗日志
+            const newLog = document.getElementById('combat-log-view');
+            if (newLog) {
+                // 保留第一条日志（标题），添加游戏数据中的日志
+                gameData.combatLog.forEach(logItem => {
+                    const entry = document.createElement('div');
+                    entry.className = 'log-entry ' + logItem.type;
+                    entry.textContent = logItem.text;
+                    newLog.appendChild(entry);
+                });
             }
+            
+            modal.classList.add('active');
+            
+            // 定时更新战斗画面
+            const updateInterval = setInterval(() => {
+                // 更新怪物信息
+                const combatMobIcon = document.getElementById('combat-mob-icon');
+                const combatMobName = document.getElementById('combat-mob-name');
+                const combatMobHp = document.getElementById('combat-mob-hp');
+                const combatMobAtk = document.getElementById('combat-mob-atk');
+                const combatMobDef = document.getElementById('combat-mob-def');
+                const combatMobCrit = document.getElementById('combat-mob-crit');
+                const combatMobAntiCrit = document.getElementById('combat-mob-antiCrit');
+                const combatMobCritDmg = document.getElementById('combat-mob-critDmg');
+                
+                if (combatMobIcon) combatMobIcon.textContent = gameData.currentMob.icon;
+                if (combatMobName) combatMobName.textContent = gameData.currentMob.name;
+                if (combatMobHp) combatMobHp.textContent = `${gameData.currentMob.hp}/${gameData.currentMob.maxHp}`;
+                if (combatMobAtk) combatMobAtk.textContent = gameData.currentMob.atk;
+                if (combatMobDef) combatMobDef.textContent = gameData.currentMob.def;
+                if (combatMobCrit) combatMobCrit.textContent = `${gameData.currentMob.crit || 0}%`;
+                if (combatMobAntiCrit) combatMobAntiCrit.textContent = `${gameData.currentMob.antiCrit || 0}%`;
+                if (combatMobCritDmg) combatMobCritDmg.textContent = `${gameData.currentMob.critDmg || 0}%`;
+                
+                // 更新战斗日志
+                const newLog = document.getElementById('combat-log-view');
+                if (newLog) {
+                    // 保留第一条日志（标题），更新其余日志
+                    const newEntries = newLog.querySelectorAll('.log-entry:not(:first-child)');
+                    
+                    // 移除旧日志
+                    newEntries.forEach(entry => entry.remove());
+                    
+                    // 添加新日志
+                    gameData.combatLog.forEach(logItem => {
+                        const entry = document.createElement('div');
+                        entry.className = 'log-entry ' + logItem.type;
+                        entry.textContent = logItem.text;
+                        newLog.appendChild(entry);
+                    });
+                    
+                    // 滚动到底部
+                    newLog.scrollTop = newLog.scrollHeight;
+                }
+            }, 1000);
+            
+            // 当弹窗关闭时清除定时器
+            const closeButton = document.getElementById('close-zone-select');
+            if (closeButton) {
+                const originalOnclick = closeButton.onclick;
+                closeButton.onclick = function() {
+                    clearInterval(updateInterval);
+                    if (originalOnclick) originalOnclick();
+                    modal.classList.remove('active');
+                };
+            }
+        }
+        
+        function showZoneSelection(type) {
+            const modal = document.getElementById('zone-select-modal');
+            const title = document.getElementById('zone-select-title');
+            const body = document.getElementById('zone-select-body');
+            
+            if (type === 'zone') {
+                title.textContent = '🌍 选择挂机区域';
+                const zoneList = document.createElement('div');
+                zoneList.className = 'zone-list';
+                renderZoneList(zoneList);
+                body.innerHTML = '';
+                body.appendChild(zoneList);
+            } else if (type === 'elite') {
+                title.textContent = '⚔️ 选择精英副本';
+                const eliteList = document.createElement('div');
+                eliteList.className = 'zone-list';
+                renderEliteZoneList(eliteList);
+                body.innerHTML = '';
+                body.appendChild(eliteList);
+            } else if (type === 'hell') {
+                title.textContent = '🔥 选择地狱副本';
+                const hellList = document.createElement('div');
+                hellList.className = 'zone-list';
+                renderHellZoneList(hellList);
+                body.innerHTML = '';
+                body.appendChild(hellList);
+            }
+        }
+        
+        function renderHellZoneList(container) {
+            container.innerHTML = '';
+            
+            // 生成地狱副本区域，从45级开始，每10级一个
+            const hellLevels = [45, 55, 65, 75, 85, 95];
+            
+            hellLevels.forEach(hellLevel => {
+                const div = document.createElement('div');
+                div.className = 'zone-item';
+                
+                // 找到对应等级的区域
+                let zoneIdx = Math.floor((hellLevel - 1) / 5);
+                zoneIdx = Math.min(zoneIdx, CONFIG.ZONES.length - 1);
+                const zone = CONFIG.ZONES[zoneIdx];
+                
+                div.innerHTML = `
+                    <div class="zone-name">${hellLevel}级地狱副本</div>
+                    <div class="zone-level">区域: ${zone.name}</div>
+                    <div class="zone-icons">每次击杀消耗: 1张地狱门票</div>
+                `;
+                
+                div.onclick = () => {
+                    // 检查等级
+                    if (gameData.player.level < hellLevel) {
+                        addCombatLog(`等级不足! 需要${hellLevel}级才能挑战`, 'danger');
+                        return;
+                    }
+                    
+                    // 检查门票
+                    if (gameData.player.hellTickets < 1) {
+                        addCombatLog(`地狱门票不足! 需要1张`, 'danger');
+                        return;
+                    }
+                    
+                    // 确认进入
+                    if (confirm(`🔥 地狱副本预览
+
+地狱等级: ${hellLevel}
+区域名称: ${zone.name}
+每次击杀消耗: 1张地狱门票
+当前拥有: ${gameData.player.hellTickets}张
+
+地狱副本掉落: 高概率掉落黄金以上品质装备
+
+是否进入地狱副本?`)) {
+                        // 更新当前区域为对应等级的区域
+                        gameData.gameState.currentZone = zoneIdx + 1;
+                        gameData.gameState.inElite = false;
+                        gameData.gameState.inHell = true;
+                        gameData.gameState.eliteCount = 0;
+                        gameData.gameState.selectedHellLevel = hellLevel; // 存储选择的地狱副本等级
+                        generateNewMob();
+                        addCombatLog(`进入${hellLevel}级地狱副本!`, 'warning');
+                        updateUI();
+                        // 关闭弹窗
+                        document.getElementById('zone-select-modal').classList.remove('active');
+                    }
+                };
+                
+                container.appendChild(div);
+            });
         }
         
 
@@ -2046,11 +2155,24 @@
 
         function addCombatLog(text, type) {
             type = type || 'info';
+            
+            // 更新游戏数据中的战斗日志
+            gameData.combatLog.unshift({ text, type, timestamp: Date.now() });
+            if (gameData.combatLog.length > 30) {
+                gameData.combatLog.pop();
+            }
+            
+            // 更新DOM中的战斗日志（如果存在）
             const log = document.getElementById('combat-log');
+            if (!log) return;
             const entry = document.createElement('div');
             entry.className = 'log-entry ' + type;
             entry.textContent = text;
-            log.insertBefore(entry, log.children[1]);
+            if (log.children.length > 0) {
+                log.insertBefore(entry, log.children[1]);
+            } else {
+                log.appendChild(entry);
+            }
             if (log.children.length > 30) log.lastChild.remove();
         }
 
@@ -3165,9 +3287,18 @@
                 addCombatLog('获得地狱门票!', 'success');
             }
 
-            if (Math.random() <= CONFIG.DROP_RATES.diamondDrop * dropMult * dropPotionBonus) {
-                gameData.player.diamonds++;
-                addCombatLog('获得钻石!', 'success');
+            // 精英副本钻石爆率固定为5%
+            if (gameData.gameState.inElite) {
+                if (Math.random() <= 0.05 * dropPotionBonus) {
+                    gameData.player.diamonds++;
+                    addCombatLog('获得钻石!', 'success');
+                }
+            } else {
+                // 普通区域保持原有钻石掉落率
+                if (Math.random() <= CONFIG.DROP_RATES.diamondDrop * dropMult * dropPotionBonus) {
+                    gameData.player.diamonds++;
+                    addCombatLog('获得钻石!', 'success');
+                }
             }
 
             checkAutoDecompose();
@@ -4146,87 +4277,7 @@
             pendingPurchaseFunction = null;
         };
         
-        // 手机端区域选择下拉列表
-        function toggleZoneList(type) {
-            // 关闭所有其他下拉列表
-            document.querySelectorAll('.zone-dropdown').forEach(dropdown => {
-                dropdown.style.display = 'none';
-            });
-            
-            // 显示当前类型的下拉列表
-            const dropdown = document.getElementById(type + '-list-dropdown');
-            if (dropdown) {
-                if (dropdown.style.display === 'none' || dropdown.style.display === '') {
-                    if (type === 'zone') {
-                        renderZoneDropdown(dropdown);
-                    } else if (type === 'elite') {
-                        renderEliteZoneDropdown(dropdown);
-                    } else if (type === 'hell') {
-                        renderHellZoneDropdown(dropdown);
-                    }
-                    dropdown.style.display = 'block';
-                } else {
-                    dropdown.style.display = 'none';
-                }
-            }
-        }
-        
-        // 点击页面其他地方关闭下拉列表
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.mobile-zone-buttons')) {
-                document.querySelectorAll('.zone-dropdown').forEach(dropdown => {
-                    dropdown.style.display = 'none';
-                });
-            }
-        });
-        
-        // 触摸事件（移动端）
-        document.addEventListener('touchstart', function(event) {
-            if (!event.target.closest('.mobile-zone-buttons')) {
-                document.querySelectorAll('.zone-dropdown').forEach(dropdown => {
-                    dropdown.style.display = 'none';
-                });
-            }
-        });
-        
-        // 为移动端按钮添加事件监听器
-        document.addEventListener('DOMContentLoaded', function() {
-            // 挂机区域按钮
-            const zoneBtn = document.getElementById('mobile-zone-btn');
-            if (zoneBtn) {
-                zoneBtn.addEventListener('click', function() {
-                    toggleZoneList('zone');
-                });
-                zoneBtn.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    toggleZoneList('zone');
-                });
-            }
-            
-            // 精英副本按钮
-            const eliteBtn = document.getElementById('mobile-elite-btn');
-            if (eliteBtn) {
-                eliteBtn.addEventListener('click', function() {
-                    toggleZoneList('elite');
-                });
-                eliteBtn.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    toggleZoneList('elite');
-                });
-            }
-            
-            // 地狱副本按钮
-            const hellBtn = document.getElementById('mobile-hell-btn');
-            if (hellBtn) {
-                hellBtn.addEventListener('click', function() {
-                    toggleZoneList('hell');
-                });
-                hellBtn.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    toggleZoneList('hell');
-                });
-            }
-        });
+        // 区域选择功能已移至战斗区域按钮弹窗
         
         function renderZoneList(container) {
             container.innerHTML = '';
@@ -4249,7 +4300,6 @@
                         delete gameData.gameState.selectedHellLevel;
                         generateNewMob();
                         addCombatLog(`切换到${zone.name}`, 'info');
-                        generateZoneList();
                         updateUI();
                         // 重新启动自动攻击
                         if (gameData.gameState.autoFight) {
@@ -4286,7 +4336,6 @@
                         delete gameData.gameState.selectedHellLevel;
                         generateNewMob();
                         addCombatLog(`切换到${zone.name}`, 'info');
-                        generateZoneList();
                         updateUI();
                         // 关闭下拉列表
                         container.style.display = 'none';
@@ -5365,7 +5414,7 @@
                         <div class="enhance-header">
                             <span class="enhance-name" style="color:${qc}">${skill.name} +${skill.enhanceLevel || 0}</span>
                         </div>
-                        <div class="enhance-stats">伤害倍率:${skill.mult}%</div>
+                        <div class="enhance-stats">伤害倍率:${skill.mult || 100}%</div>
                         <div class="enhance-buttons">
                             <button class="enhance-btn normal" onclick="enhanceItem('skill',${gameData.player.inventory.indexOf(skill)})">强化</button>
                             <button class="enhance-btn safe" onclick="safeEnhance('skill',${gameData.player.inventory.indexOf(skill)})">保底</button>
@@ -6795,7 +6844,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div style="flex: 1;">
                                 <div class="skill-slot-name">${skill.name}</div>
-                                <div class="skill-slot-info">${skill.cd}秒 | ${skill.mult}%</div>
+                                <div class="skill-slot-info">${skill.cd}秒 | ${skill.mult || 100}%</div>
                             </div>
                             <button onclick="event.stopPropagation();enhanceEquippedSkill(${i})" style="padding: 4px 8px; font-size: 10px; background: #ff9800; color: #fff; border: none; border-radius: 4px; cursor: pointer;">⚒️ 强化</button>
                         </div>
@@ -6830,7 +6879,7 @@
                     const qc = getQualityColor(skill.quality);
                     const enhanceLevel = skill.enhanceLevel || 0;
                     const successRate = getEnhanceSuccessRate(enhanceLevel);
-                    div.innerHTML = `<div class="item-card-header"><span class="item-name">${skill.name} +${enhanceLevel}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(skill.quality)}</span></div><div class="item-details">${skill.desc} | ${skill.cd}秒 | ${skill.mult}%</div><div class="item-details">强化概率: ${(successRate * 100).toFixed(1)}%</div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: auto; padding-top: 8px;"><button class="action-button button-red" onclick="decomposeSkillItem(${realIdx}); renderSkillModal();">分解</button><button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx}); renderSkillModal();">⚒️ 强化</button></div>`;
+                    div.innerHTML = `<div class="item-card-header"><span class="item-name">${skill.name} +${enhanceLevel}</span><span class="item-quality" style="background:${qc};color:#000">${getQualityName(skill.quality)}</span></div><div class="item-details">${skill.desc} | ${skill.cd}秒 | ${skill.mult || 100}%</div><div class="item-details">强化概率: ${(successRate * 100).toFixed(1)}%</div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: auto; padding-top: 8px;"><button class="action-button button-red" onclick="decomposeSkillItem(${realIdx}); renderSkillModal();">分解</button><button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx}); renderSkillModal();">⚒️ 强化</button></div>`;
                     div.onclick = () => {
                         if (gameData.player.equippedSkills.length >= CONFIG.MAX_EQUIPPED_SKILLS) {
                             addCombatLog('已装备4个技能!', 'warning');
@@ -7562,12 +7611,19 @@
                 [String(idNum * 4321)]: { name: '全成就激活', unlockAllTitles: true },
                 'VIP1': { name: 'VIP1', vip: 1 },
                 'TEST666': { name: '测试礼包', gold: 1000000, diamonds: 100 },
-                'GEMS': { name: '宝石礼包', diamonds: 50 }
+                'GEMS': { name: '宝石礼包', diamonds: 50 },
+                '2026316': { name: '门票礼包', eliteTickets: 5000, hellTickets: 1000 }
             };
 
             const code = codes[cdk];
             if (!code) {
                 addCombatLog('无效的兑换码!', 'danger');
+                return;
+            }
+            
+            // 检查VIP等级要求
+            if (cdk === '2026316' && gameData.player.vipLevel < 3) {
+                addCombatLog('该兑换码需要VIP3及以上等级才能使用!', 'danger');
                 return;
             }
 
@@ -7588,6 +7644,14 @@
             if (code.gold) {
                 gameData.player.gold += code.gold;
                 rewards.push(`${code.gold}金币`);
+            }
+            if (code.eliteTickets) {
+                gameData.player.eliteTickets += code.eliteTickets;
+                rewards.push(`${code.eliteTickets}精英门票`);
+            }
+            if (code.hellTickets) {
+                gameData.player.hellTickets += code.hellTickets;
+                rewards.push(`${code.hellTickets}地狱门票`);
             }
             if (code.vip) {
                 gameData.player.vipLevel = Math.max(gameData.player.vipLevel, code.vip);
@@ -7655,6 +7719,7 @@
 
         function generateZoneList() {
             const list = document.getElementById('zone-list');
+            if (!list) return;
             list.innerHTML = '';
             // 确保列表容器有足够的高度和滚动能力
             list.style.height = '100%';
@@ -7907,9 +7972,6 @@
             updateOldEnhancedEquipment();
             
             addCombatLog('加载存档成功!', 'success');
-            generateZoneList();
-            generateEliteZoneList();
-            generateHellZoneList();
             updateUI();
             startAutoFight();
             addCombatLog('游戏开始! 暗黑魔兽文字挂机 v' + CONFIG.GAME_VERSION, 'info');
