@@ -1626,6 +1626,7 @@
         function toggleCombatPanel() {
             const combatArea = document.querySelector('.combat-area');
             const toggleButton = document.getElementById('toggle-combat-panel');
+            const playerStatus = document.querySelector('.player-status');
             
             if (!combatArea) return;
             
@@ -1638,12 +1639,22 @@
                 if (toggleButton) toggleButton.textContent = '📦 简化';
                 // 恢复飘血功能
                 gameData.gameState.showFloatingText = true;
+                // 恢复角色属性面板的原始样式
+                if (playerStatus) {
+                    playerStatus.style.flex = '0 0 auto';
+                    playerStatus.style.minHeight = '550px';
+                }
             } else {
                 // 隐藏战斗区域
                 combatArea.style.display = 'none';
                 if (toggleButton) toggleButton.textContent = '📋 展开';
                 // 暂停飘血功能
                 gameData.gameState.showFloatingText = false;
+                // 确保角色属性面板下方的按钮可见
+                if (playerStatus) {
+                    playerStatus.style.flex = '1 1 auto';
+                    playerStatus.style.minHeight = 'auto';
+                }
             }
         }
         
@@ -7076,21 +7087,25 @@
         }
 
         function updateOldEnhancedEquipment() {
-            // 更新身上穿戴的装备
-            for (const slot in gameData.player.equipment) {
-                const equip = gameData.player.equipment[slot];
-                if (equip && equip.enhanceLevel > 0 && equip.stats) {
-                    updateEquipmentStats(equip);
-                }
-            }
-            
-            // 更新背包里的装备
-            if (gameData.player.inventory) {
-                gameData.player.inventory.forEach(item => {
-                    if (item && item.enhanceLevel > 0 && item.stats) {
-                        updateEquipmentStats(item);
+            // 只在存档版本低于1.05时更新老版本的强化装备属性
+            const savedVersion = gameData.gameVersion || '0.0.0';
+            if (savedVersion < '1.05') {
+                // 更新身上穿戴的装备
+                for (const slot in gameData.player.equipment) {
+                    const equip = gameData.player.equipment[slot];
+                    if (equip && equip.enhanceLevel > 0 && equip.stats) {
+                        updateEquipmentStats(equip);
                     }
-                });
+                }
+                
+                // 更新背包里的装备
+                if (gameData.player.inventory) {
+                    gameData.player.inventory.forEach(item => {
+                        if (item && item.enhanceLevel > 0 && item.stats) {
+                            updateEquipmentStats(item);
+                        }
+                    });
+                }
             }
         }
         
@@ -7196,21 +7211,9 @@
         });
     </script>
 <!--客服 开始-->
-<script src="//g8hh.github.io/static/js/jquery.min.js"></script>
-<link rel="stylesheet" href="//g8hh.github.io/static/css/kf.css" type="text/css" media="screen" charset="utf-8">
-<script src="//g8hh.github.io/static/js/kf.js"></script>
+<script src="//g8hh.com.cn/static/js/jquery.min.js"></script>
+<link rel="stylesheet" href="//g8hh.com.cn/static/css/kf.css" type="text/css" media="screen" charset="utf-8">
+<script src="//g8hh.com.cn/static/js/kf.js"></script>
 <!-- 客服 结束 -->
-<!--站长统计-->
-    <div style="display: none">
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "https://hm.baidu.com/hm.js?6581389daf4dd6fe7dbb4d20fdcb52a6";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
-    </div>
 </body>
 </html>
