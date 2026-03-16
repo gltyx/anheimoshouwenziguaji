@@ -859,7 +859,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本1.11</div>
+                    <div class="panel-title">📊 角色属性 版本1.12</div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -932,15 +932,15 @@
             <!-- 手机端区域选择按钮 -->
             <div class="mobile-zone-buttons">
                 <div style="position: relative; z-index: 2000;">
-                    <button class="action-button button-green" onclick="toggleZoneList('zone')">🌍 挂机区域</button>
+                    <button class="action-button button-green" id="mobile-zone-btn">🌍 挂机区域</button>
                     <div id="zone-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 2000; max-height: 300px; overflow-y: auto;"></div>
                 </div>
                 <div style="position: relative; z-index: 2000;">
-                    <button class="action-button button-yellow" onclick="toggleZoneList('elite')">⚔️ 精英副本</button>
+                    <button class="action-button button-yellow" id="mobile-elite-btn">⚔️ 精英副本</button>
                     <div id="elite-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 2000; max-height: 300px; overflow-y: auto;"></div>
                 </div>
                 <div style="position: relative; z-index: 2000;">
-                    <button class="action-button button-red" onclick="toggleZoneList('hell')">🔥 地狱副本</button>
+                    <button class="action-button button-red" id="mobile-hell-btn">🔥 地狱副本</button>
                     <div id="hell-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 2000; max-height: 300px; overflow-y: auto;"></div>
                 </div>
             </div>
@@ -3356,12 +3356,23 @@
         let gameUpdateId = null;
         let lastUpdateTime = 0;
         let lastAttackTime = 0;
+        let useIntervalMode = false;
+        let intervalId = null;
 
         function gameUpdate(timestamp) {
             if (!lastUpdateTime) lastUpdateTime = timestamp;
             const dt = Math.min((timestamp - lastUpdateTime) / 1000, 0.1); // 限制时间步长
             lastUpdateTime = timestamp;
 
+            updateGameLogic(dt, timestamp);
+
+            // 继续游戏循环
+            if (!useIntervalMode) {
+                gameUpdateId = requestAnimationFrame(gameUpdate);
+            }
+        }
+
+        function updateGameLogic(dt, timestamp) {
             // 自动战斗逻辑
             if (gameData.gameState.autoFight && !gameData.gameState.isDead) {
                 // 攻击计时器
@@ -3372,23 +3383,51 @@
                 while (gameData.player.atkTimer >= 1.0) {
                     gameData.player.atkTimer -= 1.0;
                     fightMob();
-                    lastAttackTime = timestamp; // 更新最后攻击时间
+                    lastAttackTime = timestamp || Date.now(); // 更新最后攻击时间
                 }
                 
                 // 检测：如果1.5秒没有攻击，自动生成新怪物
-                if (timestamp - lastAttackTime > 1500) {
+                if ((timestamp || Date.now()) - lastAttackTime > 1500) {
                     generateNewMob(true);
-                    lastAttackTime = timestamp;
-                    // 确保自动攻击继续
-                    if (!gameUpdateId) {
-                        gameUpdateId = requestAnimationFrame(gameUpdate);
-                    }
+                    lastAttackTime = timestamp || Date.now();
                 }
             }
+        }
 
-            // 继续游戏循环
+        function gameLoopByInterval() {
+            const dt = 0.1;
+            updateGameLogic(dt, Date.now());
+        }
+
+        function startIntervalMode() {
+            if (!intervalId) {
+                useIntervalMode = true;
+                intervalId = setInterval(gameLoopByInterval, 100);
+            }
+        }
+
+        function stopIntervalMode() {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+            useIntervalMode = false;
+            lastUpdateTime = 0;
             gameUpdateId = requestAnimationFrame(gameUpdate);
         }
+
+        // 页面可见性处理
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // 页面隐藏时，切换到setInterval模式
+                if (gameData.gameState.autoFight) {
+                    startIntervalMode();
+                }
+            } else {
+                // 页面重新可见时，切换回requestAnimationFrame模式
+                stopIntervalMode();
+            }
+        });
 
         function startAutoFight() {
             // 确保有怪物存在
@@ -4146,6 +4185,45 @@
             if (!event.target.closest('.mobile-zone-buttons')) {
                 document.querySelectorAll('.zone-dropdown').forEach(dropdown => {
                     dropdown.style.display = 'none';
+                });
+            }
+        });
+        
+        // 为移动端按钮添加事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 挂机区域按钮
+            const zoneBtn = document.getElementById('mobile-zone-btn');
+            if (zoneBtn) {
+                zoneBtn.addEventListener('click', function() {
+                    toggleZoneList('zone');
+                });
+                zoneBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    toggleZoneList('zone');
+                });
+            }
+            
+            // 精英副本按钮
+            const eliteBtn = document.getElementById('mobile-elite-btn');
+            if (eliteBtn) {
+                eliteBtn.addEventListener('click', function() {
+                    toggleZoneList('elite');
+                });
+                eliteBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    toggleZoneList('elite');
+                });
+            }
+            
+            // 地狱副本按钮
+            const hellBtn = document.getElementById('mobile-hell-btn');
+            if (hellBtn) {
+                hellBtn.addEventListener('click', function() {
+                    toggleZoneList('hell');
+                });
+                hellBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    toggleZoneList('hell');
                 });
             }
         });
