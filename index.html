@@ -12,7 +12,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { font-family: 'Arial', sans-serif; background-color: #191c23; color: #ffffff; height: 100%; overflow: hidden; -webkit-overflow-scrolling: touch; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         body { display: flex; justify-content: center; align-items: flex-start; }
-        .game-canvas { width: 100vw; min-height: 100vh; background-color: #191c23; position: relative; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .game-canvas { width: 100vw; min-height: 100vh; background-color: #191c23; position: relative; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; -webkit-transform: translateZ(0); transform: translateZ(0); }
         @media (max-width: 768px) {
             .game-canvas {
                 min-height: 100dvh;
@@ -34,11 +34,13 @@
         .resource-item:hover { background: rgba(0,0,0,0.5); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
         .resource-icon { font-size: 18px; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
         .resource-value { color: #ffd700; font-weight: bold; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
-        .game-container { display: grid; grid-template-columns: 1fr; gap: 10px; padding: 10px; min-height: calc(100vh - 60px); overflow-y: auto; }
+        .game-container { display: flex; flex-direction: column; gap: 10px; padding: 10px 10px 40px 10px; min-height: calc(100vh - 100px); overflow-y: auto; }
         @media (min-width: 1200px) {
             .game-container { 
+                display: grid;
                 grid-template-columns: 1fr 1fr 1fr; 
-                height: calc(100vh - 60px); 
+                height: calc(100vh - 100px); 
+                padding: 10px 10px 40px 10px;
                 overflow-y: auto;
             } 
         }
@@ -258,7 +260,8 @@
                 font-size: 12px; 
             } 
             .game-container { 
-                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
                 padding: 6px; 
                 gap: 6px; 
                 min-height: calc(100dvh - 40px);
@@ -269,25 +272,29 @@
                 padding: 8px; 
                 gap: 6px; 
                 max-height: none;
-                min-height: 350px;
+                min-height: 550px;
                 touch-action: manipulation;
                 order: 1;
+                flex-shrink: 0;
+                flex: 0 0 auto;
             } 
             .combat-area { 
                 padding: 8px; 
                 gap: 6px; 
-                max-height: 200px;
-                min-height: 150px;
+                max-height: 150px;
+                min-height: 100px;
                 touch-action: manipulation;
                 order: 2;
+                flex-shrink: 1;
             } 
             .right-panel { 
                 padding: 8px; 
                 gap: 6px; 
-                max-height: 250px;
-                min-height: 200px;
+                max-height: 180px;
+                min-height: 120px;
                 touch-action: manipulation;
                 order: 3;
+                flex-shrink: 1;
             } 
             .combat-area {
                 overflow: visible;
@@ -311,12 +318,14 @@
                 gap: 4px;
             }
             .action-button { 
-                padding: 8px 12px;
-                font-size: 9px; 
-                min-height: 44px;
-                min-width: 80px;
+                padding: 10px 14px;
+                font-size: 10px; 
+                min-height: 50px;
+                min-width: 90px;
                 touch-action: manipulation;
                 border-radius: 8px;
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
             } 
             .mob-info {
                 padding: 6px;
@@ -514,6 +523,8 @@
                 font-size: 10px; 
             } 
             .game-container { 
+                display: flex;
+                flex-direction: column;
                 padding: 3px; 
                 gap: 3px; 
                 min-height: calc(100dvh - 25px);
@@ -523,7 +534,7 @@
             .player-status { 
                 padding: 5px; 
                 gap: 3px; 
-                min-height: 300px;
+                min-height: 450px;
                 touch-action: manipulation;
                 order: 1;
             } 
@@ -552,12 +563,14 @@
                 gap: 2px; 
             } 
             .action-button { 
-                padding: 6px 8px;
-                font-size: 7px; 
-                min-height: 44px;
-                min-width: 70px;
+                padding: 8px 10px;
+                font-size: 8px; 
+                min-height: 50px;
+                min-width: 80px;
                 touch-action: manipulation;
                 border-radius: 6px;
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
             } 
             .mob-info {
                 padding: 4px;
@@ -750,7 +763,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本1.03</div>
+                    <div class="panel-title">📊 角色属性 版本1.05</div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -1116,7 +1129,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.03",
+            GAME_VERSION: "1.05",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1317,7 +1330,7 @@
         }
 
         let gameData = {
-            gameVersion: "1.03",
+            gameVersion: "1.05",
             player: {
                 level: 1, exp: 0, expNext: 100, gold: 0, diamonds: 0,
                 classId: "warrior", className: "战士",
@@ -1403,10 +1416,10 @@
             for (const slot in gameData.player.equipment) {
                 const equip = gameData.player.equipment[slot];
                 if (equip) {
-                    const enhanceMult = 1 + (equip.enhanceLevel || 0) * CONFIG.ENHANCE_MULT.equip;
-                    if (equip.stats && equip.stats.atk) bonusAtk += Math.floor(equip.stats.atk * enhanceMult);
-                    if (equip.stats && equip.stats.def) bonusDef += Math.floor(equip.stats.def * enhanceMult);
-                    if (equip.stats && equip.stats.hp) bonusHp += Math.floor(equip.stats.hp * enhanceMult);
+                    // 装备属性已经在强化时直接修改，不需要再乘以强化倍数
+                    if (equip.stats && equip.stats.atk) bonusAtk += Math.floor(equip.stats.atk);
+                    if (equip.stats && equip.stats.def) bonusDef += Math.floor(equip.stats.def);
+                    if (equip.stats && equip.stats.hp) bonusHp += Math.floor(equip.stats.hp);
                     if (equip.affixes) {
                         equip.affixes.forEach(a => {
                             if (a.id === 'aspd') bonusAspd += a.value;
@@ -1559,10 +1572,14 @@
             document.getElementById('stat-lifesteal').textContent = gameData.player.lifesteal.toFixed(1) + '%';
             document.getElementById('stat-penetration').textContent = gameData.player.penetration.toFixed(1) + '%';
             
-            // 计算当前爆率和VIP加成
+            // 计算当前爆率、VIP加成和称号加成
             let dropRate = 0;
             const vipBonus = CONFIG.VIP_BONUSES[gameData.player.vipLevel];
             dropRate += vipBonus.equipDropBonus;
+            
+            // 添加称号加成
+            const titleBonus = getTitleBonuses();
+            if (titleBonus.equipDropBonus) dropRate += titleBonus.equipDropBonus;
             
             // 显示包含VIP加成的经验和金币加成
             const totalExpBonus = gameData.player.expBonus + vipBonus.expBonus;
@@ -1608,123 +1625,29 @@
         
         function toggleCombatPanel() {
             const combatArea = document.querySelector('.combat-area');
-            const mobInfo = document.querySelector('.mob-info');
-            const combatLog = document.getElementById('combat-log');
             const toggleButton = document.getElementById('toggle-combat-panel');
             
             if (!combatArea) return;
             
             // 检查当前状态
-            const isMinimized = combatArea.classList.contains('minimized');
+            const isHidden = combatArea.style.display === 'none';
             
-            if (isMinimized) {
+            if (isHidden) {
                 // 恢复正常状态
-                combatArea.classList.remove('minimized');
-                if (mobInfo) mobInfo.style.display = 'flex';
-                if (combatLog) combatLog.style.display = 'block';
+                combatArea.style.display = 'flex';
                 if (toggleButton) toggleButton.textContent = '📦 简化';
                 // 恢复飘血功能
                 gameData.gameState.showFloatingText = true;
-                // 移除简化血条
-                const simplifiedHealth = document.getElementById('simplified-health');
-                if (simplifiedHealth) simplifiedHealth.remove();
             } else {
-                // 最小化状态
-                combatArea.classList.add('minimized');
-                if (mobInfo) mobInfo.style.display = 'none';
-                if (combatLog) combatLog.style.display = 'none';
+                // 隐藏战斗区域
+                combatArea.style.display = 'none';
                 if (toggleButton) toggleButton.textContent = '📋 展开';
                 // 暂停飘血功能
                 gameData.gameState.showFloatingText = false;
-                // 添加简化的怪物血条
-                addSimplifiedHealthBar();
             }
         }
         
-        function addSimplifiedHealthBar() {
-            const combatArea = document.querySelector('.combat-area');
-            if (!combatArea) return;
-            
-            // 检查是否已经存在简化血条
-            const existingHealth = document.getElementById('simplified-health');
-            if (existingHealth) return;
-            
-            const healthBar = document.createElement('div');
-            healthBar.id = 'simplified-health';
-            healthBar.style.cssText = `
-                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-                border: 2px solid #16213e;
-                border-radius: 10px;
-                padding: 10px;
-                text-align: center;
-                margin-top: 5px;
-            `;
-            
-            const mobName = document.createElement('div');
-            mobName.style.cssText = `
-                color: #ffd700;
-                font-weight: bold;
-                margin-bottom: 5px;
-                font-size: 14px;
-            `;
-            mobName.textContent = gameData.currentMob.name;
-            
-            const healthContainer = document.createElement('div');
-            healthContainer.style.cssText = `
-                width: 100%;
-                height: 20px;
-                background: #333;
-                border-radius: 10px;
-                overflow: hidden;
-            `;
-            
-            const healthBarFill = document.createElement('div');
-            healthBarFill.id = 'simplified-health-fill';
-            healthBarFill.style.cssText = `
-                height: 100%;
-                background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
-                border-radius: 10px;
-                transition: width 0.3s ease;
-            `;
-            
-            const healthText = document.createElement('div');
-            healthText.id = 'simplified-health-text';
-            healthText.style.cssText = `
-                color: #fff;
-                font-size: 12px;
-                margin-top: 5px;
-            `;
-            
-            healthContainer.appendChild(healthBarFill);
-            healthBar.appendChild(mobName);
-            healthBar.appendChild(healthContainer);
-            healthBar.appendChild(healthText);
-            
-            // 插入到战斗区域的合适位置
-            const combatHeader = combatArea.querySelector('.combat-header');
-            if (combatHeader) {
-                combatHeader.after(healthBar);
-            } else {
-                combatArea.appendChild(healthBar);
-            }
-            
-            // 更新血条状态
-            updateSimplifiedHealthBar();
-        }
-        
-        function updateSimplifiedHealthBar() {
-            const healthFill = document.getElementById('simplified-health-fill');
-            const healthText = document.getElementById('simplified-health-text');
-            
-            if (healthFill && healthText) {
-                const currentHp = gameData.currentMob.hp;
-                const maxHp = gameData.currentMob.maxHp;
-                const percentage = (currentHp / maxHp) * 100;
-                
-                healthFill.style.width = percentage + '%';
-                healthText.textContent = `${Math.floor(currentHp)}/${maxHp}`;
-            }
-        }
+
 
         function checkPotionEffects() {
             const now = Date.now();
@@ -2329,7 +2252,7 @@
             }
             
             // 更新简化血条
-            updateSimplifiedHealthBar();
+
         }
 
         function showFloatingDamage(damage, isCrit, isPlayer) {
@@ -2404,7 +2327,7 @@
             gameData.currentMob.hp -= finalDmg;
             showFloatingDamage(finalDmg, isCrit, true);
             // 更新简化血条
-            updateSimplifiedHealthBar();
+
 
             // 吸血效果
             if (gameData.player.lifesteal > 0) {
@@ -4647,17 +4570,26 @@
         }
 
         function getEnhanceSuccessRate(level) {
-            if (level === 0) return 0.95; // +1
-            if (level === 1) return 0.85; // +2
-            if (level === 2) return 0.75; // +3
-            if (level === 3) return 0.65; // +4
-            if (level === 4) return 0.55; // +5
-            if (level === 5) return 0.45; // +6
-            if (level === 6) return 0.35; // +7
-            if (level === 7) return 0.25; // +8
-            if (level === 8) return 0.15; // +9
-            if (level >= 9) return 0.10; // +10 to +15
-            return 1.0;
+            let rate;
+            if (level === 0) rate = 0.95; // +1
+            if (level === 1) rate = 0.85; // +2
+            if (level === 2) rate = 0.75; // +3
+            if (level === 3) rate = 0.65; // +4
+            if (level === 4) rate = 0.55; // +5
+            if (level === 5) rate = 0.45; // +6
+            if (level === 6) rate = 0.35; // +7
+            if (level === 7) rate = 0.25; // +8
+            if (level === 8) rate = 0.15; // +9
+            if (level >= 9) rate = 0.10; // +10 to +15
+            
+            // 添加称号加成
+            const titleBonus = getTitleBonuses();
+            if (titleBonus.enhanceRateBonus) {
+                rate += titleBonus.enhanceRateBonus / 100;
+                rate = Math.min(rate, 1.0); // 最高100%成功率
+            }
+            
+            return rate;
         }
 
         function getFragmentCostByLevel(level) {
@@ -7280,6 +7212,5 @@ var _hmt = _hmt || [];
 })();
 </script>
     </div>
-
 </body>
 </html>
