@@ -265,6 +265,14 @@
         .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #3a3d48; font-size: 12px; }
         .info-label { color: #aaa; }
         .info-value { color: #ffd700; font-weight: bold; }
+        /* 区域选择样式 */
+        .desktop-zone-select {
+            display: block;
+        }
+        .mobile-zone-buttons {
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             .game-canvas {
                 width: 100vw;
@@ -564,6 +572,22 @@
             .player-status::-webkit-scrollbar-thumb:hover {
                 background: #ffed4e;
             }
+            
+            /* 手机端区域选择按钮 */
+            .desktop-zone-select {
+                display: none;
+            }
+            .mobile-zone-buttons {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+                width: 100%;
+            }
+            .mobile-zone-buttons .action-button {
+                font-size: 9px;
+                padding: 8px;
+                min-height: 40px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -835,7 +859,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本1.07</div>
+                    <div class="panel-title">📊 角色属性 版本1.08</div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -885,23 +909,41 @@
 
         </div>
         <div class="right-panel">
-            <div class="panel-tabs">
-                <button class="panel-tab active" data-tab="zone">🌍 挂机区域</button>
-                <button class="panel-tab" data-tab="elite">⚔️ 精英副本</button>
-                <button class="panel-tab" data-tab="hell">🔥 地狱副本</button>
+            <!-- 桌面端区域选择 -->
+            <div class="desktop-zone-select">
+                <div class="panel-tabs">
+                    <button class="panel-tab active" data-tab="zone">🌍 挂机区域</button>
+                    <button class="panel-tab" data-tab="elite">⚔️ 精英副本</button>
+                    <button class="panel-tab" data-tab="hell">🔥 地狱副本</button>
+                </div>
+                <div class="panel-content">
+                    <div class="panel-tab-content active" id="zone-tab">
+                        <div class="zone-list" id="zone-list"></div>
+                    </div>
+                    <div class="panel-tab-content" id="elite-tab">
+                        <div class="zone-list" id="elite-zone-list"></div>
+                    </div>
+                    <div class="panel-tab-content" id="hell-tab">
+                        <div class="zone-list" id="hell-zone-list"></div>
+                    </div>
+                </div>
             </div>
-            <div class="panel-content">
-                <div class="panel-tab-content active" id="zone-tab">
-                    <div class="zone-list" id="zone-list"></div>
+            
+            <!-- 手机端区域选择按钮 -->
+            <div class="mobile-zone-buttons">
+                <div style="position: relative;">
+                    <button class="action-button button-green" onclick="toggleZoneList('zone')">🌍 挂机区域</button>
+                    <div id="zone-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
                 </div>
-                <div class="panel-tab-content" id="elite-tab">
-                    <div class="zone-list" id="elite-zone-list"></div>
+                <div style="position: relative;">
+                    <button class="action-button button-yellow" onclick="toggleZoneList('elite')">⚔️ 精英副本</button>
+                    <div id="elite-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
                 </div>
-                <div class="panel-tab-content" id="hell-tab">
-                    <div class="zone-list" id="hell-zone-list"></div>
+                <div style="position: relative;">
+                    <button class="action-button button-red" onclick="toggleZoneList('hell')">🔥 地狱副本</button>
+                    <div id="hell-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
                 </div>
             </div>
-
 
         </div>
         </div>
@@ -1218,6 +1260,19 @@
         </div>
         </div>
     </div>
+    
+    <!-- 手机端区域选择弹窗 -->
+    <div class="modal-overlay" id="zone-select-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="zone-select-title">🌍 选择区域</div>
+                <button class="modal-close" id="close-zone-select">&times;</button>
+            </div>
+            <div class="modal-body" id="zone-select-body">
+                <!-- 区域列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
 
     <script>
         const CONFIG = {
@@ -1340,7 +1395,7 @@
             MAX_SOCKETS: 5,
             BLACK_MARKET: { skillPrice: 500000, gemPrice: 1000000 },
             BLACK_MARKET_QUALITY_PROBS: { gray: 0.75, green: 0.10, blue: 0.08, purple: 0.05, orange: 0.02 },
-            DROP_RATES: { normalMob: 0.15, eliteTicket: 0.14, diamondDrop: 0.0035 },
+            DROP_RATES: { normalMob: 0.15, eliteTicket: 0.1, diamondDrop: 0.0035 },
             ELITE_DROP_RATES: { equipment: { gold: 0.05, platinum: 0.02, diamond: 0.005, darkgold: 0.002, myth: 0.001, supreme: 0.00033, zenith: 0.0001 }, gem: { gray: 0.01, green: 0.005, blue: 0.0033, purple: 0.002, orange: 0.0005 }, skill: { gray: 0.02, green: 0.0067, blue: 0.0025, purple: 0.00125, orange: 0.0004 } },
             HELL_DROP_RATES: { equipment: { gold: 0.15, platinum: 0.06, diamond: 0.015, darkgold: 0.006, myth: 0.003, supreme: 0.001, zenith: 0.0003 }, gem: { gray: 0.03, green: 0.015, blue: 0.01, purple: 0.006, orange: 0.0015 }, skill: { gray: 0.06, green: 0.02, blue: 0.0075, purple: 0.00375, orange: 0.0012 } },
             ELITE_TYPES: { normal: { name: "普通精英", color: [255,152,0], atkM: 1.5, defM: 1.5, hpM: 4, dropM: 2, critBonus: 1.0 }, silver: { name: "白银精英", color: [192,192,192], atkM: 2.0, defM: 2.0, hpM: 7, dropM: 3, critBonus: 1.5 }, gold: { name: "黄金精英", color: [255,215,0], atkM: 3.0, defM: 3.0, hpM: 12, dropM: 5, critBonus: 2.0 }, adventure: { name: "奇遇BOSS", color: [255,0,255], atkM: 1.0, defM: 1.0, hpM: 1, dropM: 1, critBonus: 1.0 } },
@@ -1383,7 +1438,7 @@
             ENHANCE_MULT: { equip: 0.5, skill: 0.1, gem: 0.1 },
             DECOMPOSE_FORMULA: { equip: 1, skill: 1, gem: 1 },
             TITLES: [
-                { id: "sword_master", name: "十里坡剑神", icon: "🗡️", desc: "新手平原（0区）击杀30000只", condition: "zone1_kills", threshold: 30000, bonuses: { atk: 500 } },
+                { id: "sword_master", name: "十里坡剑神", icon: "🗡️", desc: "新手平原（1区）击杀30000只", condition: "zone1_kills", threshold: 30000, bonuses: { atk: 500 } },
                 { id: "lucky_one", name: "幸运之人", icon: "🍀", desc: "击杀100只奇遇BOSS", condition: "adventure_boss_kills", threshold: 100, bonuses: { equipDropBonus: 10 } },
                 { id: "unlucky", name: "非酋", icon: "😭", desc: "连续强化失败5次", condition: "enhance_consec_fails", threshold: 5, bonuses: { enhanceRateBonus: 2 } },
                 { id: "chosen_one", name: "天选之人", icon: "✨", desc: "单件装备连续强化成功8次", condition: "enhance_consec_success", threshold: 8, bonuses: { enhanceRateBonus: 2 } },
@@ -1394,7 +1449,7 @@
                 { id: "hell_slayer", name: "地狱屠杀者", icon: "💀", desc: "累计消耗地狱门票20000张", condition: "hell_tickets_spent", threshold: 20000, bonuses: { equipDropBonus: 10 } },
                 { id: "hell_terminator", name: "地狱终结者", icon: "👿", desc: "累计消耗地狱门票50000张", condition: "hell_tickets_spent", threshold: 50000, bonuses: { equipDropBonus: 20 } },
                 { id: "forging_god", name: "锻造之神", icon: "⚒️", desc: "武器强化到+11", condition: "weapon_enhance_max", threshold: 11, bonuses: { crit: 50 } },
-                { id: "zone_master", name: "区域之主", icon: "👑", desc: "单区域击杀100000只", condition: "zone_kills_max", threshold: 100000, bonuses: { atk: 300, def: 300 } }
+                { id: "zone_master", name: "区域之主", icon: "👑", desc: "总击杀数达到200000只", condition: "killCount", threshold: 200000, bonuses: { atk: 300, def: 300 } }
             ],
             VIP_BONUSES: { 0: { equipDropBonus: 0, goldBonus: 0, expBonus: 0 }, 1: { equipDropBonus: 10, goldBonus: 10, expBonus: 10 }, 2: { equipDropBonus: 30, goldBonus: 30, expBonus: 30 }, 3: { equipDropBonus: 50, goldBonus: 50, expBonus: 50 } },
             VIP_REWARDS: { 1: { diamonds: 200, eliteTickets: 1000 }, 2: { diamonds: 500, eliteTickets: 2000 }, 3: { diamonds: 1000, eliteTickets: 5000 } },
@@ -1458,7 +1513,9 @@
                 gems: [],
                 titleCounters: { zone1_kills: 0, adventure_boss_kills: 0, enhance_consec_fails: 0, enhance_consec_success: 0, elite_tickets_spent: 0, hell_tickets_spent: 0, weapon_enhance_max: 0, reach_max_zone: 0, max_gold: 0, max_diamonds: 0, zone_kills: {}, zone_kills_max: 0 },
                 saveCount: 0, lastSaveDate: null,
-                titles: []
+                titles: [],
+                lastOnlineTime: Date.now(),
+                offlineEarnings: null
             },
             currentMob: { name: "史莱姆", icon: "🟢", hp: 60, maxHp: 60, atk: 10, def: 5, exp: 15, gold: 8, isElite: false, eliteType: null },
             gameState: { currentZone: 1, autoFight: true, inElite: false, inHell: false, eliteCount: 0, showFloatingText: true, autoDecomposeEnabled: false },
@@ -1681,7 +1738,14 @@
             const counters = gameData.player.titleCounters;
             CONFIG.TITLES.forEach(title => {
                 if (!gameData.player.titles.includes(title.id)) {
-                    const value = counters[title.condition] || 0;
+                    let value = 0;
+                    // 检查条件是否直接存储在 player 对象中
+                    if (title.condition === 'killCount') {
+                        value = gameData.player.killCount || 0;
+                    } else {
+                        // 其他条件存储在 titleCounters 中
+                        value = counters[title.condition] || 0;
+                    }
                     if (value >= title.threshold) {
                         gameData.player.titles.push(title.id);
                         addCombatLog(`🏆 解锁新称号: ${title.name}`, 'success');
@@ -2573,18 +2637,18 @@
             });
 
             if (gameData.currentMob.hp <= 0) {
-                if (!quick) addCombatLog(`击败${gameData.currentMob.name}! 获得${gameData.currentMob.exp}经验,${gameData.currentMob.gold}金币`, 'success');
-
                 const vipBonus = CONFIG.VIP_BONUSES[gameData.player.vipLevel];
                 const expGain = Math.floor(gameData.currentMob.exp * (1 + gameData.player.expBonus / 100 + vipBonus.expBonus / 100));
                 const goldGain = Math.floor(gameData.currentMob.gold * (1 + gameData.player.goldBonus / 100 + vipBonus.goldBonus / 100));
+                
+                if (!quick) addCombatLog(`击败${gameData.currentMob.name}! 获得${expGain}经验,${goldGain}金币`, 'success');
 
                 gameData.player.exp += expGain;
                 gameData.player.gold += goldGain;
                 gameData.player.killCount++;
                 
-                // 新手平原（0区）击杀计数
-                if (gameData.gameState.currentZone === 0) {
+                // 新手平原（1区）击杀计数
+                if (gameData.gameState.currentZone === 1) {
                     gameData.player.titleCounters.zone1_kills++;
                 }
                 
@@ -2683,6 +2747,9 @@
                     if (!quick) addCombatLog(`击杀奇遇BOSS!`, 'success');
                 }
 
+                // 检查成就
+                checkTitles();
+
                 rollLoot();
 
                 if (gameData.gameState.autoElite && !gameData.gameState.inElite && gameData.player.eliteTickets > 0) {
@@ -2768,6 +2835,11 @@
                             
                             if (!quick) addCombatLog(`复活成功,损失${expLoss}经验`, 'info');
                             updateUI();
+                            
+                            // 重新启动自动攻击
+                            if (gameData.gameState.autoFight) {
+                                startAutoFight();
+                            }
                         }, 3000);
                     }
                     updateUI();
@@ -3360,6 +3432,10 @@
             generateNewMob();
             addCombatLog(`进入${eliteLevel}级精英副本!`, 'warning');
             updateUI();
+            // 重新启动自动攻击
+            if (gameData.gameState.autoFight) {
+                startAutoFight();
+            }
         }
 
 
@@ -4017,6 +4093,376 @@
             document.getElementById('confirm-modal').classList.remove('active');
             pendingPurchaseFunction = null;
         };
+        
+        // 手机端区域选择下拉列表
+        function toggleZoneList(type) {
+            // 关闭所有其他下拉列表
+            document.querySelectorAll('.zone-dropdown').forEach(dropdown => {
+                dropdown.style.display = 'none';
+            });
+            
+            // 显示当前类型的下拉列表
+            const dropdown = document.getElementById(type + '-list-dropdown');
+            if (dropdown.style.display === 'none') {
+                if (type === 'zone') {
+                    renderZoneDropdown(dropdown);
+                } else if (type === 'elite') {
+                    renderEliteZoneDropdown(dropdown);
+                } else if (type === 'hell') {
+                    renderHellZoneDropdown(dropdown);
+                }
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+        
+        // 点击页面其他地方关闭下拉列表
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.mobile-zone-buttons')) {
+                document.querySelectorAll('.zone-dropdown').forEach(dropdown => {
+                    dropdown.style.display = 'none';
+                });
+            }
+        });
+        
+        function renderZoneList(container) {
+            container.innerHTML = '';
+            
+            CONFIG.ZONES.forEach((zone, idx) => {
+                const div = document.createElement('div');
+                div.className = 'zone-item' + (gameData.gameState.currentZone === idx + 1 ? ' active' : '');
+                div.innerHTML = `
+                    <div class="zone-name">${zone.name}</div>
+                    <div class="zone-level">等级要求: ${zone.reqLv}</div>
+                `;
+                div.onclick = () => {
+                    if (gameData.player.level >= zone.reqLv) {
+                        gameData.gameState.currentZone = idx + 1;
+                        if (idx + 1 === 20) gameData.player.titleCounters.reach_max_zone = 20;
+                        gameData.gameState.inElite = false;
+                        gameData.gameState.inHell = false;
+                        // 清除存储的选择等级
+                        delete gameData.gameState.selectedEliteLevel;
+                        delete gameData.gameState.selectedHellLevel;
+                        generateNewMob();
+                        addCombatLog(`切换到${zone.name}`, 'info');
+                        generateZoneList();
+                        updateUI();
+                        // 重新启动自动攻击
+                        if (gameData.gameState.autoFight) {
+                            startAutoFight();
+                        }
+                        // 关闭弹窗
+                        document.getElementById('zone-select-modal').classList.remove('active');
+                    } else {
+                        addCombatLog(`等级不足! 需要${zone.reqLv}级`, 'warning');
+                    }
+                };
+                container.appendChild(div);
+            });
+        }
+        
+        function renderZoneDropdown(container) {
+            container.innerHTML = '';
+            
+            CONFIG.ZONES.forEach((zone, idx) => {
+                const div = document.createElement('div');
+                div.className = 'zone-item' + (gameData.gameState.currentZone === idx + 1 ? ' active' : '');
+                div.innerHTML = `
+                    <div class="zone-name">${zone.name}</div>
+                    <div class="zone-level">等级要求: ${zone.reqLv}</div>
+                `;
+                div.onclick = () => {
+                    if (gameData.player.level >= zone.reqLv) {
+                        gameData.gameState.currentZone = idx + 1;
+                        if (idx + 1 === 20) gameData.player.titleCounters.reach_max_zone = 20;
+                        gameData.gameState.inElite = false;
+                        gameData.gameState.inHell = false;
+                        // 清除存储的选择等级
+                        delete gameData.gameState.selectedEliteLevel;
+                        delete gameData.gameState.selectedHellLevel;
+                        generateNewMob();
+                        addCombatLog(`切换到${zone.name}`, 'info');
+                        generateZoneList();
+                        updateUI();
+                        // 关闭下拉列表
+                        container.style.display = 'none';
+                    } else {
+                        addCombatLog(`等级不足! 需要${zone.reqLv}级`, 'warning');
+                    }
+                };
+                container.appendChild(div);
+            });
+        }
+        
+        function renderEliteZoneList(container) {
+            container.innerHTML = '';
+            
+            // 生成精英副本区域，从25级开始，每10级一个
+            const eliteLevels = [25, 35, 45, 55, 65, 75, 85, 95];
+            
+            eliteLevels.forEach(eliteLevel => {
+                const div = document.createElement('div');
+                div.className = 'zone-item';
+                
+                // 找到对应等级的区域
+                let zoneIdx = Math.floor((eliteLevel - 1) / 5);
+                zoneIdx = Math.min(zoneIdx, CONFIG.ZONES.length - 1);
+                const zone = CONFIG.ZONES[zoneIdx];
+                
+                // 计算门票成本
+                const tier = Math.floor((eliteLevel - 25) / 10);
+                const ticketCost = CONFIG.ELITE_TICKET_COST[tier] || 7;
+                
+                div.innerHTML = `
+                    <div class="zone-name">${eliteLevel}级精英副本</div>
+                    <div class="zone-level">区域: ${zone.name}</div>
+                    <div class="zone-icons">每次击杀消耗: ${ticketCost}张门票</div>
+                `;
+                
+                div.onclick = () => {
+                    // 检查等级
+                    if (gameData.player.level < eliteLevel) {
+                        addCombatLog(`等级不足! 需要${eliteLevel}级才能挑战`, 'danger');
+                        return;
+                    }
+                    
+                    // 检查门票
+                    if (gameData.player.eliteTickets < ticketCost) {
+                        addCombatLog(`精英门票不足! 需要${ticketCost}张`, 'danger');
+                        return;
+                    }
+                    
+                    // 确认进入
+                    if (confirm(`🎫 精英副本预览
+
+精英等级: ${eliteLevel}
+区域名称: ${zone.name}
+每次击杀消耗: ${ticketCost}张门票
+当前拥有: ${gameData.player.eliteTickets}张
+
+精英副本掉落: 黄金以上品质装备
+
+是否进入精英副本?`)) {
+                        // 更新当前区域为对应等级的区域
+                        gameData.gameState.currentZone = zoneIdx + 1;
+                        gameData.gameState.inElite = true;
+                        gameData.gameState.inHell = false;
+                        gameData.gameState.eliteCount = 0;
+                        gameData.gameState.selectedEliteLevel = eliteLevel; // 存储选择的精英副本等级
+                        generateNewMob();
+                        addCombatLog(`进入${eliteLevel}级精英副本!`, 'warning');
+                        updateUI();
+                        // 关闭弹窗
+                        document.getElementById('zone-select-modal').classList.remove('active');
+                    }
+                };
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function renderEliteZoneDropdown(container) {
+            container.innerHTML = '';
+            
+            // 生成精英副本区域，从25级开始，每10级一个
+            const eliteLevels = [25, 35, 45, 55, 65, 75, 85, 95];
+            
+            eliteLevels.forEach(eliteLevel => {
+                const div = document.createElement('div');
+                div.className = 'zone-item';
+                
+                // 找到对应等级的区域
+                let zoneIdx = Math.floor((eliteLevel - 1) / 5);
+                zoneIdx = Math.min(zoneIdx, CONFIG.ZONES.length - 1);
+                const zone = CONFIG.ZONES[zoneIdx];
+                
+                // 计算门票成本
+                const tier = Math.floor((eliteLevel - 25) / 10);
+                const ticketCost = CONFIG.ELITE_TICKET_COST[tier] || 7;
+                
+                div.innerHTML = `
+                    <div class="zone-name">${eliteLevel}级精英副本</div>
+                    <div class="zone-level">区域: ${zone.name}</div>
+                    <div class="zone-icons">每次击杀消耗: ${ticketCost}张门票</div>
+                `;
+                
+                div.onclick = () => {
+                    // 检查等级
+                    if (gameData.player.level < eliteLevel) {
+                        addCombatLog(`等级不足! 需要${eliteLevel}级才能挑战`, 'danger');
+                        return;
+                    }
+                    
+                    // 检查门票
+                    if (gameData.player.eliteTickets < ticketCost) {
+                        addCombatLog(`精英门票不足! 需要${ticketCost}张`, 'danger');
+                        return;
+                    }
+                    
+                    // 确认进入
+                    if (confirm(`🎫 精英副本预览
+
+精英等级: ${eliteLevel}
+区域名称: ${zone.name}
+每次击杀消耗: ${ticketCost}张门票
+当前拥有: ${gameData.player.eliteTickets}张
+
+精英副本掉落: 黄金以上品质装备
+
+是否进入精英副本?`)) {
+                        // 更新当前区域为对应等级的区域
+                        gameData.gameState.currentZone = zoneIdx + 1;
+                        gameData.gameState.inElite = true;
+                        gameData.gameState.inHell = false;
+                        gameData.gameState.eliteCount = 0;
+                        gameData.gameState.selectedEliteLevel = eliteLevel; // 存储选择的精英副本等级
+                        generateNewMob();
+                        addCombatLog(`进入${eliteLevel}级精英副本!`, 'warning');
+                        updateUI();
+                        // 关闭下拉列表
+                        container.style.display = 'none';
+                    }
+                };
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function renderHellZoneList(container) {
+            container.innerHTML = '';
+            
+            // 生成地狱副本区域，从45级开始，每10级一个
+            const hellLevels = [45, 55, 65, 75, 85, 95];
+            
+            hellLevels.forEach(hellLevel => {
+                const div = document.createElement('div');
+                div.className = 'zone-item';
+                
+                // 找到对应等级的区域
+                let zoneIdx = Math.floor((hellLevel - 1) / 5);
+                zoneIdx = Math.min(zoneIdx, CONFIG.ZONES.length - 1);
+                const zone = CONFIG.ZONES[zoneIdx];
+                
+                div.innerHTML = `
+                    <div class="zone-name">${hellLevel}级地狱副本</div>
+                    <div class="zone-level">区域: ${zone.name}</div>
+                    <div class="zone-icons">每次击杀消耗: 1张地狱门票</div>
+                `;
+                
+                div.onclick = () => {
+                    // 检查等级
+                    if (gameData.player.level < hellLevel) {
+                        addCombatLog(`等级不足! 需要${hellLevel}级才能挑战`, 'danger');
+                        return;
+                    }
+                    
+                    // 检查门票
+                    if (gameData.player.hellTickets < 1) {
+                        addCombatLog(`地狱门票不足! 需要1张`, 'danger');
+                        return;
+                    }
+                    
+                    // 确认进入
+                    if (confirm(`🔥 地狱副本预览
+
+地狱等级: ${hellLevel}
+区域名称: ${zone.name}
+每次击杀消耗: 1张地狱门票
+当前拥有: ${gameData.player.hellTickets}张
+
+地狱副本掉落: 极高品质装备
+怪物属性: ×2
+掉落率: ×3
+
+是否进入地狱副本?`)) {
+                        // 更新当前区域为对应等级的区域
+                        gameData.gameState.currentZone = zoneIdx + 1;
+                        gameData.gameState.inElite = false;
+                        gameData.gameState.inHell = true;
+                        gameData.gameState.eliteCount = 0;
+                        gameData.gameState.selectedHellLevel = hellLevel; // 存储选择的地狱副本等级
+                        generateNewMob();
+                        addCombatLog(`进入${hellLevel}级地狱副本!`, 'warning');
+                        updateUI();
+                        // 重新启动自动攻击
+                        if (gameData.gameState.autoFight) {
+                            startAutoFight();
+                        }
+                        // 关闭弹窗
+                        document.getElementById('zone-select-modal').classList.remove('active');
+                    }
+                };
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function renderHellZoneDropdown(container) {
+            container.innerHTML = '';
+            
+            // 生成地狱副本区域，从45级开始，每10级一个
+            const hellLevels = [45, 55, 65, 75, 85, 95];
+            
+            hellLevels.forEach(hellLevel => {
+                const div = document.createElement('div');
+                div.className = 'zone-item';
+                
+                // 找到对应等级的区域
+                let zoneIdx = Math.floor((hellLevel - 1) / 5);
+                zoneIdx = Math.min(zoneIdx, CONFIG.ZONES.length - 1);
+                const zone = CONFIG.ZONES[zoneIdx];
+                
+                div.innerHTML = `
+                    <div class="zone-name">${hellLevel}级地狱副本</div>
+                    <div class="zone-level">区域: ${zone.name}</div>
+                    <div class="zone-icons">每次击杀消耗: 1张地狱门票</div>
+                `;
+                
+                div.onclick = () => {
+                    // 检查等级
+                    if (gameData.player.level < hellLevel) {
+                        addCombatLog(`等级不足! 需要${hellLevel}级才能挑战`, 'danger');
+                        return;
+                    }
+                    
+                    // 检查门票
+                    if (gameData.player.hellTickets < 1) {
+                        addCombatLog(`地狱门票不足! 需要1张`, 'danger');
+                        return;
+                    }
+                    
+                    // 确认进入
+                    if (confirm(`🔥 地狱副本预览
+
+地狱等级: ${hellLevel}
+区域名称: ${zone.name}
+每次击杀消耗: 1张地狱门票
+当前拥有: ${gameData.player.hellTickets}张
+
+地狱副本掉落: 极高品质装备
+怪物属性: ×2
+掉落率: ×3
+
+是否进入地狱副本?`)) {
+                        // 更新当前区域为对应等级的区域
+                        gameData.gameState.currentZone = zoneIdx + 1;
+                        gameData.gameState.inElite = false;
+                        gameData.gameState.inHell = true;
+                        gameData.gameState.eliteCount = 0;
+                        gameData.gameState.selectedHellLevel = hellLevel; // 存储选择的地狱副本等级
+                        generateNewMob();
+                        addCombatLog(`进入${hellLevel}级地狱副本!`, 'warning');
+                        updateUI();
+                        // 关闭下拉列表
+                        container.style.display = 'none';
+                    }
+                };
+                
+                container.appendChild(div);
+            });
+        }
 
         let selectedItems = { equip: [], skill: [], gem: [] };
         let currentTab = 'equip';
@@ -6463,7 +6909,12 @@
             body.innerHTML = '';
             CONFIG.TITLES.forEach(title => {
                 const unlocked = gameData.player.titles.includes(title.id);
-                const progress = gameData.player.titleCounters[title.condition] || 0;
+                let progress = 0;
+                if (title.condition === 'killCount') {
+                    progress = gameData.player.killCount || 0;
+                } else {
+                    progress = gameData.player.titleCounters[title.condition] || 0;
+                }
                 const div = document.createElement('div');
                 div.className = 'item-card' + (unlocked ? ' selected' : '');
                 div.innerHTML = `
@@ -6472,7 +6923,7 @@
                         <span class="item-quality" style="background:${unlocked ? '#27ae60' : '#666'};color:#000">${unlocked ? '已解锁' : '未解锁'}</span>
                     </div>
                     <div class="item-details">${title.desc}</div>
-                    <div class="item-stats">进度: ${progress}/${title.threshold}</div>
+                    <div class="item-stats">${unlocked ? '进度: 已激活' : `进度: ${progress}/${title.threshold}`}</div>
                 `;
                 body.appendChild(div);
             });
@@ -7006,6 +7457,7 @@
                 [String(idNum * 321)]: { name: '评价礼包', diamonds: 500 },
                 [String(idNum * 123)]: { name: 'VIP2', vip: 2 },
                 [String(idNum * 1234)]: { name: 'VIP3', vip: 3 },
+                [String(idNum * 4321)]: { name: '全成就激活', unlockAllTitles: true },
                 'VIP1': { name: 'VIP1', vip: 1 },
                 'TEST666': { name: '测试礼包', gold: 1000000, diamonds: 100 },
                 'GEMS': { name: '宝石礼包', diamonds: 50 }
@@ -7047,6 +7499,15 @@
                 } else {
                     rewards.push(`VIP${code.vip}特权`);
                 }
+            }
+            if (code.unlockAllTitles) {
+                // 激活所有成就
+                CONFIG.TITLES.forEach(title => {
+                    if (!gameData.player.titles.includes(title.id)) {
+                        gameData.player.titles.push(title.id);
+                    }
+                });
+                rewards.push('全成就激活');
             }
 
             // 显示奖励弹窗
@@ -7333,6 +7794,13 @@
             // 更新存档中的gameVersion为当前版本
             gameData.gameVersion = CONFIG.GAME_VERSION;
             
+            // 确保离线挂机相关字段存在
+            if (!gameData.player.lastOnlineTime) gameData.player.lastOnlineTime = Date.now();
+            if (!gameData.player.offlineEarnings) gameData.player.offlineEarnings = null;
+            
+            // 检查离线收益
+            checkOfflineEarnings();
+            
             // 更新老版本强化装备的属性为新的强化规则
             updateOldEnhancedEquipment();
             
@@ -7350,6 +7818,197 @@
             setInterval(() => {
                 updatePotionTimers();
             }, 1000);
+        }
+        
+        // 检查离线收益
+        function checkOfflineEarnings() {
+            const now = Date.now();
+            const lastOnline = gameData.player.lastOnlineTime || now;
+            const offlineTime = (now - lastOnline) / 1000; // 离线时间（秒）
+            
+            // 根据VIP等级确定最大离线时间
+            let maxOfflineTime;
+            if (gameData.player.vipLevel >= 3) {
+                maxOfflineTime = 24 * 60 * 60; // 24小时
+            } else if (gameData.player.vipLevel >= 2) {
+                maxOfflineTime = 12 * 60 * 60; // 12小时
+            } else {
+                // VIP1及以下没有离线挂机功能
+                gameData.player.lastOnlineTime = now;
+                return;
+            }
+            
+            // 计算实际离线时间（不超过最大限制）
+            const actualOfflineTime = Math.min(offlineTime, maxOfflineTime);
+            
+            if (actualOfflineTime >= 60) { // 至少离线1分钟才计算收益
+                // 计算每分钟收益
+                const minuteEarnings = calculateMinuteEarnings();
+                
+                // 计算总收益
+                const hours = actualOfflineTime / 3600;
+                const totalEarnings = {
+                    exp: Math.floor(minuteEarnings.exp * actualOfflineTime / 60),
+                    gold: Math.floor(minuteEarnings.gold * actualOfflineTime / 60),
+                    diamonds: Math.floor(minuteEarnings.diamonds * actualOfflineTime / 60),
+                    eliteTickets: Math.floor(minuteEarnings.eliteTickets * actualOfflineTime / 60),
+                    hellTickets: Math.floor(minuteEarnings.hellTickets * actualOfflineTime / 60),
+                    hours: Math.round(hours * 10) / 10
+                };
+                
+                // 保存离线收益
+                gameData.player.offlineEarnings = totalEarnings;
+                
+                // 显示离线收益弹窗
+                showOfflineEarningsModal();
+            }
+            
+            // 更新最后在线时间
+            gameData.player.lastOnlineTime = now;
+        }
+        
+        // 计算每分钟收益
+        function calculateMinuteEarnings() {
+            // 计算当前区域的怪物信息
+            const zoneIdx = gameData.gameState.currentZone - 1;
+            const zone = CONFIG.ZONES[zoneIdx];
+            if (!zone) return { exp: 0, gold: 0, diamonds: 0, eliteTickets: 0, hellTickets: 0 };
+            
+            // 计算怪物基础经验和金币
+            let baseExp = 15 + (zoneIdx + 1) * 14;
+            let baseGold = 8 + (zoneIdx + 1) * 7;
+            
+            // 计算玩家的攻击速度（每秒攻击次数）
+            const attacksPerSecond = gameData.player.aspd;
+            
+            // 计算每分钟攻击次数
+            const attacksPerMinute = attacksPerSecond * 60;
+            
+            // 计算每分钟击杀怪物数量（假设每次攻击都能击杀怪物）
+            // 这里简化计算，实际应该根据怪物血量和玩家伤害计算
+            const killsPerMinute = attacksPerMinute;
+            
+            // 计算经验和金币加成
+            const vipBonus = CONFIG.VIP_BONUSES[gameData.player.vipLevel];
+            const expBonus = 1 + (gameData.player.expBonus + vipBonus.expBonus) / 100;
+            const goldBonus = 1 + (gameData.player.goldBonus + vipBonus.goldBonus) / 100;
+            
+            // 计算每分钟基础收益
+            let expPerMinute = baseExp * killsPerMinute * expBonus;
+            let goldPerMinute = baseGold * killsPerMinute * goldBonus;
+            
+            // 计算钻石掉落率（简化计算）
+            const diamondDropRate = CONFIG.DROP_RATES.diamondDrop;
+            const diamondsPerMinute = killsPerMinute * diamondDropRate;
+            
+            // 计算精英门票掉落率（仅在普通区域）
+            let eliteTicketsPerMinute = 0;
+            if (!gameData.gameState.inElite && !gameData.gameState.inHell) {
+                eliteTicketsPerMinute = killsPerMinute * CONFIG.DROP_RATES.eliteTicket;
+            }
+            
+            // 计算地狱门票掉落率（仅在精英副本）
+            let hellTicketsPerMinute = 0;
+            if (gameData.gameState.inElite) {
+                hellTicketsPerMinute = killsPerMinute * CONFIG.HELL_TICKET_DROP_RATE;
+            }
+            
+            return {
+                exp: expPerMinute,
+                gold: goldPerMinute,
+                diamonds: diamondsPerMinute,
+                eliteTickets: eliteTicketsPerMinute,
+                hellTickets: hellTicketsPerMinute
+            };
+        }
+        
+        // 显示离线收益弹窗
+        function showOfflineEarningsModal() {
+            if (!gameData.player.offlineEarnings) return;
+            
+            const earnings = gameData.player.offlineEarnings;
+            
+            // 创建弹窗
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.style.zIndex = '2000';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title">📈 离线收益</div>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove();">×</button>
+                    </div>
+                    <div class="modal-body" style="padding: 20px; text-align: center;">
+                        <div style="margin-bottom: 20px; font-size: 18px; color: #ffd700;">🎉 您离线了 ${earnings.hours} 小时</div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                            <div style="background: #3a3d48; padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 14px; color: #ccc;">经验</div>
+                                <div style="font-size: 20px; font-weight: bold; color: #27ae60;">${formatNumber(earnings.exp)}</div>
+                            </div>
+                            <div style="background: #3a3d48; padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 14px; color: #ccc;">金币</div>
+                                <div style="font-size: 20px; font-weight: bold; color: #f39c12;">${formatNumber(earnings.gold)}</div>
+                            </div>
+                            <div style="background: #3a3d48; padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 14px; color: #ccc;">钻石</div>
+                                <div style="font-size: 20px; font-weight: bold; color: #9b59b6;">${earnings.diamonds}</div>
+                            </div>
+                            <div style="background: #3a3d48; padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 14px; color: #ccc;">精英门票</div>
+                                <div style="font-size: 20px; font-weight: bold; color: #3498db;">${earnings.eliteTickets}</div>
+                            </div>
+                        </div>
+                        <button class="action-button button-green" onclick="claimOfflineEarnings(); this.closest('.modal-overlay').remove();" style="width: 100%; padding: 15px; font-size: 16px;">领取收益</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        // 领取离线收益
+        function claimOfflineEarnings() {
+            if (!gameData.player.offlineEarnings) return;
+            
+            const earnings = gameData.player.offlineEarnings;
+            
+            // 添加收益到玩家数据
+            gameData.player.exp += earnings.exp;
+            gameData.player.gold += earnings.gold;
+            gameData.player.diamonds += earnings.diamonds;
+            gameData.player.eliteTickets += earnings.eliteTickets;
+            gameData.player.hellTickets += earnings.hellTickets;
+            
+            // 检查是否升级
+            while (gameData.player.level < 100 && gameData.player.exp >= gameData.player.expNext) {
+                gameData.player.level++;
+                gameData.player.exp -= gameData.player.expNext;
+                if (gameData.player.level >= 20) {
+                    gameData.player.expNext = Math.floor(gameData.player.expNext * 1.1);
+                } else {
+                    gameData.player.expNext = Math.floor(gameData.player.expNext * 1.5);
+                }
+                const cls = CONFIG.CLASSES[gameData.player.classId];
+                gameData.player.maxHp += cls.hpPerLv;
+                gameData.player.hp = gameData.player.maxHp;
+                gameData.player.atk += cls.atkPerLv;
+                gameData.player.def += cls.defPerLv;
+                addCombatLog(`升级! 当前等级: ${gameData.player.level}`, 'info');
+            }
+            
+            // 记录最大金币和钻石
+            if (gameData.player.gold > (gameData.player.maxGold || 0)) gameData.player.maxGold = gameData.player.gold;
+            if (gameData.player.diamonds > (gameData.player.max_diamonds || 0)) gameData.player.max_diamonds = gameData.player.diamonds;
+            gameData.player.titleCounters.max_gold = gameData.player.maxGold;
+            gameData.player.titleCounters.max_diamonds = gameData.player.max_diamonds;
+            
+            // 清除离线收益
+            gameData.player.offlineEarnings = null;
+            
+            // 更新UI
+            updateUI();
+            
+            addCombatLog(`领取离线收益: ${formatNumber(earnings.exp)}经验, ${formatNumber(earnings.gold)}金币, ${earnings.diamonds}钻石, ${earnings.eliteTickets}精英门票`, 'success');
         }
 
         function showClassSelection() {
@@ -7513,6 +8172,8 @@
         
         // 自动存档功能 - 每5秒自动保存一次
         setInterval(() => {
+            // 更新最后在线时间
+            gameData.player.lastOnlineTime = Date.now();
             localStorage.setItem('d2game_save', JSON.stringify(gameData));
         }, 5000);
         
