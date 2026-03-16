@@ -2,14 +2,23 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
     <title>暗黑魔兽文字挂机</title>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { font-family: 'Arial', sans-serif; background-color: #191c23; color: #ffffff; height: 100%; overflow: hidden; -webkit-overflow-scrolling: touch; }
+        html, body { font-family: 'Arial', sans-serif; background-color: #191c23; color: #ffffff; height: 100%; overflow: hidden; -webkit-overflow-scrolling: touch; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         body { display: flex; justify-content: center; align-items: flex-start; }
-        .game-canvas { width: 100vw; min-height: 100vh; background-color: #191c23; position: relative; overflow-y: auto; }
+        .game-canvas { width: 100vw; min-height: 100vh; background-color: #191c23; position: relative; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        @media (max-width: 768px) {
+            .game-canvas {
+                min-height: 100dvh;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+        }
         @media (max-width: 750px) {
             .game-canvas {
                 transform: none;
@@ -18,16 +27,23 @@
                 overflow-y: auto;
             }
         }
-        .top-bar { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffd700; box-shadow: 0 4px 12px rgba(0,0,0,0.3); position: relative; z-index: 100; }
+        .top-bar { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffd700; box-shadow: 0 4px 12px rgba(0,0,0,0.3); position: relative; z-index: 100; transform: translateZ(0); will-change: transform; }
         .top-bar::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0) 50%, rgba(255,215,0,0.1) 100%); }
         .top-bar-left { display: flex; gap: 20px; align-items: center; overflow-x: auto; white-space: nowrap; padding-bottom: 5px; position: relative; z-index: 101; }
         .resource-item { display: flex; align-items: center; gap: 5px; font-size: 14px; padding: 6px 12px; background: rgba(0,0,0,0.3); border-radius: 20px; border: 1px solid rgba(255,215,0,0.2); transition: all 0.3s; }
         .resource-item:hover { background: rgba(0,0,0,0.5); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
         .resource-icon { font-size: 18px; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
         .resource-value { color: #ffd700; font-weight: bold; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
-        .game-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 10px; min-height: calc(100vh - 60px); overflow-y: auto; }
-        .player-status, .right-panel { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); height: 100%; overflow: hidden; }
-        .combat-area { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex: 1; } 
+        .game-container { display: grid; grid-template-columns: 1fr; gap: 10px; padding: 10px; min-height: calc(100vh - 60px); overflow-y: auto; }
+        @media (min-width: 1200px) {
+            .game-container { 
+                grid-template-columns: 1fr 1fr 1fr; 
+                height: calc(100vh - 60px); 
+                overflow-y: auto;
+            } 
+        }
+        .player-status, .right-panel { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); height: 100%; overflow: hidden; transform: translateZ(0); will-change: transform; }
+        .combat-area { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex: 1; transform: translateZ(0); will-change: transform; } 
         .combat-area.minimized { min-height: 60px; }
         h2 { color: #ffd700; font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .status-item { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -35,7 +51,7 @@
         .status-label { font-size: 10px; color: #cccccc; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
         .status-number { font-size: 13px; font-weight: bold; color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.3); }
         .action-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
-        .action-button { padding: 8px; border: none; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 4px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
+        .action-button { padding: 12px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 4px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); position: relative; overflow: hidden; min-height: 44px; min-width: 80px; touch-action: manipulation; }
         .action-button:hover, .action-button:active { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
         .action-button::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
         .action-button:hover::before { left: 100%; }
@@ -105,9 +121,9 @@
         .panel-tab-content.active { display: flex; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .modal-title { font-size: 18px; font-weight: bold; color: #ffd700; }
-        .modal-close { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+        .modal-close { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
         .modal-tabs { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .modal-tab { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; background-color: #3a3d48; color: #ccc; }
+        .modal-tab { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; background-color: #3a3d48; color: #ccc; min-height: 44px; display: flex; align-items: center; touch-action: manipulation; }
         .modal-tab.active { background-color: #ffd700; color: #000; }
         .modal-body { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
         .modal-body.hidden { display: none; }
@@ -201,31 +217,24 @@
         .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #3a3d48; font-size: 12px; }
         .info-label { color: #aaa; }
         .info-value { color: #ffd700; font-weight: bold; }
-        @media (max-width: 1200px) {
-            .game-container { 
-                grid-template-columns: 1fr; 
-                height: calc(100vh - 60px); 
-                overflow-y: auto;
-            } 
-            .player-status, .combat-area, .right-panel { 
-                min-height: 300px; 
-                max-height: none;
-            } 
-        }
-        
         @media (max-width: 768px) {
             .game-canvas {
                 width: 100vw;
                 min-height: 100dvh;
                 transform: none;
                 overflow-y: auto;
-                padding-bottom: 20px;
+                padding-bottom: env(safe-area-inset-bottom, 20px);
                 touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
             }
             .top-bar { 
                 padding: 6px 8px; 
                 flex-shrink: 0;
                 height: auto;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%);
             } 
             .top-bar-left { 
                 gap: 4px; 
@@ -233,6 +242,7 @@
                 white-space: nowrap;
                 scrollbar-width: none;
                 -webkit-overflow-scrolling: touch;
+                padding-bottom: 2px;
             } 
             .top-bar-left::-webkit-scrollbar { 
                 display: none;
@@ -242,6 +252,7 @@
                 padding: 4px 8px;
                 border-radius: 12px;
                 min-width: 80px;
+                flex-shrink: 0;
             } 
             .resource-icon { 
                 font-size: 12px; 
@@ -259,6 +270,7 @@
                 gap: 6px; 
                 max-height: none;
                 min-height: 200px;
+                touch-action: manipulation;
             } 
             .combat-area {
                 overflow: visible;
@@ -282,11 +294,12 @@
                 gap: 4px;
             }
             .action-button { 
-                padding: 6px;
+                padding: 8px 12px;
                 font-size: 9px; 
-                min-height: 35px;
-                min-width: 60px;
+                min-height: 44px;
+                min-width: 80px;
                 touch-action: manipulation;
+                border-radius: 8px;
             } 
             .mob-info {
                 padding: 6px;
@@ -317,7 +330,7 @@
             .combat-button { 
                 padding: 6px; 
                 font-size: 9px; 
-                min-height: 30px;
+                min-height: 44px;
                 touch-action: manipulation;
             } 
             .combat-log { 
@@ -348,12 +361,31 @@
                 font-size: 10px; 
                 touch-action: manipulation;
             } 
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.8);
+                display: none;
+                justify-content: center;
+                align-items: flex-start;
+                z-index: 1000;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
             .modal-content { 
                 padding: 8px; 
                 max-height: 95dvh; 
                 width: 98%;
                 margin-top: 10px;
+                margin-bottom: 20px;
                 touch-action: manipulation;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 12px;
+                background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%);
             } 
             .modal-title { 
                 font-size: 12px; 
@@ -363,6 +395,7 @@
                 gap: 4px; 
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
+                max-height: 60vh;
             } 
             .item-card { 
                 padding: 8px; 
@@ -383,6 +416,68 @@
                 height: 300px; 
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                scrollbar-color: #ffd700 #3a3d48;
+            }
+            .zone-list::-webkit-scrollbar {
+                width: 6px;
+            }
+            .zone-list::-webkit-scrollbar-track {
+                background: #3a3d48;
+                border-radius: 3px;
+            }
+            .zone-list::-webkit-scrollbar-thumb {
+                background: #ffd700;
+                border-radius: 3px;
+            }
+            .zone-list::-webkit-scrollbar-thumb:hover {
+                background: #ffed4e;
+            }
+            /* 背包界面优化 */
+            #inventory-body {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 3px;
+                max-height: 50vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                scrollbar-color: #ffd700 #3a3d48;
+            }
+            #inventory-body::-webkit-scrollbar {
+                width: 6px;
+            }
+            #inventory-body::-webkit-scrollbar-track {
+                background: #3a3d48;
+                border-radius: 3px;
+            }
+            #inventory-body::-webkit-scrollbar-thumb {
+                background: #ffd700;
+                border-radius: 3px;
+            }
+            #inventory-body::-webkit-scrollbar-thumb:hover {
+                background: #ffed4e;
+            }
+            /* 属性面板优化 */
+            .player-status {
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                max-height: 300px;
+                scrollbar-width: thin;
+                scrollbar-color: #ffd700 #3a3d48;
+            }
+            .player-status::-webkit-scrollbar {
+                width: 6px;
+            }
+            .player-status::-webkit-scrollbar-track {
+                background: #3a3d48;
+                border-radius: 3px;
+            }
+            .player-status::-webkit-scrollbar-thumb {
+                background: #ffd700;
+                border-radius: 3px;
+            }
+            .player-status::-webkit-scrollbar-thumb:hover {
+                background: #ffed4e;
             }
         }
         
@@ -396,6 +491,7 @@
                 padding: 2px 4px;
                 border-radius: 8px;
                 min-width: 70px;
+                flex-shrink: 0;
             } 
             .resource-icon { 
                 font-size: 10px; 
@@ -411,6 +507,7 @@
                 padding: 5px; 
                 gap: 3px; 
                 min-height: 150px;
+                touch-action: manipulation;
             } 
             h2 { 
                 font-size: 10px; 
@@ -421,11 +518,12 @@
                 gap: 2px; 
             } 
             .action-button { 
-                padding: 3px;
+                padding: 6px 8px;
                 font-size: 7px; 
-                min-height: 25px;
-                min-width: 50px;
+                min-height: 44px;
+                min-width: 70px;
                 touch-action: manipulation;
+                border-radius: 6px;
             } 
             .mob-info {
                 padding: 4px;
@@ -456,7 +554,7 @@
             .combat-button { 
                 padding: 4px; 
                 font-size: 8px; 
-                min-height: 25px;
+                min-height: 44px;
                 touch-action: manipulation;
             } 
             .combat-log { 
@@ -487,16 +585,29 @@
                 max-height: 95dvh;
                 width: 99%;
                 margin-top: 8px;
+                margin-bottom: 20px;
                 touch-action: manipulation;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             } 
             .modal-title { 
                 font-size: 11px;
             } 
+            .modal-tabs {
+                gap: 4px;
+                margin-bottom: 10px;
+            }
+            .modal-tab {
+                padding: 6px 10px;
+                font-size: 10px;
+                min-height: 44px;
+            }
             .modal-body { 
-                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); 
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
                 gap: 3px;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
+                max-height: 50vh;
             } 
             .item-card { 
                 padding: 6px; 
@@ -517,6 +628,30 @@
                 height: 250px; 
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
+            }
+            /* 背包界面优化 */
+            #inventory-body {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+                gap: 2px;
+                max-height: 40vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                scrollbar-color: #ffd700 #3a3d48;
+            }
+            #inventory-body::-webkit-scrollbar {
+                width: 4px;
+            }
+            #inventory-body::-webkit-scrollbar-track {
+                background: #3a3d48;
+                border-radius: 2px;
+            }
+            #inventory-body::-webkit-scrollbar-thumb {
+                background: #ffd700;
+                border-radius: 2px;
+            }
+            #inventory-body::-webkit-scrollbar-thumb:hover {
+                background: #ffed4e;
             }
         }
     </style>
@@ -1213,6 +1348,12 @@
             }
         }
 
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化拖拽功能
+            initDragAndDrop();
+        });
+
         function calculatePlayerStats() {
             const cls = CONFIG.CLASSES[gameData.player.classId];
             let baseHp = cls.baseHp + (gameData.player.level - 1) * cls.hpPerLv;
@@ -1618,6 +1759,75 @@
                 div.onclick = () => openSkillModal();
                 container.appendChild(div);
             }
+        }
+
+        // 实现属性面板拖拽功能
+        function initDragAndDrop() {
+            const playerStatus = document.querySelector('.player-status');
+            if (!playerStatus) return;
+
+            let isDragging = false;
+            let startX, startY, scrollLeft, scrollTop;
+
+            // 鼠标事件
+            playerStatus.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.pageX - playerStatus.offsetLeft;
+                startY = e.pageY - playerStatus.offsetTop;
+                scrollLeft = playerStatus.scrollLeft;
+                scrollTop = playerStatus.scrollTop;
+                playerStatus.style.cursor = 'grabbing';
+            });
+
+            playerStatus.addEventListener('mouseleave', () => {
+                isDragging = false;
+                playerStatus.style.cursor = 'grab';
+            });
+
+            playerStatus.addEventListener('mouseup', () => {
+                isDragging = false;
+                playerStatus.style.cursor = 'grab';
+            });
+
+            playerStatus.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const x = e.pageX - playerStatus.offsetLeft;
+                const y = e.pageY - playerStatus.offsetTop;
+                const walkX = (x - startX) * 2; // 滚动速度
+                const walkY = (y - startY) * 2;
+                playerStatus.scrollLeft = scrollLeft - walkX;
+                playerStatus.scrollTop = scrollTop - walkY;
+            });
+
+            // 触摸事件（移动端）
+            playerStatus.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                const touch = e.touches[0];
+                startX = touch.pageX - playerStatus.offsetLeft;
+                startY = touch.pageY - playerStatus.offsetTop;
+                scrollLeft = playerStatus.scrollLeft;
+                scrollTop = playerStatus.scrollTop;
+            }, { passive: false });
+
+            playerStatus.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+
+            playerStatus.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const touch = e.touches[0];
+                const x = touch.pageX - playerStatus.offsetLeft;
+                const y = touch.pageY - playerStatus.offsetTop;
+                const walkX = (x - startX) * 2; // 滚动速度
+                const walkY = (y - startY) * 2;
+                playerStatus.scrollLeft = scrollLeft - walkX;
+                playerStatus.scrollTop = scrollTop - walkY;
+            }, { passive: false });
+
+            // 设置初始光标样式
+            playerStatus.style.cursor = 'grab';
         }
 
 
@@ -3153,6 +3363,92 @@
         // 等待 DOM 加载完成后再绑定事件
 
 
+        // 添加拖动功能
+        function makeDraggable(element) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            const header = element.querySelector('h2') || element;
+            
+            if (header) {
+                header.onmousedown = dragMouseDown;
+                header.ontouchstart = dragTouchStart;
+            }
+            
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+            
+            function dragTouchStart(e) {
+                e = e || window.event;
+                e.preventDefault();
+                const touch = e.touches[0];
+                pos3 = touch.clientX;
+                pos4 = touch.clientY;
+                document.ontouchend = closeDragElement;
+                document.ontouchmove = touchDrag;
+            }
+            
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                const newTop = element.offsetTop - pos2;
+                const newLeft = element.offsetLeft - pos1;
+                
+                // 限制在游戏容器内
+                const gameCanvas = document.querySelector('.game-canvas');
+                if (gameCanvas) {
+                    const canvasRect = gameCanvas.getBoundingClientRect();
+                    const elementRect = element.getBoundingClientRect();
+                    
+                    const maxTop = canvasRect.height - elementRect.height;
+                    const maxLeft = canvasRect.width - elementRect.width;
+                    
+                    element.style.top = Math.max(0, Math.min(maxTop, newTop)) + 'px';
+                    element.style.left = Math.max(0, Math.min(maxLeft, newLeft)) + 'px';
+                }
+            }
+            
+            function touchDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                const touch = e.touches[0];
+                pos1 = pos3 - touch.clientX;
+                pos2 = pos4 - touch.clientY;
+                pos3 = touch.clientX;
+                pos4 = touch.clientY;
+                const newTop = element.offsetTop - pos2;
+                const newLeft = element.offsetLeft - pos1;
+                
+                // 限制在游戏容器内
+                const gameCanvas = document.querySelector('.game-canvas');
+                if (gameCanvas) {
+                    const canvasRect = gameCanvas.getBoundingClientRect();
+                    const elementRect = element.getBoundingClientRect();
+                    
+                    const maxTop = canvasRect.height - elementRect.height;
+                    const maxLeft = canvasRect.width - elementRect.width;
+                    
+                    element.style.top = Math.max(0, Math.min(maxTop, newTop)) + 'px';
+                    element.style.left = Math.max(0, Math.min(maxLeft, newLeft)) + 'px';
+                }
+            }
+            
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                document.ontouchend = null;
+                document.ontouchmove = null;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // 确保所有函数都已定义
             setTimeout(function() {
@@ -3172,6 +3468,13 @@
                 document.getElementById('equipment').addEventListener('click', openEquipmentModal);
                 document.getElementById('daily').addEventListener('click', openDailyModal);
                 document.getElementById('game-intro').addEventListener('click', openGameIntroModal);
+                
+                // 为属性面板添加拖动功能
+                const playerStatus = document.querySelector('.player-status');
+                if (playerStatus) {
+                    playerStatus.style.position = 'relative';
+                    makeDraggable(playerStatus);
+                }
                 
             }, 100); // 延迟100毫秒，确保所有函数都已定义
         });
@@ -5114,11 +5417,12 @@
             const body = document.getElementById('inventory-body');
             body.innerHTML = '';
             body.style.display = 'grid';
-            body.style.gridTemplateColumns = 'repeat(2, 1fr)';
-            body.style.gap = '20px';
-            body.style.padding = '15px';
-            body.style.maxHeight = '800px';
+            body.style.gridTemplateColumns = '1fr';
+            body.style.gap = '10px';
+            body.style.padding = '10px';
+            body.style.maxHeight = '50vh';
             body.style.overflowY = 'auto';
+            body.style.webkitOverflowScrolling = 'touch';
             
             let items = gameData.player.inventory;
             if (filter === 'equip') items = items.filter(i => !i.baseName && i.slot);
