@@ -98,7 +98,7 @@
         .status-label { font-size: 10px; color: #cccccc; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
         .status-number { font-size: 13px; font-weight: bold; color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.3); }
         .action-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
-        .action-button { padding: 12px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 4px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); position: relative; overflow: hidden; min-height: 44px; min-width: 80px; touch-action: manipulation; }
+        .action-button { padding: 12px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); position: relative; overflow: hidden; min-height: 44px; min-width: 80px; touch-action: manipulation; }
         .action-button:hover, .action-button:active { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
         .action-button::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
         .action-button:hover::before { left: 100%; }
@@ -247,7 +247,7 @@
         .protect-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-top: 10px; }
         .protect-toggle input { width: 16px; height: 16px; }
         .market-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .market-item { background-color: #3a3d48; padding: 15px; border-radius: 8px; text-align: center; }
+        .market-item { background-color: #3a3d48; padding: 15px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 280px; }
         .market-icon { font-size: 40px; margin-bottom: 10px; }
         .market-name { font-weight: bold; margin-bottom: 5px; }
         .market-price { color: #ffd700; font-size: 14px; margin-bottom: 10px; }
@@ -835,7 +835,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本1.06</div>
+                    <div class="panel-title">📊 角色属性 版本1.07</div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -953,6 +953,21 @@
             <div class="modal-body" id="market-body"></div>
         </div>
     </div>
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">确认购买</div>
+                <button class="modal-close" id="close-confirm">&times;</button>
+            </div>
+            <div class="modal-body" id="confirm-body" style="padding: 20px;">
+                <p id="confirm-message" style="text-align: center; margin-bottom: 20px;"></p>
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <button class="action-button button-green" id="confirm-yes">确认</button>
+                    <button class="action-button button-red" id="confirm-no">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal-overlay" id="enhance-modal">
         <div class="modal-content modal-large">
@@ -983,9 +998,6 @@
             </div>
             <div class="sub-tabs">
                 <button class="sub-tab active" data-tab="all">全部</button>
-                <button class="sub-tab" data-tab="equip">装备</button>
-                <button class="sub-tab" data-tab="skill">技能</button>
-                <button class="sub-tab" data-tab="gem">宝石</button>
                 <button class="sub-tab" data-tab="slot:weapon">武器</button>
                 <button class="sub-tab" data-tab="slot:helmet">头盔</button>
                 <button class="sub-tab" data-tab="slot:armor">铠甲</button>
@@ -1209,7 +1221,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.06",
+            GAME_VERSION: "1.07",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1382,7 +1394,7 @@
                 { id: "hell_slayer", name: "地狱屠杀者", icon: "💀", desc: "累计消耗地狱门票20000张", condition: "hell_tickets_spent", threshold: 20000, bonuses: { equipDropBonus: 10 } },
                 { id: "hell_terminator", name: "地狱终结者", icon: "👿", desc: "累计消耗地狱门票50000张", condition: "hell_tickets_spent", threshold: 50000, bonuses: { equipDropBonus: 20 } },
                 { id: "forging_god", name: "锻造之神", icon: "⚒️", desc: "武器强化到+11", condition: "weapon_enhance_max", threshold: 11, bonuses: { crit: 50 } },
-                { id: "zone_master", name: "区域之主", icon: "👑", desc: "单区域击杀100000只", condition: "zone1_kills", threshold: 100000, bonuses: { atk: 300, def: 300 } }
+                { id: "zone_master", name: "区域之主", icon: "👑", desc: "单区域击杀100000只", condition: "zone_kills_max", threshold: 100000, bonuses: { atk: 300, def: 300 } }
             ],
             VIP_BONUSES: { 0: { equipDropBonus: 0, goldBonus: 0, expBonus: 0 }, 1: { equipDropBonus: 10, goldBonus: 10, expBonus: 10 }, 2: { equipDropBonus: 30, goldBonus: 30, expBonus: 30 }, 3: { equipDropBonus: 50, goldBonus: 50, expBonus: 50 } },
             VIP_REWARDS: { 1: { diamonds: 200, eliteTickets: 1000 }, 2: { diamonds: 500, eliteTickets: 2000 }, 3: { diamonds: 1000, eliteTickets: 5000 } },
@@ -1444,7 +1456,7 @@
                 equippedSkills: [],
                 inventory: [],
                 gems: [],
-                titleCounters: { zone1_kills: 0, adventure_boss_kills: 0, enhance_consec_fails: 0, enhance_consec_success: 0, elite_tickets_spent: 0, hell_tickets_spent: 0, weapon_enhance_max: 0, reach_max_zone: 0, max_gold: 0, max_diamonds: 0 },
+                titleCounters: { zone1_kills: 0, adventure_boss_kills: 0, enhance_consec_fails: 0, enhance_consec_success: 0, elite_tickets_spent: 0, hell_tickets_spent: 0, weapon_enhance_max: 0, reach_max_zone: 0, max_gold: 0, max_diamonds: 0, zone_kills: {}, zone_kills_max: 0 },
                 saveCount: 0, lastSaveDate: null,
                 titles: []
             },
@@ -1475,8 +1487,85 @@
             }
         }
 
+        // 单实例检测 - 后来者居上机制
+        function initSingleInstanceProtection() {
+            const INSTANCE_KEY = 'dark_warcraft_instance';
+            const HEARTBEAT_INTERVAL = 2000; // 2秒心跳
+            const CHECK_INTERVAL = 1000; // 1秒检查一次
+            
+            // 生成唯一实例ID
+            const instanceId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            let isActive = true;
+            
+            // 发送心跳
+            function sendHeartbeat() {
+                if (!isActive) return;
+                
+                const data = {
+                    instanceId: instanceId,
+                    lastHeartbeat: Date.now()
+                };
+                localStorage.setItem(INSTANCE_KEY, JSON.stringify(data));
+            }
+            
+            // 检查是否仍然是活跃实例
+            function checkIfStillActive() {
+                const storedData = localStorage.getItem(INSTANCE_KEY);
+                if (storedData) {
+                    try {
+                        const data = JSON.parse(storedData);
+                        if (data.instanceId !== instanceId) {
+                            // 发现新的活跃实例，当前实例被抢占
+                            if (isActive) {
+                                isActive = false;
+                                alert('游戏已在另一个标签页启动，当前页面的游戏已被禁用。');
+                                // 禁用游戏功能
+                                disableGame();
+                            }
+                        }
+                    } catch (e) {
+                        // 数据格式错误
+                    }
+                }
+            }
+            
+            // 禁用游戏功能
+            function disableGame() {
+                // 禁用所有游戏交互
+                document.body.style.pointerEvents = 'none';
+                document.body.style.opacity = '0.5';
+                
+                // 停止所有游戏循环
+                // 这里需要根据实际游戏代码添加停止游戏循环的逻辑
+            }
+            
+            // 初始化
+            function init() {
+                // 立即发送心跳，抢占实例
+                sendHeartbeat();
+                
+                // 定期发送心跳
+                setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
+                
+                // 定期检查是否仍然是活跃实例
+                setInterval(checkIfStillActive, CHECK_INTERVAL);
+                
+                // 页面关闭时清理
+                window.addEventListener('beforeunload', function() {
+                    // 不清理实例标记，让其他实例可以抢占
+                });
+                
+                return true;
+            }
+            
+            return init();
+        }
+        
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
+            // 初始化单实例保护
+            initSingleInstanceProtection();
+            
             // 初始化拖拽功能
             initDragAndDrop();
         });
@@ -1707,6 +1796,7 @@
             const combatArea = document.querySelector('.combat-area');
             const toggleButton = document.getElementById('toggle-combat-panel');
             const playerStatus = document.querySelector('.player-status');
+            const gameContainer = document.querySelector('.game-container');
             
             if (!combatArea) return;
             
@@ -1724,6 +1814,10 @@
                     playerStatus.style.flex = '0 0 auto';
                     playerStatus.style.minHeight = '550px';
                 }
+                // 恢复游戏容器布局
+                if (gameContainer) {
+                    gameContainer.style.minHeight = 'calc(100dvh - 40px)';
+                }
             } else {
                 // 隐藏战斗区域
                 combatArea.style.display = 'none';
@@ -1734,6 +1828,12 @@
                 if (playerStatus) {
                     playerStatus.style.flex = '1 1 auto';
                     playerStatus.style.minHeight = 'auto';
+                    playerStatus.style.maxHeight = 'none';
+                }
+                // 调整游戏容器布局，确保所有内容可见
+                if (gameContainer) {
+                    gameContainer.style.minHeight = 'calc(100dvh - 40px)';
+                    gameContainer.style.overflowY = 'auto';
                 }
             }
         }
@@ -2482,8 +2582,28 @@
                 gameData.player.exp += expGain;
                 gameData.player.gold += goldGain;
                 gameData.player.killCount++;
-                gameData.player.titleCounters.zone1_kills++;
-                if (gameData.gameState.currentZone === 1) gameData.player.titleCounters.zone1_kills++;
+                
+                // 新手平原（0区）击杀计数
+                if (gameData.gameState.currentZone === 0) {
+                    gameData.player.titleCounters.zone1_kills++;
+                }
+                
+                // 区域击杀计数
+                if (!gameData.player.titleCounters.zone_kills) {
+                    gameData.player.titleCounters.zone_kills = {};
+                }
+                if (!gameData.player.titleCounters.zone_kills[gameData.gameState.currentZone]) {
+                    gameData.player.titleCounters.zone_kills[gameData.gameState.currentZone] = 0;
+                }
+                gameData.player.titleCounters.zone_kills[gameData.gameState.currentZone]++;
+                
+                // 单区域最高击杀数
+                if (!gameData.player.titleCounters.zone_kills_max) {
+                    gameData.player.titleCounters.zone_kills_max = 0;
+                }
+                if (gameData.player.titleCounters.zone_kills[gameData.gameState.currentZone] > gameData.player.titleCounters.zone_kills_max) {
+                    gameData.player.titleCounters.zone_kills_max = gameData.player.titleCounters.zone_kills[gameData.gameState.currentZone];
+                }
                 
                 // 更新日常任务进度
                 if (gameData.gameState.inElite) {
@@ -2766,8 +2886,8 @@
                                 gameData.player.gold += gold;
                                 addCombatLog(`自动分解${skill.name}获得: ${gold}金币, ${actualFrag}${skill.quality}技能碎片`, 'success');
                             } else {
-                                // 添加到背包
-                                gameData.player.inventory.push(skill);
+                                // 添加到技能书栏
+                                gameData.player.skills.push(skill);
                                 addCombatLog(`🎁 奇遇BOSS掉落: ${skill.name}`, 'success');
                             }
                             updateUI();
@@ -2857,8 +2977,8 @@
                                 gameData.player.gold += gold;
                                 addCombatLog(`自动分解${skill.name}获得: ${gold}金币, ${actualFrag}${skill.quality}技能碎片`, 'success');
                             } else {
-                                // 添加到背包
-                                gameData.player.inventory.push(skill);
+                                // 添加到技能书栏
+                                gameData.player.skills.push(skill);
                                 addCombatLog(`获得 ${skill.name}`, 'success');
                             }
                             updateUI();
@@ -2949,10 +3069,10 @@
                             gameData.player.gold += gold;
                             addCombatLog(`自动分解${skill.name}获得: ${gold}金币, ${actualFrag}${skill.quality}技能碎片`, 'success');
                         } else {
-                            // 添加到背包
-                            gameData.player.inventory.push(skill);
-                            addCombatLog(`获得 ${skill.name}`, 'success');
-                        }
+                                // 添加到技能书栏
+                                gameData.player.skills.push(skill);
+                                addCombatLog(`获得 ${skill.name}`, 'success');
+                            }
                         updateUI();
                         // 检查技能界面是否打开，如果打开则更新显示
                         const skillModal = document.getElementById('skill-modal');
@@ -3161,19 +3281,53 @@
             return { id: Date.now() + Math.floor(Math.random() * 10000), name: '[' + quality.name + ']' + slot.name, slot: slot.id, level: equipLevel, quality: quality.id, stats: stats, affixes: affixes, sockets: Math.min(sockets, CONFIG.MAX_SOCKETS), gems: [], enhanceLevel: 0, locked: false };
         }
 
+        let gameUpdateId = null;
+        let lastUpdateTime = 0;
+
+        function gameUpdate(timestamp) {
+            if (!lastUpdateTime) lastUpdateTime = timestamp;
+            const dt = Math.min((timestamp - lastUpdateTime) / 1000, 0.1); // 限制时间步长
+            lastUpdateTime = timestamp;
+
+            // 自动战斗逻辑
+            if (gameData.gameState.autoFight && !gameData.gameState.isDead) {
+                // 攻击计时器
+                if (!gameData.player.atkTimer) gameData.player.atkTimer = 0;
+                gameData.player.atkTimer += dt * gameData.player.aspd;
+                
+                // 当攻击计时器达到1时执行攻击
+                while (gameData.player.atkTimer >= 1.0) {
+                    gameData.player.atkTimer -= 1.0;
+                    fightMob();
+                }
+            }
+
+            // 继续游戏循环
+            gameUpdateId = requestAnimationFrame(gameUpdate);
+        }
+
         function startAutoFight() {
-            if (gameData.autoFightInterval) clearInterval(gameData.autoFightInterval);
             // 确保有怪物存在
             if (!gameData.currentMob) {
                 generateNewMob();
             }
-            gameData.autoFightInterval = setInterval(fightMob, 1000);
             gameData.gameState.autoFight = true;
+            
+            // 开始游戏更新循环
+            if (!gameUpdateId) {
+                lastUpdateTime = 0;
+                gameUpdateId = requestAnimationFrame(gameUpdate);
+            }
         }
 
         function stopAutoFight() {
-            if (gameData.autoFightInterval) { clearInterval(gameData.autoFightInterval); gameData.autoFightInterval = null; }
             gameData.gameState.autoFight = false;
+            
+            // 停止游戏更新循环
+            if (gameUpdateId) {
+                cancelAnimationFrame(gameUpdateId);
+                gameUpdateId = null;
+            }
         }
 
 
@@ -3291,7 +3445,7 @@
             } else if (type === 'skill') {
                 // 分解技能书，不分解已装备的
                 gameData.player.inventory.forEach((item, idx) => {
-                    if (item.baseName && qualities.includes(item.quality)) {
+                    if (item.baseName && qualities.includes(item.quality) && item.locked !== true) {
                         // 检查是否是已装备的技能
                         const isEquipped = gameData.player.equippedSkills.some(skill => skill && skill.id === item.id);
                         if (!isEquipped) {
@@ -3302,7 +3456,7 @@
             } else if (type === 'gem') {
                 // 分解背包中的宝石，不分解已镶嵌的
                 gameData.player.gems.forEach((gem, idx) => {
-                    if (qualities.includes(gem.quality)) {
+                    if (qualities.includes(gem.quality) && gem.locked !== true) {
                         // 检查是否是已镶嵌的宝石
                         let isSocketed = false;
                         Object.values(gameData.player.equipment).forEach(equip => {
@@ -3563,7 +3717,7 @@
                             necklace: { id: 6, name: "新手项链", atk: 3, level: 1, quality: "gray", sockets: 0, gems: [], enhanceLevel: 0, locked: false }
                         },
                         equippedSkills: [], inventory: [], gems: [],
-                        titleCounters: { zone1_kills: 0, adventure_boss_kills: 0, enhance_consec_fails: 0, enhance_consec_success: 0, elite_tickets_spent: 0, hell_tickets_spent: 0, weapon_enhance_max: 0, reach_max_zone: 0, max_gold: 0, max_diamonds: 0 },
+                        titleCounters: { zone1_kills: 0, adventure_boss_kills: 0, enhance_consec_fails: 0, enhance_consec_success: 0, elite_tickets_spent: 0, hell_tickets_spent: 0, weapon_enhance_max: 0, reach_max_zone: 0, max_gold: 0, max_diamonds: 0, zone_kills: {}, zone_kills_max: 0 },
                         titles: [], saveCount: 0, lastSaveDate: null,
                         potions: {
                             expPotion: { active: false, endTime: 0 },
@@ -3597,7 +3751,7 @@
                         <div>紫色: 5%</div>
                         <div>橙色: 2%</div>
                     </div>
-                    <button class="action-button button-green" onclick="buySkill()">购买</button>
+                    <button class="action-button button-green" onclick="showConfirmModal('确定要购买随机技能书吗？花费50万金币', buySkill)">购买</button>
                 </div>
                 <div class="market-item">
                     <div class="market-icon">💎</div>
@@ -3611,7 +3765,7 @@
                         <div>紫色: 5%</div>
                         <div>橙色: 2%</div>
                     </div>
-                    <button class="action-button button-blue" onclick="buyGem()">购买</button>
+                    <button class="action-button button-blue" onclick="showConfirmModal('确定要购买随机宝石吗？花费100万金币', buyGem)">购买</button>
                 </div>
                 <div class="market-item">
                     <div class="market-icon">🛡️</div>
@@ -3621,7 +3775,7 @@
                         <div>使用保护卷可在强化失败时</div>
                         <div>避免装备消失，仅降低一级强化等级</div>
                     </div>
-                    <button class="action-button button-yellow" onclick="buyProtection('equip')">购买</button>
+                    <button class="action-button button-yellow" onclick="showConfirmModal('确定要购买装备保护卷吗？花费100钻石', function() { buyProtection('equip'); })">购买</button>
                 </div>
                 <div class="market-item">
                     <div class="market-icon">💍</div>
@@ -3631,7 +3785,7 @@
                         <div>使用保护卷可在强化失败时</div>
                         <div>避免宝石消失，仅降低一级强化等级</div>
                     </div>
-                    <button class="action-button button-yellow" onclick="buyProtection('gem')">购买</button>
+                    <button class="action-button button-yellow" onclick="showConfirmModal('确定要购买宝石保护卷吗？花费100钻石', function() { buyProtection('gem'); })">购买</button>
                 </div>
                 <div class="market-item">
                     <div class="market-icon">📖</div>
@@ -3641,7 +3795,7 @@
                         <div>使用保护卷可在强化失败时</div>
                         <div>避免技能书消失，仅降低一级强化等级</div>
                     </div>
-                    <button class="action-button button-yellow" onclick="buyProtection('skill')">购买</button>
+                    <button class="action-button button-yellow" onclick="showConfirmModal('确定要购买技能保护卷吗？花费100钻石', function() { buyProtection('skill'); })">购买</button>
                 </div>
                 <div class="market-item">
                     <div class="market-icon">📈</div>
@@ -3651,7 +3805,7 @@
                         <div>效果: 50%经验加成</div>
                         <div>持续时间: 12小时</div>
                     </div>
-                    <button class="action-button button-purple" onclick="buyExpPotion()">购买</button>
+                    <button class="action-button button-purple" onclick="showConfirmModal('确定要购买经验药水吗？花费100钻石', buyExpPotion)">购买</button>
                 </div>
                 <div class="market-item">
                     <div class="market-icon">🎯</div>
@@ -3661,7 +3815,17 @@
                         <div>效果: 30%爆率加成</div>
                         <div>持续时间: 30分钟</div>
                     </div>
-                    <button class="action-button button-orange" onclick="buyDropPotion()">购买</button>
+                    <button class="action-button button-orange" onclick="showConfirmModal('确定要购买爆率药水吗？花费150钻石', buyDropPotion)">购买</button>
+                </div>
+                <div class="market-item">
+                    <div class="market-icon">🎫</div>
+                    <div class="market-name">精英门票</div>
+                    <div class="market-price">💎 100</div>
+                    <div style="font-size: 12px; color: #ccc; margin: 8px 0;">
+                        <div>购买后获得300张精英门票</div>
+                        <div>用于挑战精英副本</div>
+                    </div>
+                    <button class="action-button button-green" onclick="showConfirmModal('确定要购买精英门票吗？花费100钻石购买300张', buyEliteTickets)">购买</button>
                 </div>
             `;
             modal.classList.add('active');
@@ -3814,7 +3978,45 @@
             }
         }
 
+        function buyEliteTickets() {
+            if (gameData.player.diamonds >= 100) {
+                gameData.player.diamonds -= 100;
+                gameData.player.eliteTickets += 300;
+                addCombatLog('购买精英门票成功! 获得300张精英门票', 'success');
+                updateUI();
+            } else {
+                addCombatLog('钻石不足!', 'danger');
+            }
+        }
+
         document.getElementById('close-market').onclick = () => document.getElementById('market-modal').classList.remove('active');
+
+        // 购买确认弹窗功能
+        let pendingPurchaseFunction = null;
+        
+        function showConfirmModal(message, purchaseFunction) {
+            pendingPurchaseFunction = purchaseFunction;
+            document.getElementById('confirm-message').textContent = message;
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+        
+        document.getElementById('close-confirm').onclick = () => {
+            document.getElementById('confirm-modal').classList.remove('active');
+            pendingPurchaseFunction = null;
+        };
+        
+        document.getElementById('confirm-yes').onclick = () => {
+            if (pendingPurchaseFunction) {
+                pendingPurchaseFunction();
+            }
+            document.getElementById('confirm-modal').classList.remove('active');
+            pendingPurchaseFunction = null;
+        };
+        
+        document.getElementById('confirm-no').onclick = () => {
+            document.getElementById('confirm-modal').classList.remove('active');
+            pendingPurchaseFunction = null;
+        };
 
         let selectedItems = { equip: [], skill: [], gem: [] };
         let currentTab = 'equip';
@@ -5514,44 +5716,23 @@
             body.style.overflowY = 'auto';
             body.style.webkitOverflowScrolling = 'touch';
             
-            let items = gameData.player.inventory;
-            if (filter === 'equip') items = items.filter(i => !i.baseName && i.slot);
-            else if (filter === 'skill') items = items.filter(i => i.baseName);
-            else if (filter === 'gem') items = items.filter(i => !i.baseName && !i.slot && (i.affix || (i.affixes && i.affixes.length > 0)));
-            else if (filter === 'material') items = [];
-            else if (filter && filter.startsWith('slot:')) {
-                const slot = filter.replace('slot:', '');
-                items = items.filter(i => !i.baseName && i.slot === slot);
-            }
+            // 过滤物品，只显示装备，不显示技能和宝石
+            let items = gameData.player.inventory.filter(item => {
+                // 排除技能（有baseName）
+                if (item.baseName) return false;
+                // 排除宝石（没有slot但有affix）
+                if (!item.slot && (item.affix || (item.affixes && item.affixes.length > 0))) return false;
+                // 只保留装备（有slot）
+                return item.slot;
+            });
             
-            // 为了确保背包中只显示装备和宝石，不显示技能
-            // 对于不同过滤类型，确保物品被正确识别
-            if (filter === 'all') {
-                // 显示装备和宝石，不显示技能
-                items = gameData.player.inventory.filter(item => !item.baseName);
-            } else if (filter === 'equip' || (filter && filter.startsWith('slot:'))) {
-                // 只显示装备
-                items = gameData.player.inventory.filter(item => {
-                    if (item.baseName) return false; // 排除技能
-                    if (item.affix || (item.affixes && item.affixes.length > 0) && !item.slot) return false; // 排除宝石，保留有slot的装备
-                    return true; // 保留装备
-                });
-                
-                // 如果是槽位过滤，再进一步过滤
-                if (filter && filter.startsWith('slot:')) {
-                    const slot = filter.replace('slot:', '');
-                    items = items.filter(item => item.slot === slot);
-                }
-            } else if (filter === 'gem') {
-                // 只显示宝石
-                items = gameData.player.inventory.filter(item => {
-                    if (item.baseName) return false; // 排除技能
-                    if (!item.affix && (!item.affixes || item.affixes.length === 0)) return false; // 排除非宝石
-                    return true; // 保留宝石
-                });
+            // 根据过滤条件进一步筛选
+            if (filter && filter.startsWith('slot:')) {
+                const slot = filter.replace('slot:', '');
+                items = items.filter(item => item.slot === slot);
             }
 
-            document.getElementById('inventory-count').textContent = gameData.player.inventory.filter(i => !i.baseName).length;
+            document.getElementById('inventory-count').textContent = items.length;
 
             if (items.length === 0) {
                 body.innerHTML = '<div style="grid-column: 1 / -1; text-align:center;padding:40px;color:#888">背包为空</div>';
@@ -5582,9 +5763,21 @@
                 div.style.border = '1px solid #333';
                 div.style.borderRadius = '8px';
                 div.style.padding = '12px';
-                div.style.backgroundColor = isBetter ? '#1a2d1a' : '#1a1a1a';
+                
+                // 根据装备品质设置渐变色底色
+                const quality = CONFIG.EQUIP_QUALITIES.find(q => q.id === item.quality) || CONFIG.SKILL_QUALITIES.find(q => q.id === item.quality) || CONFIG.GEM_QUALITIES.find(q => q.id === item.quality);
+                if (quality && quality.color) {
+                    const [r, g, b] = quality.color;
+                    const lightColor = `rgba(${r}, ${g}, ${b}, 0.3)`;
+                    const darkColor = `rgba(${r}, ${g}, ${b}, 0.1)`;
+                    div.style.background = `linear-gradient(135deg, ${lightColor}, ${darkColor})`;
+                    div.style.borderColor = `rgba(${r}, ${g}, ${b}, 0.5)`;
+                } else {
+                    div.style.backgroundColor = isBetter ? '#1a2d1a' : '#1a1a1a';
+                    div.style.borderColor = isBetter ? '#27ae60' : '#333';
+                }
+                
                 div.style.boxShadow = isBetter ? '0 0 15px rgba(39, 174, 96, 0.6), 0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.3)';
-                div.style.borderColor = isBetter ? '#27ae60' : '#333';
                 div.style.minHeight = '200px';
                 div.style.display = 'flex';
                 div.style.flexDirection = 'column';
@@ -5929,7 +6122,7 @@
             // 分解技能书，不分解已装备的
             skillQualities.forEach(q => {
                 gameData.player.inventory.forEach((item, idx) => {
-                    if (item.baseName && item.quality === q) {
+                    if (item.baseName && item.quality === q && item.locked !== true) {
                         // 检查是否是已装备的技能
                         const isEquipped = gameData.player.equippedSkills.some(skill => skill && skill.id === item.id);
                         if (!isEquipped) {
@@ -5942,7 +6135,7 @@
             // 分解背包中的宝石，不分解已镶嵌的
             gemQualities.forEach(q => {
                 gameData.player.gems.forEach((gem, idx) => {
-                    if (gem.quality === q) {
+                    if (gem.quality === q && gem.locked !== true) {
                         // 检查是否是已镶嵌的宝石
                         let isSocketed = false;
                         Object.values(gameData.player.equipment).forEach(equip => {
@@ -6490,6 +6683,16 @@
                 if (equip) {
                     const qc = getQualityColor(equip.quality);
                     div.className += ' ' + equip.quality;
+                    
+                    // 根据装备品质设置渐变色底色
+                    const quality = CONFIG.EQUIP_QUALITIES.find(q => q.id === equip.quality);
+                    if (quality && quality.color) {
+                        const [r, g, b] = quality.color;
+                        const lightColor = `rgba(${r}, ${g}, ${b}, 0.3)`;
+                        const darkColor = `rgba(${r}, ${g}, ${b}, 0.1)`;
+                        div.style.background = `linear-gradient(135deg, ${lightColor}, ${darkColor})`;
+                        div.style.borderColor = `rgba(${r}, ${g}, ${b}, 0.5)`;
+                    }
                     
                     // 构建基础属性
                     let baseStatsHtml = '';
