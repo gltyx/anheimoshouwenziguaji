@@ -39,14 +39,59 @@
             .game-container { 
                 display: grid;
                 grid-template-columns: 1fr 1fr 1fr; 
-                height: calc(100vh - 100px); 
-                padding: 10px 10px 40px 10px;
-                overflow-y: auto;
+                height: calc(100vh - 60px); 
+                padding: 10px;
+                overflow: hidden;
             } 
+            
+            .right-panel {
+                height: calc(100vh - 80px);
+                overflow-y: auto;
+            }
+            
+            .zone-list {
+                height: calc(100% - 40px);
+                overflow-y: auto;
+            }
         }
-        .player-status, .right-panel { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); height: 100%; overflow: hidden; transform: translateZ(0); will-change: transform; }
+        .player-status, .right-panel { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; transform: translateZ(0); will-change: transform; }
         .combat-area { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex: 1; transform: translateZ(0); will-change: transform; } 
         .combat-area.minimized { min-height: 60px; }
+        
+        /* 优化区域列表显示 */
+        .zone-list {
+            height: 100%;
+            max-height: none;
+            overflow-y: auto;
+        }
+        
+        @media (min-width: 1200px) {
+            .right-panel {
+                height: calc(100vh - 80px);
+                overflow-y: auto;
+                min-height: 600px;
+            }
+            
+            .zone-list {
+                height: calc(100% - 40px);
+                overflow-y: auto;
+            }
+            
+            .zone-item {
+                min-height: 35px;
+                padding: 4px;
+                margin-bottom: 3px;
+            }
+            
+            .zone-name {
+                font-size: 11px;
+                margin-bottom: 2px;
+            }
+            
+            .zone-level {
+                font-size: 9px;
+            }
+        }
         h2 { color: #ffd700; font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .status-item { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .status-value { background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%); padding: 6px; border-radius: 8px; text-align: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.1); }
@@ -99,12 +144,12 @@
         .log-entry.danger { color: #e74c3c; border-left: 3px solid #e74c3c; }
         .log-entry.info { color: #3498db; border-left: 3px solid #3498db; }
         .log-entry.warning { color: #f39c12; border-left: 3px solid #f39c12; }
-        .zone-item { background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%); padding: 10px; border-radius: 8px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.1); }
+        .zone-item { background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%); padding: 6px; border-radius: 8px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.1); min-height: 50px; }
         .zone-item:hover { background: linear-gradient(145deg, #4a4d58 0%, #3a3d48 100%); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
         .zone-item.active { border: 2px solid #ffd700; box-shadow: 0 0 15px rgba(255,215,0,0.3); }
-        .zone-name { font-weight: bold; font-size: 13px; margin-bottom: 3px; }
-        .zone-level { font-size: 11px; color: #ccc; }
-        .zone-icons { font-size: 12px; margin-top: 5px; }
+        .zone-name { font-weight: bold; font-size: 12px; margin-bottom: 2px; }
+        .zone-level { font-size: 10px; color: #ccc; }
+        .zone-icons { font-size: 10px; margin-top: 3px; }
         .setting-buttons { display: flex; flex-direction: column; gap: 8px; }
         .setting-button { padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; transition: all 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); position: relative; overflow: hidden; background: linear-gradient(135deg, #3a3d48 0%, #2f323a 100%); color: #fff; }
         .setting-button:hover, .setting-button:active { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
@@ -118,8 +163,8 @@
         .panel-tab:hover { background-color: #4a4d58; }
         .panel-tab.active { background-color: #ffd700; color: #000; }
         .panel-content { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-        .panel-tab-content { display: none; flex: 1; overflow-y: auto; height: 400px; width: 100%; }
-        .zone-list { height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        .panel-tab-content { display: none; flex: 1; overflow-y: auto; height: 100%; width: 100%; }
+        .zone-list { height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; width: 100%; }
         .panel-tab-content.active { display: flex; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .modal-title { font-size: 18px; font-weight: bold; color: #ffd700; }
@@ -130,13 +175,14 @@
         .modal-body { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
         .modal-body.hidden { display: none; }
         .modal-body-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .item-card { background-color: #3a3d48; border-radius: 10px; padding: 20px; cursor: pointer; border: 3px solid transparent; position: relative; min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; }
-        .item-card.selected { border-color: #27ae60; background-color: #2d3a2e; box-shadow: 0 0 20px rgba(39, 174, 96, 0.6); }
-        .item-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .item-name { font-weight: bold; font-size: 18px; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
-        .item-quality { font-size: 14px; padding: 4px 12px; border-radius: 6px; font-weight: bold; }
-        .item-details { font-size: 14px; color: #e0e0e0; margin-bottom: 12px; }
-        .item-stats { font-size: 14px; color: #b0b0b0; line-height: 1.5; flex: 1; }
+        .item-card { background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%); border-radius: 10px; padding: 15px; cursor: pointer; border: 3px solid transparent; position: relative; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: all 0.3s ease; }
+        .item-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+        .item-card.selected { border-color: #27ae60; background: linear-gradient(145deg, #2d3a2e 0%, #233024 100%); box-shadow: 0 0 20px rgba(39, 174, 96, 0.6); }
+        .item-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .item-name { font-weight: bold; font-size: 16px; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.6); line-height: 1.2; }
+        .item-quality { font-size: 12px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+        .item-details { font-size: 12px; color: #e0e0e0; margin-bottom: 8px; line-height: 1.3; }
+        .item-stats { font-size: 12px; color: #b0b0b0; line-height: 1.4; flex: 1; }
         .item-card.gray { border-color: #a0a0a0; box-shadow: 0 0 8px rgba(160, 160, 160, 0.2); }
         .item-card.green { border-color: #4caf50; box-shadow: 0 0 12px rgba(76, 175, 80, 0.4); background-color: #3a4d48; }
         .item-card.blue { border-color: #2196f3; box-shadow: 0 0 12px rgba(33, 150, 243, 0.4); background-color: #3a3d58; }
@@ -424,19 +470,29 @@
                 max-height: 60vh;
             } 
             .item-card { 
-                padding: 8px; 
-                min-height: 80px; 
+                padding: 10px; 
+                min-height: 90px; 
                 touch-action: manipulation;
+                background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+            } 
+            .item-card:hover { 
+                transform: translateY(-1px); 
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             } 
             .item-name { 
-                font-size: 11px; 
+                font-size: 10px; 
+                line-height: 1.2;
             } 
             .item-quality { 
-                font-size: 8px; 
-                padding: 1px 3px; 
+                font-size: 7px; 
+                padding: 2px 6px; 
+                border-radius: 3px;
             } 
             .item-details, .item-stats { 
                 font-size: 8px; 
+                line-height: 1.3;
             } 
             .zone-list { 
                 height: 300px; 
@@ -461,13 +517,16 @@
             }
             /* 背包界面优化 */
             #inventory-body {
-                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-                gap: 3px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
                 max-height: 50vh;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: thin;
                 scrollbar-color: #ffd700 #3a3d48;
+                padding: 10px;
+                background: linear-gradient(145deg, #2a2d38 0%, #1f222a 100%);
+                border-radius: 10px;
             }
             #inventory-body::-webkit-scrollbar {
                 width: 6px;
@@ -657,19 +716,29 @@
                 max-height: 50vh;
             } 
             .item-card { 
-                padding: 6px; 
-                min-height: 70px;
+                padding: 8px; 
+                min-height: 80px;
                 touch-action: manipulation;
+                background: linear-gradient(145deg, #3a3d48 0%, #2f323a 100%);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+            } 
+            .item-card:hover { 
+                transform: translateY(-1px); 
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             } 
             .item-name { 
-                font-size: 10px;
+                font-size: 9px; 
+                line-height: 1.2;
             } 
             .item-quality { 
-                font-size: 7px; 
-                padding: 1px 2px;
+                font-size: 6px; 
+                padding: 1px 4px; 
+                border-radius: 2px;
             } 
             .item-details, .item-stats { 
-                font-size: 7px;
+                font-size: 7px; 
+                line-height: 1.3;
             } 
             .zone-list { 
                 height: 250px; 
@@ -678,13 +747,16 @@
             }
             /* 背包界面优化 */
             #inventory-body {
-                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-                gap: 2px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
                 max-height: 40vh;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: thin;
                 scrollbar-color: #ffd700 #3a3d48;
+                padding: 8px;
+                background: linear-gradient(145deg, #2a2d38 0%, #1f222a 100%);
+                border-radius: 8px;
             }
             #inventory-body::-webkit-scrollbar {
                 width: 4px;
@@ -763,7 +835,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本1.05</div>
+                    <div class="panel-title">📊 角色属性 版本1.06</div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -930,6 +1002,14 @@
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;" id="auto-decompose-equip-list-inventory"></div>
                 <div class="auto-decompose-toggle">
                     <input type="checkbox" id="auto-decompose-inventory"><label>自动分解选中品质</label>
+                </div>
+            </div>
+            <div style="padding: 15px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); border-top: 1px solid #3a3d48; border-radius: 0 0 10px 10px;">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <button class="action-button button-green" id="inventory-equip" style="padding: 12px; font-size: 12px; min-height: 50px;">🛡️ 装备</button>
+                    <button class="action-button button-blue" id="inventory-decompose" style="padding: 12px; font-size: 12px; min-height: 50px;">🔧 分解</button>
+                    <button class="action-button button-yellow" id="inventory-enhance" style="padding: 12px; font-size: 12px; min-height: 50px;">⚒️ 强化</button>
+                    <button class="action-button button-orange" id="inventory-lock" style="padding: 12px; font-size: 12px; min-height: 50px;">🔒 锁定</button>
                 </div>
             </div>
         </div>
@@ -1129,7 +1209,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.05",
+            GAME_VERSION: "1.06",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -5273,11 +5353,11 @@
                     // 强化失败，使用保护卷，只降低一级强化等级
                     if (item.enhanceLevel > 0) {
                         // 降低装备基础属性
-                        if (item.stats) {
-                            if (item.stats.atk) item.stats.atk = Math.floor(item.stats.atk / 1.5);
-                            if (item.stats.def) item.stats.def = Math.floor(item.stats.def / 1.5);
-                            if (item.stats.hp) item.stats.hp = Math.floor(item.stats.hp / 1.5);
-                        }
+                            if (item.stats) {
+                                if (item.stats.atk) item.stats.atk = Math.floor(item.stats.atk / 1.2);
+                                if (item.stats.def) item.stats.def = Math.floor(item.stats.def / 1.2);
+                                if (item.stats.hp) item.stats.hp = Math.floor(item.stats.hp / 1.2);
+                            }
                         item.enhanceLevel--;
                         addCombatLog(`${item.name}强化失败，保护卷生效，强化等级降低一级!`, 'warning');
                     } else {
@@ -5390,14 +5470,47 @@
             });
         });
 
+        // 为背包底部按钮添加事件监听器
+        document.getElementById('inventory-equip').onclick = () => {
+            if (gameData.selectedItem !== undefined) {
+                equipItemFromInventory(gameData.selectedItem);
+            } else {
+                addCombatLog('请先选择一件装备', 'warning');
+            }
+        };
+        
+        document.getElementById('inventory-decompose').onclick = () => {
+            if (gameData.selectedItem !== undefined) {
+                decomposeSingleItem(gameData.selectedItem);
+            } else {
+                addCombatLog('请先选择一件装备', 'warning');
+            }
+        };
+        
+        document.getElementById('inventory-enhance').onclick = () => {
+            if (gameData.selectedItem !== undefined) {
+                enhanceItemFromInventory(gameData.selectedItem);
+            } else {
+                addCombatLog('请先选择一件装备', 'warning');
+            }
+        };
+        
+        document.getElementById('inventory-lock').onclick = () => {
+            if (gameData.selectedItem !== undefined) {
+                toggleItemLock(gameData.selectedItem);
+            } else {
+                addCombatLog('请先选择一件装备', 'warning');
+            }
+        };
+        
         function renderInventory(filter) {
             const body = document.getElementById('inventory-body');
             body.innerHTML = '';
             body.style.display = 'grid';
-            body.style.gridTemplateColumns = '1fr';
-            body.style.gap = '10px';
+            body.style.gridTemplateColumns = '1fr 1fr 1fr';
+            body.style.gap = '15px';
             body.style.padding = '10px';
-            body.style.maxHeight = '50vh';
+            body.style.maxHeight = '70vh';
             body.style.overflowY = 'auto';
             body.style.webkitOverflowScrolling = 'touch';
             
@@ -5594,22 +5707,24 @@
                 let buttonsHtml = '';
                 if (isEquip) {
                     buttonsHtml = `
-                        <button class="action-button button-blue" onclick="equipItemFromInventory(${realIdx})" style="padding: 6px 12px; font-size: 12px;">装备</button>
-                        <button class="action-button button-red" onclick="decomposeSingleItem(${realIdx})" style="padding: 6px 12px; font-size: 12px;">分解</button>
-                        <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx}); console.log('强化按钮点击，索引:', ${realIdx});" style="padding: 6px 12px; font-size: 12px;">⚒️ 强化</button>
-                        <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 6px 12px; font-size: 12px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
+                        <button class="action-button button-blue" onclick="equipItemFromInventory(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">装备</button>
+                        <button class="action-button button-red" onclick="decomposeSingleItem(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">分解</button>
+                        <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx}); console.log('强化按钮点击，索引:', ${realIdx});" style="padding: 8px; font-size: 11px; min-height: 40px;">⚒️ 强化</button>
+                        <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
                     `;
                 } else if (isSkill) {
                     buttonsHtml = `
-                        <button class="action-button button-red" onclick="decomposeSkillItem(${realIdx})" style="padding: 6px 12px; font-size: 12px;">分解</button>
-                        <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx})" style="padding: 6px 12px; font-size: 12px;">⚒️ 强化</button>
-                        <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 6px 12px; font-size: 12px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
+                        <button class="action-button button-red" onclick="decomposeSkillItem(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">分解</button>
+                        <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">⚒️ 强化</button>
+                        <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
+                        <div style="background-color: rgba(0, 0, 0, 0.2); border-radius: 6px;"></div>
                     `;
                 } else if (isGem) {
                     buttonsHtml = `
-                        <button class="action-button button-red" onclick="decomposeGemItem(${realIdx})" style="padding: 6px 12px; font-size: 12px;">分解</button>
-                        <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx})" style="padding: 6px 12px; font-size: 12px;">⚒️ 强化</button>
-                        <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 6px 12px; font-size: 12px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
+                        <button class="action-button button-red" onclick="decomposeGemItem(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">分解</button>
+                        <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">⚒️ 强化</button>
+                        <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
+                        <div style="background-color: rgba(0, 0, 0, 0.2); border-radius: 6px;"></div>
                     `;
                 }
                 
@@ -5618,21 +5733,15 @@
                         <span class="item-name" style="font-weight: bold; font-size: 14px;">${item.name} +${item.enhanceLevel || 0} ${betterIcon}</span>
                         <span class="item-quality" style="background:${qc};color:#000; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${getQualityName(item.quality)}</span>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 15px; margin-bottom: 8px;">
-                        <div>
-                            ${baseStats ? `<div style="font-size: 12px; color: #ffd700; width: 100%; margin-bottom: 4px;">${baseStats}</div>` : ''}
-                            <div class="item-details" style="font-size: 12px; color: #aaa; margin-bottom: 4px;">${isEquip ? `等级:${item.level || 1} | 孔数:${item.sockets || 0} | ` : ''}${isEquip ? `评分:${score}` : slotName}${isBetter ? '<span style="color: #27ae60; margin-left: 5px;">⬆️</span>' : ''}</div>
-                            <div class="item-details" style="font-size: 12px; color: #ffd700; margin-bottom: 4px;">强化成功率: ${(getEnhanceSuccessRate(item.enhanceLevel || 0) * 100).toFixed(0)}%</div>
-                            <div style="display: flex; gap: 15px; margin-top: 8px;">
-                                <div style="flex: 1;">
-                                    ${statsHtml || stats}
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 8px; min-width: 120px;">
-                            ${buttonsHtml}
+                    <div style="margin-bottom: 8px;">
+                        ${baseStats ? `<div style="font-size: 12px; color: #ffd700; width: 100%; margin-bottom: 4px;">${baseStats}</div>` : ''}
+                        <div class="item-details" style="font-size: 12px; color: #aaa; margin-bottom: 4px;">${isEquip ? `等级:${item.level || 1} | 孔数:${item.sockets || 0} | ` : ''}${isEquip ? `评分:${score}` : slotName}${isBetter ? '<span style="color: #27ae60; margin-left: 5px;">⬆️</span>' : ''}</div>
+                        <div class="item-details" style="font-size: 12px; color: #ffd700; margin-bottom: 4px;">强化成功率: ${(getEnhanceSuccessRate(item.enhanceLevel || 0) * 100).toFixed(0)}%</div>
+                        <div style="margin-top: 8px;">
+                            ${statsHtml || stats}
                         </div>
                     </div>
+                    ${item.locked ? '<div style="display: inline-block; padding: 4px 8px; background-color: #ff9800; color: #fff; border-radius: 4px; font-size: 12px; margin-top: 8px;">🔒 已锁定</div>' : ''}
                 `;
                 div.onclick = (e) => {
                     if (!e.target.closest('button')) {
@@ -6781,13 +6890,17 @@
         function generateZoneList() {
             const list = document.getElementById('zone-list');
             list.innerHTML = '';
+            // 确保列表容器有足够的高度和滚动能力
+            list.style.height = '100%';
+            list.style.overflowY = 'auto';
+            list.style.maxHeight = 'none';
+            
             CONFIG.ZONES.forEach((zone, idx) => {
                 const div = document.createElement('div');
                 div.className = 'zone-item' + (gameData.gameState.currentZone === idx + 1 ? ' active' : '');
                 div.innerHTML = `
                     <div class="zone-name">${zone.name}</div>
                     <div class="zone-level">等级要求: ${zone.reqLv}</div>
-                    <div class="zone-icons">怪物: ${zone.mobs.slice(0, 2).join(',')}...</div>
                 `;
                 div.onclick = () => {
                     if (gameData.player.level >= zone.reqLv) {
@@ -6829,7 +6942,7 @@
                 
                 // 计算门票成本
                 const tier = Math.floor((eliteLevel - 25) / 10);
-                const ticketCost = 6 + tier;
+                const ticketCost = CONFIG.ELITE_TICKET_COST[tier] || 7;
                 
                 div.innerHTML = `
                     <div class="zone-name">${eliteLevel}级精英副本</div>
@@ -7211,9 +7324,21 @@
         });
     </script>
 <!--客服 开始-->
-<script src="//g8hh.com.cn/static/js/jquery.min.js"></script>
-<link rel="stylesheet" href="//g8hh.com.cn/static/css/kf.css" type="text/css" media="screen" charset="utf-8">
-<script src="//g8hh.com.cn/static/js/kf.js"></script>
+<script src="//g8hh.github.io/static/js/jquery.min.js"></script>
+<link rel="stylesheet" href="//g8hh.github.io/static/css/kf.css" type="text/css" media="screen" charset="utf-8">
+<script src="//g8hh.github.io/static/js/kf.js"></script>
 <!-- 客服 结束 -->
+<!--站长统计-->
+    <div style="display: none">
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?6581389daf4dd6fe7dbb4d20fdcb52a6";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+    </div>
 </body>
 </html>
