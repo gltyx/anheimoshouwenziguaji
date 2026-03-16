@@ -859,7 +859,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本1.1</div>
+                    <div class="panel-title">📊 角色属性 版本1.11</div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -931,17 +931,17 @@
             
             <!-- 手机端区域选择按钮 -->
             <div class="mobile-zone-buttons">
-                <div style="position: relative;">
+                <div style="position: relative; z-index: 2000;">
                     <button class="action-button button-green" onclick="toggleZoneList('zone')">🌍 挂机区域</button>
-                    <div id="zone-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
+                    <div id="zone-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 2000; max-height: 300px; overflow-y: auto;"></div>
                 </div>
-                <div style="position: relative;">
+                <div style="position: relative; z-index: 2000;">
                     <button class="action-button button-yellow" onclick="toggleZoneList('elite')">⚔️ 精英副本</button>
-                    <div id="elite-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
+                    <div id="elite-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 2000; max-height: 300px; overflow-y: auto;"></div>
                 </div>
-                <div style="position: relative;">
+                <div style="position: relative; z-index: 2000;">
                     <button class="action-button button-red" onclick="toggleZoneList('hell')">🔥 地狱副本</button>
-                    <div id="hell-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
+                    <div id="hell-list-dropdown" class="zone-dropdown" style="display: none; position: absolute; bottom: 100%; left: 0; right: 0; background: #2a2d38; border-radius: 8px; padding: 8px; margin-bottom: 5px; z-index: 2000; max-height: 300px; overflow-y: auto;"></div>
                 </div>
             </div>
 
@@ -3355,6 +3355,7 @@
 
         let gameUpdateId = null;
         let lastUpdateTime = 0;
+        let lastAttackTime = 0;
 
         function gameUpdate(timestamp) {
             if (!lastUpdateTime) lastUpdateTime = timestamp;
@@ -3371,6 +3372,17 @@
                 while (gameData.player.atkTimer >= 1.0) {
                     gameData.player.atkTimer -= 1.0;
                     fightMob();
+                    lastAttackTime = timestamp; // 更新最后攻击时间
+                }
+                
+                // 检测：如果1.5秒没有攻击，自动生成新怪物
+                if (timestamp - lastAttackTime > 1500) {
+                    generateNewMob(true);
+                    lastAttackTime = timestamp;
+                    // 确保自动攻击继续
+                    if (!gameUpdateId) {
+                        gameUpdateId = requestAnimationFrame(gameUpdate);
+                    }
                 }
             }
 
@@ -3384,6 +3396,7 @@
                 generateNewMob();
             }
             gameData.gameState.autoFight = true;
+            lastAttackTime = Date.now(); // 初始化最后攻击时间
             
             // 开始游戏更新循环
             if (!gameUpdateId) {
@@ -8215,6 +8228,5 @@ var _hmt = _hmt || [];
 })();
 </script>
     </div>
-
 </body>
 </html>
