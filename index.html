@@ -1210,7 +1210,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.16",
+            GAME_VERSION: "1.17",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1329,7 +1329,7 @@
             MAX_SOCKETS: 5,
             BLACK_MARKET: { skillPrice: 500000, gemPrice: 1000000 },
             BLACK_MARKET_QUALITY_PROBS: { gray: 0.75, green: 0.10, blue: 0.08, purple: 0.05, orange: 0.02 },
-            DROP_RATES: { normalMob: 0.15, eliteTicket: 0.1, diamondDrop: 0.0035 },
+            DROP_RATES: { normalMob: 0.15, eliteTicket: 0.1, diamondDrop: 0.05 },
             ELITE_DROP_RATES: { equipment: { gold: 0.05, platinum: 0.02, diamond: 0.005, darkgold: 0.002, myth: 0.001, supreme: 0.00033, zenith: 0.0001 }, gem: { gray: 0.01, green: 0.005, blue: 0.0033, purple: 0.002, orange: 0.0005 }, skill: { gray: 0.02, green: 0.0067, blue: 0.0025, purple: 0.00125, orange: 0.0004 } },
             HELL_DROP_RATES: { equipment: { gold: 0.15, platinum: 0.06, diamond: 0.015, darkgold: 0.006, myth: 0.003, supreme: 0.001, zenith: 0.0003 }, gem: { gray: 0.03, green: 0.015, blue: 0.01, purple: 0.006, orange: 0.0015 }, skill: { gray: 0.06, green: 0.02, blue: 0.0075, purple: 0.00375, orange: 0.0012 } },
             ELITE_TYPES: { normal: { name: "普通精英", color: [255,152,0], atkM: 1.5, defM: 1.5, hpM: 4, dropM: 2, critBonus: 1.0 }, silver: { name: "白银精英", color: [192,192,192], atkM: 2.0, defM: 2.0, hpM: 7, dropM: 3, critBonus: 1.5 }, gold: { name: "黄金精英", color: [255,215,0], atkM: 3.0, defM: 3.0, hpM: 12, dropM: 5, critBonus: 2.0 }, adventure: { name: "奇遇BOSS", color: [255,0,255], atkM: 1.0, defM: 1.0, hpM: 1, dropM: 1, critBonus: 1.0 } },
@@ -6424,8 +6424,8 @@
             const body = document.getElementById('inventory-body');
             body.innerHTML = '';
             body.style.display = 'grid';
-            body.style.gridTemplateColumns = '1fr 1fr 1fr';
-            body.style.gap = '15px';
+            // 移除硬编码的gridTemplateColumns，让CSS媒体查询来处理
+            body.style.gap = '10px';
             body.style.padding = '10px';
             body.style.maxHeight = '70vh';
             body.style.overflowY = 'auto';
@@ -6477,7 +6477,7 @@
                 div.className = 'item-card ' + item.quality + (gameData.selectedItem === realIdx ? ' selected' : '');
                 div.style.border = '1px solid #333';
                 div.style.borderRadius = '8px';
-                div.style.padding = '12px';
+                div.style.padding = '10px';
                 
                 // 根据装备品质设置渐变色底色
                 const quality = CONFIG.EQUIP_QUALITIES.find(q => q.id === item.quality) || CONFIG.SKILL_QUALITIES.find(q => q.id === item.quality) || CONFIG.GEM_QUALITIES.find(q => q.id === item.quality);
@@ -6493,9 +6493,10 @@
                 }
                 
                 div.style.boxShadow = isBetter ? '0 0 15px rgba(39, 174, 96, 0.6), 0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.3)';
-                div.style.minHeight = '200px';
+                div.style.minHeight = '180px';
                 div.style.display = 'flex';
                 div.style.flexDirection = 'column';
+                div.style.fontSize = '12px';
                 
                 const qc = getQualityColor(item.quality);
                 let stats = '';
@@ -6586,12 +6587,12 @@
                 let statsHtml = '';
                 if (col1.length > 0 || col2.length > 0) {
                     statsHtml = `
-                        <div style="display: flex; gap: 15px;">
+                        <div style="display: flex; gap: 8px; font-size: 10px;">
                             <div style="flex: 1;">
-                                ${col1.map(stat => `<div>${stat}</div>`).join('')}
+                                ${col1.map(stat => `<div style="margin-bottom: 2px;">${stat}</div>`).join('')}
                             </div>
                             <div style="flex: 1;">
-                                ${col2.map(stat => `<div>${stat}</div>`).join('')}
+                                ${col2.map(stat => `<div style="margin-bottom: 2px;">${stat}</div>`).join('')}
                             </div>
                         </div>
                     `;
@@ -6615,24 +6616,28 @@
                 let buttonsHtml = '';
                 if (isEquip) {
                     buttonsHtml = `
-                        <button class="action-button button-blue" onclick="equipItemFromInventory(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">装备</button>
-                        <button class="action-button button-red" onclick="decomposeSingleItem(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">分解</button>
-                        <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx}); console.log('强化按钮点击，索引:', ${realIdx});" style="padding: 8px; font-size: 11px; min-height: 40px;">⚒️ 强化</button>
-                        <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                            <button class="action-button button-blue" onclick="equipItemFromInventory(${realIdx})" style="padding: 6px; font-size: 10px; min-height: 35px;">装备</button>
+                            <button class="action-button button-red" onclick="decomposeSingleItem(${realIdx})" style="padding: 6px; font-size: 10px; min-height: 35px;">分解</button>
+                            <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx}); console.log('强化按钮点击，索引:', ${realIdx});" style="padding: 6px; font-size: 10px; min-height: 35px;">⚒️ 强化</button>
+                            <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 6px; font-size: 10px; min-height: 35px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
+                        </div>
                     `;
                 } else if (isSkill) {
                     buttonsHtml = `
-                        <button class="action-button button-red" onclick="decomposeSkillItem(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">分解</button>
-                        <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">⚒️ 强化</button>
-                        <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
-                        <div style="background-color: rgba(0, 0, 0, 0.2); border-radius: 6px;"></div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                            <button class="action-button button-red" onclick="decomposeSkillItem(${realIdx})" style="padding: 6px; font-size: 10px; min-height: 35px;">分解</button>
+                            <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx})" style="padding: 6px; font-size: 10px; min-height: 35px;">⚒️ 强化</button>
+                            <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 6px; font-size: 10px; min-height: 35px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff; grid-column: span 2;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
+                        </div>
                     `;
                 } else if (isGem) {
                     buttonsHtml = `
-                        <button class="action-button button-red" onclick="decomposeGemItem(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">分解</button>
-                        <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px;">⚒️ 强化</button>
-                        <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 8px; font-size: 11px; min-height: 40px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
-                        <div style="background-color: rgba(0, 0, 0, 0.2); border-radius: 6px;"></div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                            <button class="action-button button-red" onclick="decomposeGemItem(${realIdx})" style="padding: 6px; font-size: 10px; min-height: 35px;">分解</button>
+                            <button class="action-button button-purple" onclick="enhanceItemFromInventory(${realIdx})" style="padding: 6px; font-size: 10px; min-height: 35px;">⚒️ 强化</button>
+                            <button class="action-button" onclick="toggleItemLock(${realIdx})" style="padding: 6px; font-size: 10px; min-height: 35px; background: ${item.locked ? '#ff9800' : '#4caf50'}; color: #fff; grid-column: span 2;">${item.locked ? '🔒 解锁' : '🔓 锁定'}</button>
+                        </div>
                     `;
                 }
                 
