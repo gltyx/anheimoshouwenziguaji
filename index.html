@@ -12,7 +12,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { font-family: 'Arial', sans-serif; background-color: #191c23; color: #ffffff; height: 100%; overflow: hidden; -webkit-overflow-scrolling: touch; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         body { display: flex; justify-content: center; align-items: flex-start; }
-        .game-canvas { width: 100vw; min-height: 100vh; background-color: #191c23; position: relative; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; -webkit-transform: translateZ(0); transform: translateZ(0); }
+        .game-canvas { width: 100vw; min-height: 100vh; background-color: #191c23; position: relative; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; -webkit-transform: translateZ(0); transform: translateZ(0); display: flex; flex-direction: column; flex: 1 1 auto; }
         @media (max-width: 768px) {
             .game-canvas {
                 min-height: 100dvh;
@@ -34,7 +34,7 @@
         .resource-item:hover { background: rgba(0,0,0,0.5); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
         .resource-icon { font-size: 18px; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
         .resource-value { color: #ffd700; font-weight: bold; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
-        .game-container { display: flex; flex-direction: column; gap: 10px; padding: 10px 10px 40px 10px; min-height: calc(100vh - 100px); overflow-y: auto; }
+        .game-container { display: flex; flex-direction: column; gap: 10px; padding: 10px 10px 40px 10px; min-height: calc(100vh - 100px); max-height: calc(100vh - 100px); overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1 1 auto; }
         @media (min-width: 768px) {
             .game-container {
                 padding: 20px;
@@ -45,7 +45,7 @@
                 margin: 0 auto;
             }
         }
-        .player-status { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); overflow-y: auto; -webkit-overflow-scrolling: touch; transform: translateZ(0); will-change: transform; }
+        .player-status { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); overflow-y: auto; -webkit-overflow-scrolling: touch; transform: translateZ(0); will-change: transform; flex: 1 1 auto; }
         .combat-area { background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex: 1; transform: translateZ(0); will-change: transform; } 
         .combat-area.minimized { min-height: 60px; }
         
@@ -310,6 +310,7 @@
                 padding: 6px; 
                 gap: 6px; 
                 min-height: calc(100dvh - 40px);
+                max-height: calc(100dvh - 40px);
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
             } 
@@ -317,11 +318,11 @@
                 padding: 8px; 
                 gap: 6px; 
                 max-height: none;
-                min-height: 550px;
+                min-height: auto;
                 touch-action: manipulation;
                 order: 1;
-                flex-shrink: 0;
-                flex: 0 0 auto;
+                flex-shrink: 1;
+                flex: 1 1 auto;
             } 
             .combat-area { 
                 padding: 8px; 
@@ -359,14 +360,14 @@
                 font-size: 10px; 
             } 
             .action-buttons {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(2, 1fr);
                 gap: 4px;
             }
             .action-button { 
-                padding: 10px 14px;
+                padding: 12px 8px;
                 font-size: 10px; 
-                min-height: 50px;
-                min-width: 90px;
+                min-height: 45px;
+                min-width: auto;
                 touch-action: manipulation;
                 border-radius: 8px;
                 -webkit-transform: translateZ(0);
@@ -602,13 +603,14 @@
                 padding: 3px; 
                 gap: 3px; 
                 min-height: calc(100dvh - 25px);
+                max-height: calc(100dvh - 25px);
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
             } 
             .player-status { 
                 padding: 5px; 
                 gap: 3px; 
-                min-height: 450px;
+                min-height: auto;
                 touch-action: manipulation;
                 order: 1;
             } 
@@ -633,14 +635,14 @@
                 margin-bottom: 2px;
             } 
             .action-buttons { 
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(2, 1fr);
                 gap: 2px; 
             } 
             .action-button { 
-                padding: 8px 10px;
+                padding: 10px 6px;
                 font-size: 8px; 
-                min-height: 50px;
-                min-width: 80px;
+                min-height: 40px;
+                min-width: auto;
                 touch-action: manipulation;
                 border-radius: 6px;
                 -webkit-transform: translateZ(0);
@@ -1207,7 +1209,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.13",
+            GAME_VERSION: "1.15",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -2415,9 +2417,20 @@
         }
 
         function generateNewMob(isAfterKill = false) {
+            // 确保当前区域有效
+            if (!gameData.gameState.currentZone || gameData.gameState.currentZone < 1) {
+                gameData.gameState.currentZone = 1;
+            }
+            
             const zoneIdx = gameData.gameState.currentZone - 1;
-            const zone = CONFIG.ZONES[zoneIdx];
-            if (!zone) return;
+            let zone = CONFIG.ZONES[zoneIdx];
+            
+            // 确保区域存在
+            if (!zone) {
+                // 使用默认区域
+                zone = CONFIG.ZONES[0]; // 新手平原
+                gameData.gameState.currentZone = 1;
+            }
 
             let isElite = false;
             let eliteType = null;
@@ -2442,7 +2455,18 @@
                 }
             }
 
-            const mobType = isElite ? zone.elite : zone.mobs[Math.floor(Math.random() * zone.mobs.length)];
+            // 确保mobType有效
+            let mobType;
+            if (isElite) {
+                mobType = zone.elite || '史莱姆王';
+            } else {
+                if (zone.mobs && zone.mobs.length > 0) {
+                    mobType = zone.mobs[Math.floor(Math.random() * zone.mobs.length)];
+                } else {
+                    mobType = '史莱姆';
+                }
+            }
+            
             const eliteData = isElite ? CONFIG.ELITE_TYPES[eliteType] : null;
 
             let scaleFactor = 1;
@@ -2667,6 +2691,12 @@
         }
 
         function fightMob() {
+            // 确保gameData和相关对象存在
+            if (!gameData) gameData = {};
+            if (!gameData.gameState) gameData.gameState = {};
+            if (!gameData.player) gameData.player = {};
+            if (!gameData.currentMob) return;
+            
             if (!gameData.gameState.autoFight || gameData.gameState.isDead) return;
 
             const quick = false;
@@ -2849,8 +2879,10 @@
                 if (gameData.player.level < 100 && gameData.player.exp >= gameData.player.expNext) {
                     gameData.player.level++;
                     gameData.player.exp -= gameData.player.expNext;
-                    // 20级后的经验需求改为 × 1.1 而不是1.5
-                    if (gameData.player.level >= 20) {
+                    // 20级后的经验需求改为 × 1.1 而不是1.5，80级及以后改为 × 1.78
+                    if (gameData.player.level >= 80) {
+                        gameData.player.expNext = Math.floor(gameData.player.expNext * 1.78);
+                    } else if (gameData.player.level >= 20) {
                         gameData.player.expNext = Math.floor(gameData.player.expNext * 1.1);
                     } else {
                         gameData.player.expNext = Math.floor(gameData.player.expNext * 1.5);
@@ -2973,6 +3005,19 @@
         }
 
         function rollLoot() {
+            // 确保gameData和player对象存在
+            if (!gameData) gameData = {};
+            if (!gameData.player) gameData.player = {};
+            
+            // 确保player对象的必要数组属性存在
+            if (!gameData.player.inventory) gameData.player.inventory = [];
+            if (!gameData.player.skills) gameData.player.skills = [];
+            if (!gameData.player.gems) gameData.player.gems = [];
+            if (!gameData.player.skillFragments) gameData.player.skillFragments = {};
+            if (!gameData.player.equipFragments) gameData.player.equipFragments = {};
+            if (!gameData.player.gemFragments) gameData.player.gemFragments = {};
+            if (!gameData.player.potions) gameData.player.potions = {};
+            
             const vipBonus = CONFIG.VIP_BONUSES[gameData.player.vipLevel];
             const dropMult = 1 + vipBonus.equipDropBonus / 100;
             
@@ -3506,6 +3551,35 @@
         function updateGameLogic(dt, timestamp) {
             // 自动战斗逻辑
             if (gameData.gameState.autoFight && !gameData.gameState.isDead) {
+                // 确保当前区域有效
+                if (!gameData.gameState.currentZone || gameData.gameState.currentZone < 1) {
+                    gameData.gameState.currentZone = 1;
+                }
+                
+                // 确保有怪物存在
+                if (!gameData.currentMob) {
+                    generateNewMob();
+                    lastAttackTime = timestamp || Date.now();
+                }
+                
+                // 确保怪物数据有效
+                if (!gameData.currentMob) {
+                    // 如果生成失败，强制生成一个默认怪物
+                    gameData.currentMob = {
+                        name: '史莱姆',
+                        icon: '🟢',
+                        hp: 50,
+                        maxHp: 50,
+                        atk: 5,
+                        def: 2,
+                        exp: 15,
+                        gold: 8,
+                        isElite: false,
+                        eliteType: null
+                    };
+                    lastAttackTime = timestamp || Date.now();
+                }
+                
                 // 攻击计时器
                 if (!gameData.player.atkTimer) gameData.player.atkTimer = 0;
                 gameData.player.atkTimer += dt * gameData.player.aspd;
@@ -3517,8 +3591,8 @@
                     lastAttackTime = timestamp || Date.now(); // 更新最后攻击时间
                 }
                 
-                // 检测：如果1.5秒没有攻击，自动生成新怪物
-                if ((timestamp || Date.now()) - lastAttackTime > 1500) {
+                // 检测：如果2秒没有攻击，自动生成新怪物
+                if ((timestamp || Date.now()) - lastAttackTime > 2000) {
                     generateNewMob(true);
                     lastAttackTime = timestamp || Date.now();
                 }
@@ -3531,10 +3605,20 @@
         }
 
         function startIntervalMode() {
-            if (!intervalId) {
-                useIntervalMode = true;
-                intervalId = setInterval(gameLoopByInterval, 100);
+            // 取消之前的requestAnimationFrame
+            if (gameUpdateId) {
+                cancelAnimationFrame(gameUpdateId);
+                gameUpdateId = null;
             }
+            
+            // 清除之前的interval
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+            
+            useIntervalMode = true;
+            intervalId = setInterval(gameLoopByInterval, 100);
         }
 
         function stopIntervalMode() {
@@ -3561,10 +3645,33 @@
         });
 
         function startAutoFight() {
+            // 确保当前区域有效
+            if (!gameData.gameState.currentZone || gameData.gameState.currentZone < 1) {
+                gameData.gameState.currentZone = 1;
+            }
+            
             // 确保有怪物存在
             if (!gameData.currentMob) {
                 generateNewMob();
             }
+            
+            // 确保怪物数据有效
+            if (!gameData.currentMob) {
+                // 如果生成失败，强制生成一个默认怪物
+                gameData.currentMob = {
+                    name: '史莱姆',
+                    icon: '🟢',
+                    hp: 50,
+                    maxHp: 50,
+                    atk: 5,
+                    def: 2,
+                    exp: 15,
+                    gold: 8,
+                    isElite: false,
+                    eliteType: null
+                };
+            }
+            
             gameData.gameState.autoFight = true;
             lastAttackTime = Date.now(); // 初始化最后攻击时间
             
@@ -4090,15 +4197,16 @@
             modal.classList.add('active');
         }
 
-        function getRandomQuality() {
+        function getRandomQuality(type) {
             const probs = CONFIG.BLACK_MARKET_QUALITY_PROBS;
             const rand = Math.random();
             let cum = 0;
-            if (rand < (cum += probs.gray)) return CONFIG.GEM_QUALITIES[0];
-            if (rand < (cum += probs.green)) return CONFIG.GEM_QUALITIES[1];
-            if (rand < (cum += probs.blue)) return CONFIG.GEM_QUALITIES[2];
-            if (rand < (cum += probs.purple)) return CONFIG.GEM_QUALITIES[3];
-            return CONFIG.GEM_QUALITIES[4];
+            const qualities = type === 'skill' ? CONFIG.SKILL_QUALITIES : CONFIG.GEM_QUALITIES;
+            if (rand < (cum += probs.gray)) return qualities[0];
+            if (rand < (cum += probs.green)) return qualities[1];
+            if (rand < (cum += probs.blue)) return qualities[2];
+            if (rand < (cum += probs.purple)) return qualities[3];
+            return qualities[4];
         }
 
         function buySkill() {
@@ -4108,7 +4216,7 @@
                     return;
                 }
                 gameData.player.gold -= CONFIG.BLACK_MARKET.skillPrice;
-                const quality = getRandomQuality();
+                const quality = getRandomQuality('skill');
                 const skill = generateSkillWithQuality(gameData.player.classId, quality);
                 gameData.player.inventory.push(skill);
                 addCombatLog(`购买技能书: ${skill.name}`, 'success');
@@ -5077,7 +5185,7 @@
             if (type === 'equip') {
                 const toDecompose = [];
                 gameData.player.inventory.forEach((item, idx) => {
-                    if (!item.baseName && item.quality === qualityId) {
+                    if (!item.baseName && item.quality === qualityId && !item.locked) {
                         toDecompose.push(idx);
                     }
                 });
@@ -5110,7 +5218,7 @@
             } else if (type === 'skill') {
                 const toDecompose = [];
                 gameData.player.inventory.forEach((item, idx) => {
-                    if (item.baseName && item.quality === qualityId) {
+                    if (item.baseName && item.quality === qualityId && !item.locked) {
                         toDecompose.push(idx);
                     }
                 });
@@ -5135,7 +5243,7 @@
             } else if (type === 'gem') {
                 const toDecompose = [];
                 gameData.player.gems.forEach((gem, idx) => {
-                    if (gem.quality === qualityId) {
+                    if (gem.quality === qualityId && !gem.locked) {
                         toDecompose.push(idx);
                     }
                 });
@@ -5818,12 +5926,17 @@
                     
                     // 增加装备基础属性
                     if (item.stats) {
-                        if (item.stats.atk) item.stats.atk = Math.floor(item.stats.atk * 1.2);
-                        if (item.stats.def) item.stats.def = Math.floor(item.stats.def * 1.2);
-                        if (item.stats.hp) item.stats.hp = Math.floor(item.stats.hp * 1.2);
+                        if (item.stats.atk) item.stats.atk = Math.floor((item.stats.atk || 0) * 1.2);
+                        if (item.stats.def) item.stats.def = Math.floor((item.stats.def || 0) * 1.2);
+                        if (item.stats.hp) item.stats.hp = Math.floor((item.stats.hp || 0) * 1.2);
                     }
                     
                     addCombatLog(`${item.name}强化成功! +${item.enhanceLevel}`, 'success');
+                    gameData.player.titleCounters.enhance_consec_success++;
+                    gameData.player.titleCounters.enhance_consec_fails = 0;
+                    if (item.slot === 'weapon') {
+                        gameData.player.titleCounters.weapon_enhance_max = Math.max(gameData.player.titleCounters.weapon_enhance_max, item.enhanceLevel);
+                    }
                 } else {
                     // 强化失败
                     if (useProtectAuto) {
@@ -5831,9 +5944,9 @@
                         if (item.enhanceLevel > 0) {
                             // 降低装备基础属性
                             if (item.stats) {
-                                if (item.stats.atk) item.stats.atk = Math.floor(item.stats.atk / 1.2);
-                                if (item.stats.def) item.stats.def = Math.floor(item.stats.def / 1.2);
-                                if (item.stats.hp) item.stats.hp = Math.floor(item.stats.hp / 1.2);
+                                if (item.stats.atk) item.stats.atk = Math.floor((item.stats.atk || 0) / 1.2);
+                                if (item.stats.def) item.stats.def = Math.floor((item.stats.def || 0) / 1.2);
+                                if (item.stats.hp) item.stats.hp = Math.floor((item.stats.hp || 0) / 1.2);
                             }
                             item.enhanceLevel--;
                             addCombatLog(`${item.name}强化失败，保护卷生效，强化等级降低一级!`, 'warning');
@@ -5860,6 +5973,8 @@
                         }
                         return; // 立即返回，避免访问已被移除的物品
                     }
+                    gameData.player.titleCounters.enhance_consec_fails++;
+                    gameData.player.titleCounters.enhance_consec_success = 0;
                 }
             } else if (type === 'skill') {
                 // 检查对应品质碎片
@@ -5884,7 +5999,7 @@
                 if (isSuccess) {
                     // 强化成功
                     item.enhanceLevel = (item.enhanceLevel || 0) + 1;
-                    item.mult = Math.floor(item.mult * 1.1);
+                    item.mult = Math.floor((item.mult || 100) * 1.1);
                     addCombatLog(`${item.name}强化成功! +${item.enhanceLevel}`, 'success');
                 } else {
                     // 强化失败
@@ -5893,7 +6008,7 @@
                         const currentLevel = item.enhanceLevel || 0;
                         if (currentLevel > 0) {
                             item.enhanceLevel = currentLevel - 1;
-                            item.mult = Math.floor(item.mult / 1.1);
+                            item.mult = Math.floor((item.mult || 100) / 1.1);
                             addCombatLog(`${item.name}强化失败，保护卷生效，强化等级降低一级!`, 'warning');
                         } else {
                             addCombatLog(`${item.name}强化失败，保护卷生效!`, 'warning');
@@ -5936,11 +6051,11 @@
                     item.enhanceLevel = (item.enhanceLevel || 0) + 1;
                     if (item.affixes) {
                         item.affixes.forEach(affix => {
-                            affix.value = Math.floor(affix.value * 1.1);
+                            affix.value = Math.floor((affix.value || 0) * 1.1);
                         });
                     } else if (item.affix) {
                         // 兼容旧版本宝石数据
-                        item.affix.value = Math.floor(item.affix.value * 1.1);
+                        item.affix.value = Math.floor((item.affix.value || 0) * 1.1);
                     }
                     addCombatLog(`${item.name}强化成功! +${item.enhanceLevel}`, 'success');
                 } else {
@@ -5952,11 +6067,11 @@
                             item.enhanceLevel = currentLevel - 1;
                             if (item.affixes) {
                                 item.affixes.forEach(affix => {
-                                    affix.value = Math.floor(affix.value / 1.1);
+                                    affix.value = Math.floor((affix.value || 0) / 1.1);
                                 });
                             } else if (item.affix) {
                                 // 兼容旧版本宝石数据
-                                item.affix.value = Math.floor(item.affix.value / 1.1);
+                                item.affix.value = Math.floor((item.affix.value || 0) / 1.1);
                             }
                             addCombatLog(`${item.name}强化失败，保护卷生效，强化等级降低一级!`, 'warning');
                         } else {
@@ -7612,7 +7727,8 @@
                 'VIP1': { name: 'VIP1', vip: 1 },
                 'TEST666': { name: '测试礼包', gold: 1000000, diamonds: 100 },
                 'GEMS': { name: '宝石礼包', diamonds: 50 },
-                '2026316': { name: '门票礼包', eliteTickets: 5000, hellTickets: 1000 }
+                '2026316': { name: '门票礼包', eliteTickets: 5000, hellTickets: 1000 },
+                'GENGXIN': { name: '更新礼包', eliteTickets: 2000 }
             };
 
             const code = codes[cdk];
@@ -7961,6 +8077,23 @@
             // 更新存档中的gameVersion为当前版本
             gameData.gameVersion = CONFIG.GAME_VERSION;
             
+            // 确保player对象存在
+            if (!gameData.player) gameData.player = {};
+            
+            // 确保player对象的必要数组属性存在
+            if (!gameData.player.inventory) gameData.player.inventory = [];
+            if (!gameData.player.skills) gameData.player.skills = [];
+            if (!gameData.player.gems) gameData.player.gems = [];
+            if (!gameData.player.skillFragments) gameData.player.skillFragments = {};
+            if (!gameData.player.equipFragments) gameData.player.equipFragments = {};
+            if (!gameData.player.gemFragments) gameData.player.gemFragments = {};
+            if (!gameData.player.potions) gameData.player.potions = {};
+            if (!gameData.player.titleCounters) gameData.player.titleCounters = {};
+            if (!gameData.player.equippedSkills) gameData.player.equippedSkills = [];
+            
+            // 确保gameState对象存在
+            if (!gameData.gameState) gameData.gameState = {};
+            
             // 确保离线挂机相关字段存在
             if (!gameData.player.lastOnlineTime) gameData.player.lastOnlineTime = Date.now();
             if (!gameData.player.offlineEarnings) gameData.player.offlineEarnings = null;
@@ -7996,8 +8129,10 @@
                 maxOfflineTime = 24 * 60 * 60; // 24小时
             } else if (gameData.player.vipLevel >= 2) {
                 maxOfflineTime = 12 * 60 * 60; // 12小时
+            } else if (gameData.player.vipLevel >= 1) {
+                maxOfflineTime = 8 * 60 * 60; // 8小时
             } else {
-                // VIP1及以下没有离线挂机功能
+                // 普通用户没有离线挂机功能
                 gameData.player.lastOnlineTime = now;
                 return;
             }
@@ -8077,6 +8212,15 @@
                 hellTicketsPerMinute = killsPerMinute * CONFIG.HELL_TICKET_DROP_RATE;
             }
             
+            // VIP1用户收益减半
+            if (gameData.player.vipLevel === 1) {
+                expPerMinute *= 0.5;
+                goldPerMinute *= 0.5;
+                diamondsPerMinute *= 0.5;
+                eliteTicketsPerMinute *= 0.5;
+                hellTicketsPerMinute *= 0.5;
+            }
+            
             return {
                 exp: expPerMinute,
                 gold: goldPerMinute,
@@ -8147,7 +8291,10 @@
             while (gameData.player.level < 100 && gameData.player.exp >= gameData.player.expNext) {
                 gameData.player.level++;
                 gameData.player.exp -= gameData.player.expNext;
-                if (gameData.player.level >= 20) {
+                // 20级后的经验需求改为 × 1.1 而不是1.5，80级及以后改为 × 1.78
+                if (gameData.player.level >= 80) {
+                    gameData.player.expNext = Math.floor(gameData.player.expNext * 1.78);
+                } else if (gameData.player.level >= 20) {
                     gameData.player.expNext = Math.floor(gameData.player.expNext * 1.1);
                 } else {
                     gameData.player.expNext = Math.floor(gameData.player.expNext * 1.5);
@@ -8173,6 +8320,11 @@
             updateUI();
             
             addCombatLog(`领取离线收益: ${formatNumber(earnings.exp)}经验, ${formatNumber(earnings.gold)}金币, ${earnings.diamonds}钻石, ${earnings.eliteTickets}精英门票`, 'success');
+            
+            // VIP1用户提示升级VIP
+            if (gameData.player.vipLevel === 1) {
+                addCombatLog('💎 升级VIP能显著增加挂机效率！VIP2可获得12小时离线时间，收益全额；VIP3可获得24小时离线时间！', 'info');
+            }
         }
 
         function showClassSelection() {
