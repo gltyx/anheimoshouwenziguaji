@@ -546,7 +546,8 @@
             .player-status {
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
-                max-height: 300px;
+                max-height: none;
+                min-height: 400px;
                 scrollbar-width: thin;
                 scrollbar-color: #ffd700 #3a3d48;
             }
@@ -853,7 +854,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本1.12</div>
+                    <div class="panel-title">📊 角色属性 版本<span id="game-version">1.16</span></div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -1209,7 +1210,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.15",
+            GAME_VERSION: "1.16",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1727,6 +1728,8 @@
                 hellTicketsElement.textContent = gameData.player.hellTickets;
             }
             document.getElementById('gameId').textContent = gameData.player.gameId;
+            const gameVersionElement = document.getElementById('game-version');
+            if (gameVersionElement) gameVersionElement.textContent = CONFIG.GAME_VERSION;
             const mobHpElement = document.getElementById('mob-hp');
             if (mobHpElement) mobHpElement.textContent = gameData.currentMob.hp + '/' + gameData.currentMob.maxHp;
             const mobAtkElement = document.getElementById('mob-atk');
@@ -8198,7 +8201,7 @@
             
             // 计算钻石掉落率（简化计算）
             const diamondDropRate = CONFIG.DROP_RATES.diamondDrop;
-            const diamondsPerMinute = killsPerMinute * diamondDropRate;
+            let diamondsPerMinute = killsPerMinute * diamondDropRate;
             
             // 计算精英门票掉落率（仅在普通区域）
             let eliteTicketsPerMinute = 0;
