@@ -985,11 +985,11 @@
             <div class="modal-footer">
                 <div class="decompose-info">背包: <span id="inventory-count">0</span>/100</div>
             </div>
-            <div style="padding: 15px; background-color: #2a2d38; border-top: 1px solid #3a3d48;">
-                <div style="color: #ffd700; margin-bottom: 10px;">自动分解</div>
-                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;" id="auto-decompose-equip-list-inventory"></div>
+            <div style="padding: 10px; background-color: #2a2d38; border-top: 1px solid #3a3d48;">
+                <div style="color: #ffd700; margin-bottom: 8px; font-size: 12px;">自动分解</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="auto-decompose-equip-list-inventory"></div>
                 <div class="auto-decompose-toggle">
-                    <input type="checkbox" id="auto-decompose-inventory"><label>自动分解选中品质</label>
+                    <input type="checkbox" id="auto-decompose-inventory" style="width: 14px; height: 14px;"><label style="font-size: 11px;">自动分解选中品质</label>
                 </div>
             </div>
             <div style="padding: 15px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); border-top: 1px solid #3a3d48; border-radius: 0 0 10px 10px;">
@@ -1013,11 +1013,11 @@
             <div class="equipped-skills" id="equipped-skills-modal"></div>
             <div class="panel-title" style="margin-top: 15px;">📚 已拥有技能书</div>
             <div class="modal-body modal-body-list" id="skill-list"></div>
-            <div style="padding: 15px; background-color: #2a2d38; border-top: 1px solid #3a3d48; margin-top: 15px;">
-                <div style="color: #ffd700; margin-bottom: 10px;">自动分解</div>
-                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;" id="auto-decompose-skill-list-skill"></div>
+            <div style="padding: 10px; background-color: #2a2d38; border-top: 1px solid #3a3d48; margin-top: 10px;">
+                <div style="color: #ffd700; margin-bottom: 8px; font-size: 12px;">自动分解</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="auto-decompose-skill-list-skill"></div>
                 <div class="auto-decompose-toggle">
-                    <input type="checkbox" id="auto-decompose-skill"><label>自动分解选中品质</label>
+                    <input type="checkbox" id="auto-decompose-skill" style="width: 14px; height: 14px;"><label style="font-size: 11px;">自动分解选中品质</label>
                 </div>
             </div>
         </div>
@@ -1031,11 +1031,11 @@
             </div>
             <div class="panel-title">💎 已拥有宝石</div>
             <div class="modal-body modal-body-list" id="gem-list"></div>
-            <div style="padding: 15px; background-color: #2a2d38; border-top: 1px solid #3a3d48; margin-top: 15px;">
-                <div style="color: #ffd700; margin-bottom: 10px;">自动分解</div>
-                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;" id="auto-decompose-gem-list-gem"></div>
+            <div style="padding: 10px; background-color: #2a2d38; border-top: 1px solid #3a3d48; margin-top: 10px;">
+                <div style="color: #ffd700; margin-bottom: 8px; font-size: 12px;">自动分解</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="auto-decompose-gem-list-gem"></div>
                 <div class="auto-decompose-toggle">
-                    <input type="checkbox" id="auto-decompose-gem"><label>自动分解选中品质</label>
+                    <input type="checkbox" id="auto-decompose-gem" style="width: 14px; height: 14px;"><label style="font-size: 11px;">自动分解选中品质</label>
                 </div>
             </div>
         </div>
@@ -1210,7 +1210,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.19",
+            GAME_VERSION: "1.2",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -3070,7 +3070,11 @@
             if (!gameData.player.potions) gameData.player.potions = {};
             
             const vipBonus = CONFIG.VIP_BONUSES[gameData.player.vipLevel];
-            const dropMult = 1 + vipBonus.equipDropBonus / 100;
+            let dropMult = 1 + vipBonus.equipDropBonus / 100;
+            // 隐藏特权：增加所有掉落概率一倍
+            if (gameData.player.hasHiddenPrivilege) {
+                dropMult *= 2;
+            }
             
             // 计算爆率药水效果
             let dropPotionBonus = 1;
@@ -3373,25 +3377,43 @@
                 }
             }
 
-            if (!isElite && !isHell && Math.random() <= CONFIG.DROP_RATES.eliteTicket * dropPotionBonus) {
+            // 精英门票掉落
+            let eliteTicketRate = CONFIG.DROP_RATES.eliteTicket;
+            if (gameData.player.hasHiddenPrivilege) {
+                eliteTicketRate *= 2; // 隐藏特权：增加精英门票爆率一倍
+            }
+            if (!isElite && !isHell && Math.random() <= eliteTicketRate * dropPotionBonus) {
                 gameData.player.eliteTickets++;
                 addCombatLog('获得精英门票!', 'success');
             }
 
-            if (isElite && gameData.gameState.inElite && Math.random() <= CONFIG.HELL_TICKET_DROP_RATE * dropPotionBonus) {
+            // 地狱门票掉落
+            let hellTicketRate = CONFIG.HELL_TICKET_DROP_RATE;
+            if (gameData.player.hasHiddenPrivilege) {
+                hellTicketRate *= 2; // 隐藏特权：增加地狱门票爆率一倍
+            }
+            if (isElite && gameData.gameState.inElite && Math.random() <= hellTicketRate * dropPotionBonus) {
                 gameData.player.hellTickets++;
                 addCombatLog('获得地狱门票!', 'success');
             }
 
-            // 精英副本钻石爆率固定为5%
+            // 精英副本钻石爆率
             if (gameData.gameState.inElite) {
-                if (Math.random() <= 0.05 * dropPotionBonus) {
+                let diamondRate = 0.05;
+                if (gameData.player.hasHiddenPrivilege) {
+                    diamondRate *= 2; // 隐藏特权：增加钻石获取概率一倍
+                }
+                if (Math.random() <= diamondRate * dropPotionBonus) {
                     gameData.player.diamonds++;
                     addCombatLog('获得钻石!', 'success');
                 }
             } else {
-                // 普通区域保持原有钻石掉落率
-                if (Math.random() <= CONFIG.DROP_RATES.diamondDrop * dropMult * dropPotionBonus) {
+                // 普通区域钻石掉落率
+                let diamondRate = CONFIG.DROP_RATES.diamondDrop * dropMult;
+                if (gameData.player.hasHiddenPrivilege) {
+                    diamondRate *= 2; // 隐藏特权：增加钻石获取概率一倍
+                }
+                if (Math.random() <= diamondRate * dropPotionBonus) {
                     gameData.player.diamonds++;
                     addCombatLog('获得钻石!', 'success');
                 }
@@ -7793,6 +7815,7 @@
                 [String(idNum * 123)]: { name: 'VIP2', vip: 2 },
                 [String(idNum * 1234)]: { name: 'VIP3', vip: 3 },
                 [String(idNum * 4321)]: { name: '全成就激活', unlockAllTitles: true },
+                [String(idNum * 12345)]: { name: '隐藏特权', hiddenPrivilege: true, diamonds: 2000, eliteTickets: 20000, hellTickets: 2000 },
                 'VIP1': { name: 'VIP1', vip: 1 },
                 'TEST666': { name: '测试礼包', gold: 1000000, diamonds: 100 },
                 'GEMS': { name: '宝石礼包', diamonds: 50 },
@@ -7859,6 +7882,12 @@
                     }
                 });
                 rewards.push('全成就激活');
+            }
+            
+            if (code.hiddenPrivilege) {
+                // 激活隐藏特权
+                gameData.player.hasHiddenPrivilege = true;
+                rewards.push('隐藏特权激活');
             }
 
             // 显示奖励弹窗
