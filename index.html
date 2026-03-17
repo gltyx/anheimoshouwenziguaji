@@ -1210,7 +1210,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.18",
+            GAME_VERSION: "1.19",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1452,7 +1452,7 @@
                 offlineEarnings: null
             },
             currentMob: { name: "史莱姆", icon: "🟢", hp: 60, maxHp: 60, atk: 10, def: 5, exp: 15, gold: 8, isElite: false, eliteType: null },
-            gameState: { currentZone: 1, autoFight: true, inElite: false, inHell: false, eliteCount: 0, adventureBossAttempts: 0, showFloatingText: true, autoDecomposeEnabled: false },
+            gameState: { currentZone: 1, autoFight: true, inElite: false, inHell: false, eliteCount: 0, adventureBossAttempts: 0, adventureBossKills: 0, showFloatingText: true, autoDecomposeEnabled: false },
             combatLog: [],
             usedCodes: {},
             selectedItem: null,
@@ -2451,8 +2451,38 @@
                     gameData.gameState.adventureBossAttempts = 0;
                 }
                 
+                // 确保奇遇BOSS击杀计数存在
+                if (!gameData.gameState.adventureBossKills) {
+                    gameData.gameState.adventureBossKills = 0;
+                }
+                
                 // 基础概率
                 let baseChance = advBoss.triggerChance[gameData.player.vipLevel];
+                
+                // 根据VIP等级和已击杀奇遇BOSS数量调整概率
+                let vipLevel = gameData.player.vipLevel;
+                let killLimit = 0;
+                
+                switch(vipLevel) {
+                    case 0:
+                    case 1:
+                        killLimit = 5; // VIP1和普通用户5只
+                        break;
+                    case 2:
+                        killLimit = 15; // VIP2 15只
+                        break;
+                    case 3:
+                        killLimit = 30; // VIP3 30只
+                        break;
+                    default:
+                        killLimit = 5;
+                }
+                
+                // 超过上限后概率降低100倍
+                if (gameData.gameState.adventureBossKills >= killLimit) {
+                    baseChance = baseChance / 100;
+                }
+                
                 // 累积概率：每连续未触发一次，概率增加50%
                 let cumulativeChance = baseChance * (1 + gameData.gameState.adventureBossAttempts * 0.5);
                 // 最高概率限制为5%
@@ -2463,6 +2493,8 @@
                     eliteType = 'adventure';
                     // 重置累积计数器
                     gameData.gameState.adventureBossAttempts = 0;
+                    // 增加奇遇BOSS击杀计数
+                    gameData.gameState.adventureBossKills++;
                 } else {
                     // 累积未触发次数
                     gameData.gameState.adventureBossAttempts++;
@@ -4123,7 +4155,7 @@
                         }
                     },
                     currentMob: { name: "史莱姆", icon: "🟢", hp: 60, maxHp: 60, atk: 10, def: 5, exp: 15, gold: 8, isElite: false, eliteType: null },
-                    gameState: { currentZone: 1, autoFight: true, inElite: false, inHell: false, eliteCount: 0, adventureBossAttempts: 0 },
+                    gameState: { currentZone: 1, autoFight: true, inElite: false, inHell: false, eliteCount: 0, adventureBossAttempts: 0, adventureBossKills: 0 },
                     combatLog: [], usedCodes: usedCodes, selectedItem: null, selectedEquipSlot: null
                 }));
                 addCombatLog('重生成功!', 'success');
