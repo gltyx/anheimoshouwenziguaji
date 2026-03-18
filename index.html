@@ -965,7 +965,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本<span id="game-version">1.21</span></div>
+                    <div class="panel-title">📊 角色属性 版本<span id="game-version">1.22</span></div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -1321,7 +1321,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.21",
+            GAME_VERSION: "1.22",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -3010,6 +3010,9 @@
             });
 
             if (gameData.currentMob.hp <= 0) {
+                // 立即重置怪物血量，避免负数问题
+                gameData.currentMob.hp = 0;
+                
                 const vipBonus = CONFIG.VIP_BONUSES[gameData.player.vipLevel];
                 const expGain = Math.floor(gameData.currentMob.exp * (1 + gameData.player.expBonus / 100 + vipBonus.expBonus / 100));
                 const goldGain = Math.floor(gameData.currentMob.gold * (1 + gameData.player.goldBonus / 100 + vipBonus.goldBonus / 100));
@@ -3019,6 +3022,18 @@
                 gameData.player.exp += expGain;
                 gameData.player.gold += goldGain;
                 gameData.player.killCount++;
+                
+                // 确保 hourlyEarnings 被正确初始化
+                if (!gameData.player.hourlyEarnings) {
+                    gameData.player.hourlyEarnings = {
+                        exp: 0,
+                        gold: 0,
+                        diamonds: 0,
+                        eliteTickets: 0,
+                        hellTickets: 0,
+                        lastUpdate: Date.now()
+                    };
+                }
                 
                 // 记录每小时收益
                 gameData.player.hourlyEarnings.exp += expGain;
@@ -3079,6 +3094,9 @@
                         generateNewMob();
                         generateZoneList();
                         updateUI();
+                    } else {
+                        // 生成新的精英怪物
+                        generateNewMob(true);
                     }
                 } else if (gameData.gameState.inHell) {
                     // 地狱副本门票消耗：每击杀一次怪物消耗1张地狱门票
@@ -3094,6 +3112,16 @@
                         generateNewMob();
                         generateZoneList();
                         updateUI();
+                    } else {
+                        // 生成新的地狱怪物
+                        generateNewMob(true);
+                    }
+                } else {
+                    // 普通区域，直接生成新怪物
+                    if (gameData.gameState.autoElite && gameData.player.eliteTickets > 0) {
+                        enterEliteMode();
+                    } else {
+                        generateNewMob(true);
                     }
                 }
 
@@ -3130,12 +3158,6 @@
                 checkTitles();
 
                 rollLoot();
-
-                if (gameData.gameState.autoElite && !gameData.gameState.inElite && gameData.player.eliteTickets > 0) {
-                    enterEliteMode();
-                } else {
-                    generateNewMob(true);
-                }
             } else {
                 setTimeout(() => {
                     const mobDmg = Math.max(1, Math.floor(gameData.currentMob.atk - gameData.player.def * 0.6));
@@ -3549,6 +3571,18 @@
                         }
                     }
                 }
+            }
+
+            // 确保 hourlyEarnings 被正确初始化
+            if (!gameData.player.hourlyEarnings) {
+                gameData.player.hourlyEarnings = {
+                    exp: 0,
+                    gold: 0,
+                    diamonds: 0,
+                    eliteTickets: 0,
+                    hellTickets: 0,
+                    lastUpdate: Date.now()
+                };
             }
 
             // 精英门票掉落
@@ -8119,7 +8153,8 @@
                 'TEST666': { name: '测试礼包', gold: 1000000, diamonds: 100 },
                 'GEMS': { name: '宝石礼包', diamonds: 50 },
                 '2026316': { name: '门票礼包', eliteTickets: 5000, hellTickets: 1000 },
-                'GENGXIN': { name: '更新礼包', eliteTickets: 2000 }
+                'GENGXIN': { name: '更新礼包', eliteTickets: 2000 },
+                '66668888': { name: '新手豪华礼包', diamonds: 500, eliteTickets: 3000, hellTickets: 300 }
             };
 
             const code = codes[cdk];
@@ -8559,6 +8594,18 @@
             const actualOfflineTime = Math.min(offlineTime, maxOfflineTime);
             
             if (actualOfflineTime >= 60) { // 至少离线1分钟才计算收益
+                // 确保 hourlyEarnings 被正确初始化
+                if (!gameData.player.hourlyEarnings) {
+                    gameData.player.hourlyEarnings = {
+                        exp: 0,
+                        gold: 0,
+                        diamonds: 0,
+                        eliteTickets: 0,
+                        hellTickets: 0,
+                        lastUpdate: Date.now()
+                    };
+                }
+                
                 // 使用上一个小时的实际收益数据
                 const hourlyEarnings = gameData.player.hourlyEarnings;
                 
