@@ -1321,7 +1321,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.24",
+            GAME_VERSION: "1.25",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -8214,7 +8214,8 @@
                 'GEMS': { name: '宝石礼包', diamonds: 50 },
                 '2026316': { name: '门票礼包', eliteTickets: 5000, hellTickets: 1000 },
                 'GENGXIN': { name: '更新礼包', eliteTickets: 2000 },
-                '66668888': { name: '新手豪华礼包', diamonds: 500, eliteTickets: 3000, hellTickets: 300 }
+                '66668888': { name: '新手豪华礼包', diamonds: 500, eliteTickets: 3000, hellTickets: 300 },
+                '666666': { name: 'VIP3补偿礼包', diamonds: 10000, eliteTickets: 10000, hellTickets: 2000 }
             };
 
             const code = codes[cdk];
@@ -8224,7 +8225,7 @@
             }
             
             // 检查VIP等级要求
-            if (cdk === '2026316' && gameData.player.vipLevel < 3) {
+            if ((cdk === '2026316' || cdk === '666666') && gameData.player.vipLevel < 3) {
                 addCombatLog('该兑换码需要VIP3及以上等级才能使用!', 'danger');
                 return;
             }
@@ -8669,12 +8670,12 @@
                     };
                 }
                 
-                // 优先使用上一小时的收益数据（如果存在），否则使用当前的 hourlyEarnings
-                const hourlyEarnings = gameData.player.lastHourlyEarnings || gameData.player.hourlyEarnings;
+                // 使用 calculateMinuteEarnings 函数计算每分钟收益
+                const minuteEarnings = calculateMinuteEarnings();
                 
                 // 计算总收益
-                const hours = actualOfflineTime / 3600;
-                let diamondsEarned = Math.floor(hourlyEarnings.diamonds * hours);
+                const minutes = actualOfflineTime / 60;
+                let diamondsEarned = Math.floor(minuteEarnings.diamonds * minutes);
                 
                 // 检查并重置每日钻石掉落计数器
                 const today = new Date().toDateString();
@@ -8701,12 +8702,12 @@
                 }
                 
                 const totalEarnings = {
-                    exp: Math.floor(hourlyEarnings.exp * hours),
-                    gold: Math.floor(hourlyEarnings.gold * hours),
+                    exp: Math.floor(minuteEarnings.exp * minutes),
+                    gold: Math.floor(minuteEarnings.gold * minutes),
                     diamonds: diamondsEarned,
-                    eliteTickets: Math.floor(hourlyEarnings.eliteTickets * hours),
-                    hellTickets: Math.floor(hourlyEarnings.hellTickets * hours),
-                    hours: Math.round(hours * 10) / 10
+                    eliteTickets: Math.floor(minuteEarnings.eliteTickets * minutes),
+                    hellTickets: Math.floor(minuteEarnings.hellTickets * minutes),
+                    hours: Math.round((actualOfflineTime / 3600) * 10) / 10
                 };
                 
                 // 保存离线收益
