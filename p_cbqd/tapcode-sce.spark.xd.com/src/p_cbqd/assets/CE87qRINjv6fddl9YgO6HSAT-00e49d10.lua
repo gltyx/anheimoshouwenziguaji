@@ -293,16 +293,14 @@ function M.calcDamage(atkStats, defStats, skillMult)
         rawAtk = rawAtk * skillMult / 100
     end
     local pen = atkStats.penetration or 0
-    -- 穿透<=100: 百分比破防; >100: 超出部分转为百分比增伤(最高200%)
-    local penForDef = math.min(pen, 100)    -- 用于破防的穿透(上限100%)
-    local penBonusDmg = 0                   -- 超出100的增伤倍率
+    local penForDef = math.min(pen, 100)
+    local penBonusDmg = 0
     if pen > 100 then
-        penBonusDmg = math.min(pen - 100, 200) / 100  -- 最高200% → 2.0
+        penBonusDmg = math.min(pen - 100, 200) / 100
     end
     local effDef = defStats.def * (1 - penForDef / 100)
     effDef = math.max(0, effDef)
     local dmg = math.max(1, math.floor(rawAtk - effDef * 0.6))
-    -- 穿透增伤加成
     if penBonusDmg > 0 then
         dmg = math.floor(dmg * (1 + penBonusDmg))
     end
@@ -314,6 +312,13 @@ function M.calcDamage(atkStats, defStats, skillMult)
         critMult = math.max(1.2, critMult)
         dmg = math.floor(dmg * critMult)
     end
+    
+    -- 直接限制技能伤害：技能伤害不能超过基础攻击力的100倍
+    if skillMult then
+        local maxSkillDmg = atkStats.atk * 100
+        dmg = math.min(dmg, maxSkillDmg)
+    end
+    
     return dmg, isCrit
 end
 

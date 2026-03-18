@@ -147,6 +147,11 @@ function M.doAttackRound(S)
             skill.cdTimer = 0
             local sMult = SYS.getSkillMult(skill)
             local sDmg, sCrit = SYS.calcDamage(player, mob, sMult)
+            -- 限制技能伤害：技能伤害不能超过基础攻击力的100倍
+            local maxSkillDmg = player.atk * 100
+            if sDmg > maxSkillDmg then
+                sDmg = maxSkillDmg
+            end
             if mob.isAdventureBoss then
                 sDmg = CFG.ADVENTURE_BOSS.fixedDmgTaken
                 sCrit = false

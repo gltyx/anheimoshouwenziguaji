@@ -10,6 +10,105 @@
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        .grayscale { filter: grayscale(100%); }
+        .button-gray { background: linear-gradient(135deg, #666666 0%, #444444 100%); color: #fff; }
+        .light-mode { background-color: #ffffff !important; color: #000000 !important; }
+        .light-mode .top-bar { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; border-bottom: 2px solid #333333 !important; }
+        .light-mode .top-bar::before { background: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.1) 100%) !important; }
+        .light-mode .resource-item { background: rgba(0,0,0,0.05) !important; border: 1px solid rgba(0,0,0,0.2) !important; }
+        .light-mode .resource-value { color: #000000 !important; text-shadow: 0 0 8px rgba(0,0,0,0.1) !important; }
+        .light-mode .player-status, .light-mode .combat-area { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; }
+        .light-mode h2 { color: #000000 !important; }
+        .light-mode .status-value { background: linear-gradient(145deg, #e0e0e0 0%, #d0d0d0 100%) !important; border: 1px solid rgba(0,0,0,0.1) !important; }
+        .light-mode .status-label { color: #666666 !important; }
+        .light-mode .status-number { color: #000000 !important; text-shadow: 0 0 8px rgba(0,0,0,0.1) !important; }
+        .light-mode .action-button { box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important; }
+        .light-mode .button-red, .light-mode .button-green, .light-mode .button-blue, .light-mode .button-yellow, .light-mode .button-orange, .light-mode .button-purple, .light-mode .button-teal { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .action-button { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .player-id-display { background: linear-gradient(145deg, #e0e0e0 0%, #d0d0d0 100%) !important; border: 1px solid rgba(0,0,0,0.1) !important; }
+        .light-mode .id-label { color: #666666 !important; }
+        .light-mode .id-value { color: #000000 !important; }
+        .light-mode .mob-info { background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 50%, #e8e8e8 100%) !important; border: 3px solid #e0e0e0 !important; box-shadow: 0 12px 24px rgba(0,0,0,0.1), 0 0 30px rgba(0,0,0,0.1), 0 0 60px rgba(0,0,0,0.05) !important; }
+        .light-mode .mob-info::before { background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.05) 40%, transparent 70%) !important; }
+        .light-mode .mob-name { color: #000000 !important; text-shadow: 0 0 15px rgba(0,0,0,0.2), 0 0 30px rgba(0,0,0,0.1), 0 0 45px rgba(0,0,0,0.05) !important; }
+        .light-mode .stat-card { background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%) !important; border: 2px solid #e0e0e0 !important; box-shadow: 0 4px 8px rgba(0,0,0,0.1), 0 0 15px rgba(0,0,0,0.05) !important; }
+        .light-mode .stat-card::before { background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent) !important; }
+        .light-mode .stat-card-label { color: #666666 !important; }
+        .light-mode .stat-card-value { color: #000000 !important; text-shadow: 0 0 5px rgba(0,0,0,0.1) !important; }
+        .light-mode .combat-log { background: linear-gradient(145deg, #f8f8f8 0%, #f0f0f0 100%) !important; border: 1px solid rgba(0,0,0,0.1) !important; }
+        .light-mode .log-entry { background: rgba(0,0,0,0.05) !important; }
+        .light-mode .log-entry.success { color: #27ae60 !important; border-left: 3px solid #27ae60 !important; }
+        .light-mode .log-entry.danger { color: #e74c3c !important; border-left: 3px solid #e74c3c !important; }
+        .light-mode .log-entry.info { color: #3498db !important; border-left: 3px solid #3498db !important; }
+        .light-mode .log-entry.warning { color: #f39c12 !important; border-left: 3px solid #f39c12 !important; }
+        .light-mode .zone-item { background: linear-gradient(145deg, #e0e0e0 0%, #d0d0d0 100%) !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; border: 1px solid rgba(0,0,0,0.1) !important; }
+        .light-mode .zone-item:hover { background: linear-gradient(145deg, #d0d0d0 0%, #c0c0c0 100%) !important; box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important; }
+        .light-mode .zone-item.active { border: 2px solid #000000 !important; box-shadow: 0 0 15px rgba(0,0,0,0.2) !important; }
+        .light-mode .zone-level { color: #666666 !important; }
+        .light-mode .setting-button { background: linear-gradient(135deg, #e0e0e0 0%, #d0d0d0 100%) !important; color: #000000 !important; box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important; }
+        .light-mode .modal-overlay { background-color: rgba(0,0,0,0.5) !important; }
+        .light-mode .modal-content { background-color: #f0f0f0 !important; }
+        .light-mode .panel-tab { background-color: #e0e0e0 !important; color: #333333 !important; }
+        .light-mode .panel-tab.active { background-color: #000000 !important; color: #ffffff !important; }
+        .light-mode .modal-title { color: #000000 !important; }
+        .light-mode .modal-close { color: #000000 !important; }
+        .light-mode .modal-tab { background-color: #e0e0e0 !important; color: #333333 !important; }
+        .light-mode .modal-tab.active { background-color: #000000 !important; color: #ffffff !important; }
+        .light-mode .item-card { background: linear-gradient(145deg, #e0e0e0 0%, #d0d0d0 100%) !important; box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important; }
+        .light-mode .item-card:hover { box-shadow: 0 6px 12px rgba(0,0,0,0.15) !important; }
+        .light-mode .item-name { color: #000000 !important; text-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; }
+        .light-mode .item-details { color: #333333 !important; }
+        .light-mode .item-stats { color: #666666 !important; }
+        .light-mode .panel-title { color: #000000 !important; }
+        .light-mode .quick-stat { background-color: #e0e0e0 !important; }
+        .light-mode .quick-stat-label { color: #666666 !important; }
+        .light-mode .quick-stat-value { color: #000000 !important; }
+        .light-mode .ticket-item { background-color: #e0e0e0 !important; }
+        .light-mode .ticket-count { color: #000000 !important; }
+        .light-mode .enhance-item { background-color: #e0e0e0 !important; }
+        .light-mode .enhance-name { color: #000000 !important; }
+        .light-mode .enhance-stats { color: #666666 !important; }
+        .light-mode .enhance-btn.normal { background-color: #3498db !important; color: #fff !important; }
+        .light-mode .enhance-btn.safe { background-color: #27ae60 !important; color: #fff !important; }
+        .light-mode .enhance-cost { color: #666666 !important; }
+        .light-mode .market-item { background-color: #e0e0e0 !important; }
+        .light-mode .market-price { color: #000000 !important; }
+        .light-mode .inventory-slot { background-color: #e0e0e0 !important; border: 2px solid #999999 !important; }
+        .light-mode .inventory-slot:hover { border-color: #000000 !important; }
+        .light-mode .sub-tab { background-color: #e0e0e0 !important; color: #333333 !important; }
+        .light-mode .sub-tab.active { background-color: #000000 !important; color: #ffffff !important; }
+        .light-mode .title-badge { background-color: #e0e0e0 !important; }
+        .light-mode .info-label { color: #666666 !important; }
+        .light-mode .info-value { color: #000000 !important; }
+        .light-mode .panel-tab { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .panel-tab.active { background: linear-gradient(135deg, #d0d0d0 0%, #c0c0c0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .modal-tab { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .modal-tab.active { background: linear-gradient(135deg, #d0d0d0 0%, #c0c0c0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .sub-tab { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .sub-tab.active { background: linear-gradient(135deg, #d0d0d0 0%, #c0c0c0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .enhance-btn.normal, .light-mode .enhance-btn.safe { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .inventory-slot { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; border: 1px solid #000000 !important; }
+        .light-mode .item-card { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; border: 1px solid #000000 !important; }
+        .light-mode .zone-item { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; border: 1px solid #000000 !important; }
+        .light-mode .zone-item.active { background: linear-gradient(135deg, #d0d0d0 0%, #c0c0c0 100%) !important; border: 1px solid #000000 !important; }
+        .light-mode .setting-button { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .ticket-item { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; border: 1px solid #000000 !important; }
+        .light-mode .market-item { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; border: 1px solid #000000 !important; }
+        .light-mode .enhance-item { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; border: 1px solid #000000 !important; }
+        .light-mode .title-badge { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; border: 1px solid #000000 !important; }
+        .light-mode .combat-button { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .dungeon-button { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .button-gray { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode .damage-text { color: #000000 !important; text-shadow: 2px 2px 4px #000000, 0 0 10px #000000 !important; filter: drop-shadow(0 0 5px #000000) !important; }
+        .light-mode .damage-text.crit { color: #000000 !important; text-shadow: 2px 2px 4px #000000, 0 0 15px #000000 !important; filter: drop-shadow(0 0 10px #000000) !important; }
+        .light-mode .mob-icon { text-shadow: 0 0 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.6) !important; }
+        @keyframes iconGlow {
+            0% { text-shadow: 0 0 20px rgba(0,0,0,0.6), 0 0 40px rgba(0,0,0,0.4); transform: scale(1); }
+            100% { text-shadow: 0 0 30px rgba(0,0,0,1), 0 0 60px rgba(0,0,0,0.8), 0 0 90px rgba(0,0,0,0.6); transform: scale(1.05); }
+        }
+        .light-mode .resource-icon { text-shadow: 0 0 8px rgba(0,0,0,0.5) !important; }
+        .light-mode #game-intro, .light-mode #rebirth { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
+        .light-mode #cdk, .light-mode #toggle-combat-panel, .light-mode #toggle-combat-view { background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important; color: #000000 !important; border: 1px solid #000000 !important; }
         html, body { font-family: 'Arial', sans-serif; background-color: #191c23; color: #ffffff; height: 100%; overflow: hidden; -webkit-overflow-scrolling: touch; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         body { display: flex; justify-content: center; align-items: flex-start; }
         .game-canvas { width: 100vw; min-height: 100vh; background-color: #191c23; position: relative; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; -webkit-transform: translateZ(0); transform: translateZ(0); display: flex; flex-direction: column; flex: 1 1 auto; }
@@ -283,6 +382,10 @@
                 z-index: 1000;
                 background: linear-gradient(135deg, #2a2d38 0%, #1f222a 100%);
             } 
+            .light-mode .top-bar { 
+                background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important;
+                border-bottom: 2px solid #333333 !important;
+            }
             .top-bar-left { 
                 gap: 4px; 
                 overflow-x: auto;
@@ -373,6 +476,11 @@
                 -webkit-transform: translateZ(0);
                 transform: translateZ(0);
             } 
+            .light-mode .action-button { 
+                background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%) !important;
+                color: #000000 !important;
+                border: 1px solid #000000 !important;
+            }
             .mob-info {
                 padding: 6px;
                 min-height: 120px;
@@ -807,6 +915,9 @@
                 <div class="resource-item" id="exp-potion-timer" style="display: none;"><span class="resource-icon">⏰</span><span class="resource-value">经验药水: 00:00</span></div>
                 <div class="resource-item" id="drop-potion-timer" style="display: none;"><span class="resource-icon">⏰</span><span class="resource-value">爆率药水: 00:00</span></div>
             </div>
+            <div style="display: flex; align-items: center;">
+                <button class="action-button button-gray" id="toggle-grayscale" style="padding: 4px 8px; font-size: 10px; margin-right: 10px;" onclick="toggleGrayscale();">🖤 黑白</button>
+            </div>
         </div>
         <div class="game-container">
         <div class="player-status">
@@ -854,7 +965,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本<span id="game-version">1.16</span></div>
+                    <div class="panel-title">📊 角色属性 版本<span id="game-version">1.21</span></div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -939,7 +1050,7 @@
                 <p id="confirm-message" style="text-align: center; margin-bottom: 20px;"></p>
                 <div style="display: flex; justify-content: center; gap: 10px;">
                     <button class="action-button button-green" id="confirm-yes">确认</button>
-                    <button class="action-button button-red" id="confirm-no">取消</button>
+                    <button class="action-button button-red" id="confirm-no">十连</button>
                 </div>
             </div>
         </div>
@@ -1177,7 +1288,7 @@
                     <div style="margin-bottom: 15px;">
                         <div style="font-weight: bold; margin-bottom: 5px;">系统 说明</div>
                         <div>称号 11个成就称号，如"十里坡剑神"、"锻造之神"，提供永久属性加成</div>
-                        <div>VIP 0~3级，提供装备掉率/经验/金币加成，上线送VIP1签到送VIP2和VIP3或者提供重要BUG奖励VIP2和VIP3</div>
+                        <div>VIP 0~3级，提供装备掉率/经验/金币加成，VIP1找Q群管理领取，VIP2和VIP3及门票特权咨询管理</div>
                         <div>宝石 5品质，7种词缀，可强化+15</div>
                         <div>黑店 50万金币随机购技能，100万金币随机购宝石</div>
                         <div>每日任务 5种日常任务，奖励精英门票</div>
@@ -1210,7 +1321,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.2",
+            GAME_VERSION: "1.21",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1329,7 +1440,7 @@
             MAX_SOCKETS: 5,
             BLACK_MARKET: { skillPrice: 500000, gemPrice: 1000000 },
             BLACK_MARKET_QUALITY_PROBS: { gray: 0.75, green: 0.10, blue: 0.08, purple: 0.05, orange: 0.02 },
-            DROP_RATES: { normalMob: 0.15, eliteTicket: 0.1, diamondDrop: 0.05 },
+            DROP_RATES: { normalMob: 0.15, eliteTicket: 0.0333, diamondDrop: 0.05 },
             ELITE_DROP_RATES: { equipment: { gold: 0.05, platinum: 0.02, diamond: 0.005, darkgold: 0.002, myth: 0.001, supreme: 0.00033, zenith: 0.0001 }, gem: { gray: 0.01, green: 0.005, blue: 0.0033, purple: 0.002, orange: 0.0005 }, skill: { gray: 0.02, green: 0.0067, blue: 0.0025, purple: 0.00125, orange: 0.0004 } },
             HELL_DROP_RATES: { equipment: { gold: 0.15, platinum: 0.06, diamond: 0.015, darkgold: 0.006, myth: 0.003, supreme: 0.001, zenith: 0.0003 }, gem: { gray: 0.03, green: 0.015, blue: 0.01, purple: 0.006, orange: 0.0015 }, skill: { gray: 0.06, green: 0.02, blue: 0.0075, purple: 0.00375, orange: 0.0012 } },
             ELITE_TYPES: { normal: { name: "普通精英", color: [255,152,0], atkM: 1.5, defM: 1.5, hpM: 4, dropM: 2, critBonus: 1.0 }, silver: { name: "白银精英", color: [192,192,192], atkM: 2.0, defM: 2.0, hpM: 7, dropM: 3, critBonus: 1.5 }, gold: { name: "黄金精英", color: [255,215,0], atkM: 3.0, defM: 3.0, hpM: 12, dropM: 5, critBonus: 2.0 }, adventure: { name: "奇遇BOSS", color: [255,0,255], atkM: 1.0, defM: 1.0, hpM: 1, dropM: 1, critBonus: 1.0 } },
@@ -1449,7 +1560,16 @@
                 saveCount: 0, lastSaveDate: null,
                 titles: [],
                 lastOnlineTime: Date.now(),
-                offlineEarnings: null
+                offlineEarnings: null,
+                hourlyEarnings: {
+                    exp: 0,
+                    gold: 0,
+                    diamonds: 0,
+                    eliteTickets: 0,
+                    hellTickets: 0,
+                    lastUpdate: Date.now()
+                },
+                lastHourlyReset: Date.now()
             },
             currentMob: { name: "史莱姆", icon: "🟢", hp: 60, maxHp: 60, atk: 10, def: 5, exp: 15, gold: 8, isElite: false, eliteType: null },
             gameState: { currentZone: 1, autoFight: true, inElite: false, inHell: false, eliteCount: 0, adventureBossAttempts: 0, adventureBossKills: 0, showFloatingText: true, autoDecomposeEnabled: false },
@@ -1552,6 +1672,39 @@
             return init();
         }
         
+        // 切换黑白模式（白底黑字）
+        function toggleGrayscale() {
+            const gameCanvas = document.querySelector('.game-canvas');
+            const button = document.getElementById('toggle-grayscale');
+            gameCanvas.classList.toggle('light-mode');
+            
+            // 确保所有模态框也应用亮色模式
+            const modals = document.querySelectorAll('.modal-overlay');
+            modals.forEach(modal => {
+                if (gameCanvas.classList.contains('light-mode')) {
+                    modal.classList.add('light-mode');
+                } else {
+                    modal.classList.remove('light-mode');
+                }
+            });
+            
+            // 确保战斗区域的子界面和战斗画面也应用亮色模式
+            const combatElements = document.querySelectorAll('.combat-area, .mob-info, .combat-log, .combat-buttons');
+            combatElements.forEach(element => {
+                if (gameCanvas.classList.contains('light-mode')) {
+                    element.classList.add('light-mode');
+                } else {
+                    element.classList.remove('light-mode');
+                }
+            });
+            
+            if (gameCanvas.classList.contains('light-mode')) {
+                button.textContent = '🎨 彩色';
+            } else {
+                button.textContent = '🖤 黑白';
+            }
+        }
+
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             // 初始化单实例保护
@@ -2483,25 +2636,19 @@
                     baseChance = baseChance / 100;
                 }
                 
-                // 累积概率：每连续未触发一次，概率增加50%
-                let cumulativeChance = baseChance * (1 + gameData.gameState.adventureBossAttempts * 0.5);
-                // 最高概率限制为5%
-                cumulativeChance = Math.min(cumulativeChance, 0.05);
-                
-                if (Math.random() < cumulativeChance) {
+                // 使用固定基础概率，移除累积机制
+                if (Math.random() < baseChance) {
                     isElite = true;
                     eliteType = 'adventure';
-                    // 重置累积计数器
-                    gameData.gameState.adventureBossAttempts = 0;
                     // 增加奇遇BOSS击杀计数
                     gameData.gameState.adventureBossKills++;
                 } else {
-                    // 累积未触发次数
+                    // 每5次击杀，强制触发一次普通精英
                     gameData.gameState.adventureBossAttempts++;
-                    // 每5次未触发，强制触发一次普通精英
                     if (gameData.gameState.adventureBossAttempts % 5 === 0) {
                         isElite = true;
                         eliteType = 'normal';
+                        gameData.gameState.adventureBossAttempts = 0;
                     }
                 }
             }
@@ -2807,17 +2954,40 @@
                 if (skill.cdTimer >= skill.cd) {
                     skill.cdTimer = 0;
                     
-                    // 技能伤害计算
-                    let skillDmg = Math.floor(playerDmg * skill.mult / 100);
+                    // 技能伤害计算：基于基础攻击力，应用技能倍率
+                    let rawAtk = gameData.player.atk;
+                    
+                    // 穿透计算
+                    let penForDef = Math.min(gameData.player.penetration, 100);
+                    let effDef = gameData.currentMob.def * (1 - penForDef / 100);
+                    effDef = Math.max(0, effDef);
+                    
+                    // 基础技能伤害
+                    let baseSkillDmg = Math.max(1, Math.floor(rawAtk * skill.mult / 100 - effDef * 0.6));
+                    
+                    // 穿透增伤
+                    if (gameData.player.penetration > 100) {
+                        let penBonus = Math.min(gameData.player.penetration - 100, 200) / 100;
+                        baseSkillDmg = Math.floor(baseSkillDmg * (1 + penBonus));
+                    }
                     
                     // 技能暴击判定
                     let skillCrit = false;
+                    let skillCritMult = 1;
                     let skillCritChance = gameData.player.crit - (gameData.currentMob.antiCrit || 0);
                     if (skillCritChance > 0 && Math.random() * 1000 < skillCritChance * 10) {
                         skillCrit = true;
-                        let skillCritMult = (gameData.player.critDmg - (gameData.currentMob.antiCritDmg || 0)) / 100;
+                        skillCritMult = (gameData.player.critDmg - (gameData.currentMob.antiCritDmg || 0)) / 100;
                         skillCritMult = Math.max(1.2, skillCritMult);
-                        skillDmg = Math.floor(skillDmg * skillCritMult);
+                    }
+                    
+                    // 最终技能伤害
+                    let skillDmg = Math.floor(baseSkillDmg * skillCritMult);
+                    
+                    // 技能伤害上限限制：技能伤害不能超过基础攻击力的100倍
+                    let maxSkillDmg = gameData.player.atk * 100;
+                    if (skillDmg > maxSkillDmg) {
+                        skillDmg = maxSkillDmg;
                     }
                     
                     // 奇遇BOSS受到固定伤害为1
@@ -2849,6 +3019,10 @@
                 gameData.player.exp += expGain;
                 gameData.player.gold += goldGain;
                 gameData.player.killCount++;
+                
+                // 记录每小时收益
+                gameData.player.hourlyEarnings.exp += expGain;
+                gameData.player.hourlyEarnings.gold += goldGain;
                 
                 // 新手平原（1区）击杀计数
                 if (gameData.gameState.currentZone === 1) {
@@ -3384,6 +3558,7 @@
             }
             if (!isElite && !isHell && Math.random() <= eliteTicketRate * dropPotionBonus) {
                 gameData.player.eliteTickets++;
+                gameData.player.hourlyEarnings.eliteTickets++;
                 addCombatLog('获得精英门票!', 'success');
             }
 
@@ -3394,28 +3569,56 @@
             }
             if (isElite && gameData.gameState.inElite && Math.random() <= hellTicketRate * dropPotionBonus) {
                 gameData.player.hellTickets++;
+                gameData.player.hourlyEarnings.hellTickets++;
                 addCombatLog('获得地狱门票!', 'success');
             }
 
+            // 检查并重置每日钻石掉落计数器
+            const today = new Date().toDateString();
+            if (!gameData.player.dailyDiamondCount || gameData.player.lastDiamondReset !== today) {
+                gameData.player.dailyDiamondCount = 0;
+                gameData.player.lastDiamondReset = today;
+            }
+            
             // 精英副本钻石爆率
             if (gameData.gameState.inElite) {
-                let diamondRate = 0.05;
+                let diamondRate = 0.01; // 降低80%，从5%降至1%
                 if (gameData.player.hasHiddenPrivilege) {
                     diamondRate *= 2; // 隐藏特权：增加钻石获取概率一倍
                 }
                 if (Math.random() <= diamondRate * dropPotionBonus) {
                     gameData.player.diamonds++;
+                    gameData.player.hourlyEarnings.diamonds++;
                     addCombatLog('获得钻石!', 'success');
                 }
             } else {
-                // 普通区域钻石掉落率
-                let diamondRate = CONFIG.DROP_RATES.diamondDrop * dropMult;
-                if (gameData.player.hasHiddenPrivilege) {
-                    diamondRate *= 2; // 隐藏特权：增加钻石获取概率一倍
+                // 普通区域钻石掉落率 - 根据VIP等级设置不同上限，越接近上限爆率越低
+                let dailyLimit = 300; // 默认上限
+                if (gameData.player.vipLevel >= 3) {
+                    dailyLimit = 800; // VIP3上限
+                } else if (gameData.player.vipLevel >= 2) {
+                    dailyLimit = 500; // VIP2上限
                 }
-                if (Math.random() <= diamondRate * dropPotionBonus) {
-                    gameData.player.diamonds++;
-                    addCombatLog('获得钻石!', 'success');
+                const currentCount = gameData.player.dailyDiamondCount || 0;
+                
+                if (currentCount < dailyLimit) {
+                    // 基础掉落率
+                    let baseRate = CONFIG.DROP_RATES.diamondDrop * dropMult;
+                    if (gameData.player.hasHiddenPrivilege) {
+                        baseRate *= 2; // 隐藏特权：增加钻石获取概率一倍
+                    }
+                    
+                    // 爆率递减因子：越接近上限，爆率越低
+                    const progress = currentCount / dailyLimit;
+                    const rateReduction = 1 - (progress * 0.9); // 最低保留10%的基础爆率
+                    let diamondRate = baseRate * rateReduction;
+                    
+                    if (Math.random() <= diamondRate * dropPotionBonus) {
+                        gameData.player.diamonds++;
+                        gameData.player.dailyDiamondCount = (gameData.player.dailyDiamondCount || 0) + 1;
+                        gameData.player.hourlyEarnings.diamonds++;
+                        addCombatLog('获得钻石!', 'success');
+                    }
                 }
             }
 
@@ -4203,7 +4406,7 @@
                         <div>紫色: 5%</div>
                         <div>橙色: 2%</div>
                     </div>
-                    <button class="action-button button-green" onclick="showConfirmModal('确定要购买随机技能书吗？花费50万金币', buySkill)">购买</button>
+                    <button class="action-button button-green" onclick="buySkill()">购买</button>
                 </div>
                 <div class="market-item">
                     <div class="market-icon">💎</div>
@@ -4217,7 +4420,7 @@
                         <div>紫色: 5%</div>
                         <div>橙色: 2%</div>
                     </div>
-                    <button class="action-button button-blue" onclick="showConfirmModal('确定要购买随机宝石吗？花费100万金币', buyGem)">购买</button>
+                    <button class="action-button button-blue" onclick="buyGem()">购买</button>
                 </div>
                 <div class="market-item">
                     <div class="market-icon">🛡️</div>
@@ -4296,24 +4499,53 @@
         }
 
         function buySkill() {
-            if (gameData.player.gold >= CONFIG.BLACK_MARKET.skillPrice) {
-                if (gameData.player.inventory.length >= CONFIG.MAX_INVENTORY) {
-                    addCombatLog('背包已满!', 'danger');
-                    return;
+            showConfirmModal('确定要购买随机技能书吗？花费50万金币\n\n点击确定购买1个，点击十连进行十连购买（花费500万金币）', function() {
+                // 购买1个
+                if (gameData.player.gold >= CONFIG.BLACK_MARKET.skillPrice) {
+                    if (gameData.player.inventory.length >= CONFIG.MAX_INVENTORY) {
+                        addCombatLog('背包已满!', 'danger');
+                        return;
+                    }
+                    gameData.player.gold -= CONFIG.BLACK_MARKET.skillPrice;
+                    const quality = getRandomQuality('skill');
+                    const skill = generateSkillWithQuality(gameData.player.classId, quality);
+                    gameData.player.inventory.push(skill);
+                    addCombatLog(`购买技能书: ${skill.name}`, 'success');
+                    
+                    // 更新日常任务进度
+                    updateDailyTaskProgress('buySkill');
+                    
+                    updateUI();
+                } else {
+                    addCombatLog('金币不足!', 'danger');
                 }
-                gameData.player.gold -= CONFIG.BLACK_MARKET.skillPrice;
-                const quality = getRandomQuality('skill');
-                const skill = generateSkillWithQuality(gameData.player.classId, quality);
-                gameData.player.inventory.push(skill);
-                addCombatLog(`购买技能书: ${skill.name}`, 'success');
-                
-                // 更新日常任务进度
-                updateDailyTaskProgress('buySkill');
-                
-                updateUI();
-            } else {
-                addCombatLog('金币不足!', 'danger');
-            }
+            }, function() {
+                // 十连购买
+                const tenPrice = CONFIG.BLACK_MARKET.skillPrice * 10;
+                if (gameData.player.gold >= tenPrice) {
+                    if (gameData.player.inventory.length + 10 > CONFIG.MAX_INVENTORY) {
+                        addCombatLog('背包空间不足，无法进行十连购买!', 'danger');
+                        return;
+                    }
+                    gameData.player.gold -= tenPrice;
+                    for (let i = 0; i < 10; i++) {
+                        const quality = getRandomQuality('skill');
+                        const skill = generateSkillWithQuality(gameData.player.classId, quality);
+                        gameData.player.inventory.push(skill);
+                        if (i === 0) {
+                            addCombatLog(`十连购买技能书: ${skill.name}...`, 'success');
+                        }
+                    }
+                    addCombatLog('十连购买完成!', 'success');
+                    
+                    // 更新日常任务进度（只算一次）
+                    updateDailyTaskProgress('buySkill');
+                    
+                    updateUI();
+                } else {
+                    addCombatLog('金币不足，无法进行十连购买!', 'danger');
+                }
+            });
         }
 
         function generateSkillWithQuality(classId, quality) {
@@ -4329,24 +4561,53 @@
         }
 
         function buyGem() {
-            if (gameData.player.gold >= CONFIG.BLACK_MARKET.gemPrice) {
-                if (gameData.player.gems.length >= CONFIG.MAX_GEMS) {
-                    addCombatLog('宝石已满!', 'danger');
-                    return;
+            showConfirmModal('确定要购买随机宝石吗？花费100万金币\n\n点击确定购买1个，点击十连进行十连购买（花费1000万金币）', function() {
+                // 购买1个
+                if (gameData.player.gold >= CONFIG.BLACK_MARKET.gemPrice) {
+                    if (gameData.player.gems.length >= CONFIG.MAX_GEMS) {
+                        addCombatLog('宝石已满!', 'danger');
+                        return;
+                    }
+                    gameData.player.gold -= CONFIG.BLACK_MARKET.gemPrice;
+                    const quality = getRandomQuality();
+                    const gem = generateGemWithQuality(quality);
+                    gameData.player.gems.push(gem);
+                    addCombatLog(`购买宝石: ${gem.name}`, 'success');
+                    
+                    // 更新日常任务进度
+                    updateDailyTaskProgress('buyGem');
+                    
+                    updateUI();
+                } else {
+                    addCombatLog('金币不足!', 'danger');
                 }
-                gameData.player.gold -= CONFIG.BLACK_MARKET.gemPrice;
-                const quality = getRandomQuality();
-                const gem = generateGemWithQuality(quality);
-                gameData.player.gems.push(gem);
-                addCombatLog(`购买宝石: ${gem.name}`, 'success');
-                
-                // 更新日常任务进度
-                updateDailyTaskProgress('buyGem');
-                
-                updateUI();
-            } else {
-                addCombatLog('金币不足!', 'danger');
-            }
+            }, function() {
+                // 十连购买
+                const tenPrice = CONFIG.BLACK_MARKET.gemPrice * 10;
+                if (gameData.player.gold >= tenPrice) {
+                    if (gameData.player.gems.length + 10 > CONFIG.MAX_GEMS) {
+                        addCombatLog('宝石空间不足，无法进行十连购买!', 'danger');
+                        return;
+                    }
+                    gameData.player.gold -= tenPrice;
+                    for (let i = 0; i < 10; i++) {
+                        const quality = getRandomQuality();
+                        const gem = generateGemWithQuality(quality);
+                        gameData.player.gems.push(gem);
+                        if (i === 0) {
+                            addCombatLog(`十连购买宝石: ${gem.name}...`, 'success');
+                        }
+                    }
+                    addCombatLog('十连购买完成!', 'success');
+                    
+                    // 更新日常任务进度（只算一次）
+                    updateDailyTaskProgress('buyGem');
+                    
+                    updateUI();
+                } else {
+                    addCombatLog('金币不足，无法进行十连购买!', 'danger');
+                }
+            });
         }
 
         function generateGemWithQuality(quality) {
@@ -4446,9 +4707,11 @@
 
         // 购买确认弹窗功能
         let pendingPurchaseFunction = null;
+        let pendingCancelFunction = null;
         
-        function showConfirmModal(message, purchaseFunction) {
+        function showConfirmModal(message, purchaseFunction, cancelFunction) {
             pendingPurchaseFunction = purchaseFunction;
+            pendingCancelFunction = cancelFunction;
             document.getElementById('confirm-message').textContent = message;
             document.getElementById('confirm-modal').classList.add('active');
         }
@@ -4456,6 +4719,7 @@
         document.getElementById('close-confirm').onclick = () => {
             document.getElementById('confirm-modal').classList.remove('active');
             pendingPurchaseFunction = null;
+            pendingCancelFunction = null;
         };
         
         document.getElementById('confirm-yes').onclick = () => {
@@ -4464,11 +4728,16 @@
             }
             document.getElementById('confirm-modal').classList.remove('active');
             pendingPurchaseFunction = null;
+            pendingCancelFunction = null;
         };
         
         document.getElementById('confirm-no').onclick = () => {
+            if (pendingCancelFunction) {
+                pendingCancelFunction();
+            }
             document.getElementById('confirm-modal').classList.remove('active');
             pendingPurchaseFunction = null;
+            pendingCancelFunction = null;
         };
         
         // 区域选择功能已移至战斗区域按钮弹窗
@@ -6219,6 +6488,16 @@
 
             // 执行强化
             gameData.player.gemFragments[gem.quality] -= fragmentCost;
+
+            // 自动使用保护卷（如果有）
+            const hasProtect = gameData.player.gemProtectionScrolls > 0;
+            const useProtectAuto = hasProtect;
+            
+            // 消耗保护卷
+            if (useProtectAuto) {
+                gameData.player.gemProtectionScrolls--;
+                addCombatLog('使用宝石保护卷', 'info');
+            }
             
             // 计算成功率
             const successRate = getEnhanceSuccessRate(level);
@@ -6237,8 +6516,28 @@
                 addCombatLog(`${gem.name}强化成功! +${gem.enhanceLevel}`, 'success');
             } else {
                 // 强化失败
-                addCombatLog(`${gem.name}强化失败，宝石消失!`, 'danger');
-                gameData.player.gems.splice(idx, 1);
+                if (useProtectAuto) {
+                    // 使用保护卷，只降低一级强化等级
+                    const currentLevel = gem.enhanceLevel || 0;
+                    if (currentLevel > 0) {
+                        gem.enhanceLevel = currentLevel - 1;
+                        if (gem.affixes) {
+                            gem.affixes.forEach(affix => {
+                                affix.value = Math.floor(affix.value / 1.1);
+                            });
+                        } else if (gem.affix) {
+                            // 兼容旧版本宝石数据
+                            gem.affix.value = Math.floor(gem.affix.value / 1.1);
+                        }
+                        addCombatLog(`${gem.name}强化失败，保护卷生效，强化等级降低一级!`, 'warning');
+                    } else {
+                        addCombatLog(`${gem.name}强化失败，保护卷生效!`, 'warning');
+                    }
+                } else {
+                    // 没有使用保护卷，宝石消失
+                    addCombatLog(`${gem.name}强化失败，宝石消失!`, 'danger');
+                    gameData.player.gems.splice(idx, 1);
+                }
             }
 
             // 更新UI
@@ -8212,9 +8511,30 @@
             // 添加药水倒计时定时器
             setInterval(() => {
                 updatePotionTimers();
+                checkHourlyEarningsReset();
             }, 1000);
         }
         
+        // 检查并重置每小时收益
+        function checkHourlyEarningsReset() {
+            const now = Date.now();
+            const lastReset = gameData.player.lastHourlyReset || now;
+            const hourInMs = 60 * 60 * 1000;
+            
+            if (now - lastReset >= hourInMs) {
+                // 重置每小时收益
+                gameData.player.hourlyEarnings = {
+                    exp: 0,
+                    gold: 0,
+                    diamonds: 0,
+                    eliteTickets: 0,
+                    hellTickets: 0,
+                    lastUpdate: now
+                };
+                gameData.player.lastHourlyReset = now;
+            }
+        }
+
         // 检查离线收益
         function checkOfflineEarnings() {
             const now = Date.now();
@@ -8239,17 +8559,43 @@
             const actualOfflineTime = Math.min(offlineTime, maxOfflineTime);
             
             if (actualOfflineTime >= 60) { // 至少离线1分钟才计算收益
-                // 计算每分钟收益
-                const minuteEarnings = calculateMinuteEarnings();
+                // 使用上一个小时的实际收益数据
+                const hourlyEarnings = gameData.player.hourlyEarnings;
                 
                 // 计算总收益
                 const hours = actualOfflineTime / 3600;
+                let diamondsEarned = Math.floor(hourlyEarnings.diamonds * hours);
+                
+                // 检查并重置每日钻石掉落计数器
+                const today = new Date().toDateString();
+                if (!gameData.player.dailyDiamondCount || gameData.player.lastDiamondReset !== today) {
+                    gameData.player.dailyDiamondCount = 0;
+                    gameData.player.lastDiamondReset = today;
+                }
+                
+                // 根据VIP等级设置每日钻石上限
+                let dailyLimit = 300; // 默认上限
+                if (gameData.player.vipLevel >= 3) {
+                    dailyLimit = 800; // VIP3上限
+                } else if (gameData.player.vipLevel >= 2) {
+                    dailyLimit = 500; // VIP2上限
+                }
+                
+                // 计算剩余可获得的钻石数量
+                const currentCount = gameData.player.dailyDiamondCount || 0;
+                const remainingDiamonds = Math.max(0, dailyLimit - currentCount);
+                
+                // 确保离线收益的钻石不超过剩余可获得的钻石数量
+                if (diamondsEarned > remainingDiamonds) {
+                    diamondsEarned = remainingDiamonds;
+                }
+                
                 const totalEarnings = {
-                    exp: Math.floor(minuteEarnings.exp * actualOfflineTime / 60),
-                    gold: Math.floor(minuteEarnings.gold * actualOfflineTime / 60),
-                    diamonds: Math.floor(minuteEarnings.diamonds * actualOfflineTime / 60),
-                    eliteTickets: Math.floor(minuteEarnings.eliteTickets * actualOfflineTime / 60),
-                    hellTickets: Math.floor(minuteEarnings.hellTickets * actualOfflineTime / 60),
+                    exp: Math.floor(hourlyEarnings.exp * hours),
+                    gold: Math.floor(hourlyEarnings.gold * hours),
+                    diamonds: diamondsEarned,
+                    eliteTickets: Math.floor(hourlyEarnings.eliteTickets * hours),
+                    hellTickets: Math.floor(hourlyEarnings.hellTickets * hours),
                     hours: Math.round(hours * 10) / 10
                 };
                 
@@ -8310,14 +8656,7 @@
                 hellTicketsPerMinute = killsPerMinute * CONFIG.HELL_TICKET_DROP_RATE;
             }
             
-            // VIP1用户收益减半
-            if (gameData.player.vipLevel === 1) {
-                expPerMinute *= 0.5;
-                goldPerMinute *= 0.5;
-                diamondsPerMinute *= 0.5;
-                eliteTicketsPerMinute *= 0.5;
-                hellTicketsPerMinute *= 0.5;
-            }
+            // 移除VIP1用户收益减半，与在线收益保持一致
             
             return {
                 exp: expPerMinute,
@@ -8410,6 +8749,16 @@
             if (gameData.player.diamonds > (gameData.player.max_diamonds || 0)) gameData.player.max_diamonds = gameData.player.diamonds;
             gameData.player.titleCounters.max_gold = gameData.player.maxGold;
             gameData.player.titleCounters.max_diamonds = gameData.player.max_diamonds;
+            
+            // 更新每日钻石计数
+            if (earnings.diamonds > 0) {
+                const today = new Date().toDateString();
+                if (!gameData.player.dailyDiamondCount || gameData.player.lastDiamondReset !== today) {
+                    gameData.player.dailyDiamondCount = 0;
+                    gameData.player.lastDiamondReset = today;
+                }
+                gameData.player.dailyDiamondCount += earnings.diamonds;
+            }
             
             // 清除离线收益
             gameData.player.offlineEarnings = null;
@@ -8556,6 +8905,7 @@
             // 添加药水倒计时定时器
             setInterval(() => {
                 updatePotionTimers();
+                checkHourlyEarningsReset();
             }, 1000);
         }
 
