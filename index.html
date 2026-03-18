@@ -965,7 +965,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本<span id="game-version">1.23</span></div>
+                    <div class="panel-title">📊 角色属性 版本<span id="game-version">1.24</span></div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -1321,7 +1321,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.23",
+            GAME_VERSION: "1.24",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -3089,9 +3089,9 @@
                 
                 // 精英副本门票消耗：每击杀一次怪物消耗对应等级的门票数量
                 if (gameData.gameState.inElite) {
-                    // 计算当前精英副本等级
-                    let eliteLevel = 25;
-                    if (gameData.player.level >= 25) {
+                    // 使用进入副本时保存的精英副本等级
+                    let eliteLevel = gameData.gameState.selectedEliteLevel || 25;
+                    if (!eliteLevel && gameData.player.level >= 25) {
                         eliteLevel = Math.floor((gameData.player.level - 25) / 10) * 10 + 25;
                     }
                     
@@ -3982,6 +3982,10 @@
             } else {
                 // 页面重新可见时，切换回requestAnimationFrame模式
                 stopIntervalMode();
+                // 确保自动战斗状态下重启游戏循环
+                if (gameData.gameState.autoFight) {
+                    startAutoFight();
+                }
             }
         });
         
@@ -4029,17 +4033,8 @@
             gameData.gameState.autoFight = true;
             lastAttackTime = Date.now(); // 初始化最后攻击时间
             
-            // 根据页面是否可见选择合适的游戏循环模式
-            if (document.hidden) {
-                // 页面隐藏时使用 setInterval 模式
-                startIntervalMode();
-            } else {
-                // 页面可见时使用 requestAnimationFrame 模式
-                if (!gameUpdateId) {
-                    lastUpdateTime = 0;
-                    gameUpdateId = requestAnimationFrame(gameUpdate);
-                }
-            }
+            // 启动游戏循环
+            startGameLoop();
         }
 
         function stopAutoFight() {
@@ -4049,6 +4044,10 @@
             if (gameUpdateId) {
                 cancelAnimationFrame(gameUpdateId);
                 gameUpdateId = null;
+            }
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
             }
         }
 
@@ -4079,6 +4078,7 @@
             gameData.gameState.inElite = true;
             gameData.gameState.inHell = false;
             gameData.gameState.adventureBossAttempts = 0;
+            gameData.gameState.selectedEliteLevel = eliteLevel; // 保存精英副本等级
             generateNewMob();
             addCombatLog(`进入${eliteLevel}级精英副本!`, 'warning');
             updateUI();
@@ -7608,6 +7608,16 @@
             // 消耗碎片
             gameData.player.skillFragments[skill.quality] -= fragmentCost;
             
+            // 自动使用保护卷（如果有）
+            const hasProtect = gameData.player.skillProtectionScrolls > 0;
+            const useProtectAuto = hasProtect;
+            
+            // 消耗保护卷
+            if (useProtectAuto) {
+                gameData.player.skillProtectionScrolls--;
+                addCombatLog('使用技能保护卷', 'info');
+            }
+            
             // 计算成功率
             const successRate = getEnhanceSuccessRate(level);
             const isSuccess = Math.random() < successRate;
@@ -7619,8 +7629,21 @@
                 addCombatLog(`${skill.name}强化成功! +${skill.enhanceLevel}`, 'success');
             } else {
                 // 强化失败
-                addCombatLog(`${skill.name}强化失败，技能消失!`, 'danger');
-                gameData.player.equippedSkills.splice(skillIndex, 1);
+                if (useProtectAuto) {
+                    // 使用保护卷，只降低一级强化等级
+                    const currentLevel = skill.enhanceLevel || 0;
+                    if (currentLevel > 0) {
+                        skill.enhanceLevel = currentLevel - 1;
+                        skill.mult = Math.floor(skill.mult / 1.05);
+                        addCombatLog(`${skill.name}强化失败，保护卷生效，强化等级降低一级!`, 'warning');
+                    } else {
+                        addCombatLog(`${skill.name}强化失败，保护卷生效!`, 'warning');
+                    }
+                } else {
+                    // 没有使用保护卷，技能消失
+                    addCombatLog(`${skill.name}强化失败，技能消失!`, 'danger');
+                    gameData.player.equippedSkills.splice(skillIndex, 1);
+                }
             }
             
             // 更新UI
