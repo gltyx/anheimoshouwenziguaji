@@ -965,7 +965,7 @@
             </div>
             <div class="panel-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div class="panel-title">📊 角色属性 版本<span id="game-version">1.22</span></div>
+                    <div class="panel-title">📊 角色属性 版本<span id="game-version">1.23</span></div>
                     <div style="display: flex; gap: 25px; align-items: center;">
                         <button class="action-button button-purple" id="game-intro" style="padding: 6px 12px; font-size: 10px;">📖 游戏简介</button>
                         <button class="action-button button-red" id="rebirth" style="padding: 6px 12px; font-size: 10px;">🔄 重生</button>
@@ -1321,7 +1321,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.22",
+            GAME_VERSION: "1.23",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1569,6 +1569,7 @@
                     hellTickets: 0,
                     lastUpdate: Date.now()
                 },
+                lastHourlyEarnings: null,
                 lastHourlyReset: Date.now()
             },
             currentMob: { name: "史莱姆", icon: "🟢", hp: 60, maxHp: 60, atk: 10, def: 5, exp: 15, gold: 8, isElite: false, eliteType: null },
@@ -1801,9 +1802,25 @@
             gameData.player.critDmg = baseCritDmg + bonusCritDmg;
             gameData.player.lifesteal = bonusLifesteal;
             gameData.player.penetration = bonusPenetration;
-            // 经验加成可以突破最高上限
-            gameData.player.expBonus = bonusExpBonus + expPotionBonus;
-            gameData.player.goldBonus = Math.min(bonusGoldBonus, 200);
+            // 根据VIP等级设置经验和金币加成上限
+            let expBonusLimit = 200; // VIP1和普通用户默认上限
+            let goldBonusLimit = 200; // VIP1和普通用户默认上限
+            
+            // 根据VIP等级调整经验加成上限
+            if (gameData.player.vipLevel >= 3) {
+                expBonusLimit = 300; // VIP3经验上限
+            } else if (gameData.player.vipLevel >= 2) {
+                expBonusLimit = 250; // VIP2经验上限
+            }
+            
+            // 吃了经验药水后，经验上限加50
+            if (expPotionBonus > 0) {
+                expBonusLimit += 50;
+            }
+            
+            // 设置经验和金币加成
+            gameData.player.expBonus = Math.min(bonusExpBonus + expPotionBonus, expBonusLimit);
+            gameData.player.goldBonus = Math.min(bonusGoldBonus, goldBonusLimit);
             gameData.player.antiCrit = bonusAntiCrit;
             gameData.player.antiCritDmg = bonusAntiCritDmg;
         }
@@ -3842,7 +3859,7 @@
         let gameUpdateId = null;
         let lastUpdateTime = 0;
         let lastAttackTime = 0;
-        let useIntervalMode = false;
+        let useIntervalMode = true; // 默认使用 setInterval 模式，确保后台运行
         let intervalId = null;
 
         function gameUpdate(timestamp) {
@@ -3854,6 +3871,20 @@
 
             // 继续游戏循环
             if (!useIntervalMode) {
+                gameUpdateId = requestAnimationFrame(gameUpdate);
+            }
+        }
+        
+        // 使用 setInterval 来确保游戏在后台也能运行
+        function startGameLoop() {
+            if (useIntervalMode) {
+                if (intervalId) clearInterval(intervalId);
+                intervalId = setInterval(() => {
+                    const timestamp = Date.now();
+                    gameUpdate(timestamp);
+                }, 33); // 约30 FPS
+            } else {
+                if (gameUpdateId) cancelAnimationFrame(gameUpdateId);
                 gameUpdateId = requestAnimationFrame(gameUpdate);
             }
         }
@@ -3998,10 +4029,16 @@
             gameData.gameState.autoFight = true;
             lastAttackTime = Date.now(); // 初始化最后攻击时间
             
-            // 开始游戏更新循环
-            if (!gameUpdateId) {
-                lastUpdateTime = 0;
-                gameUpdateId = requestAnimationFrame(gameUpdate);
+            // 根据页面是否可见选择合适的游戏循环模式
+            if (document.hidden) {
+                // 页面隐藏时使用 setInterval 模式
+                startIntervalMode();
+            } else {
+                // 页面可见时使用 requestAnimationFrame 模式
+                if (!gameUpdateId) {
+                    lastUpdateTime = 0;
+                    gameUpdateId = requestAnimationFrame(gameUpdate);
+                }
             }
         }
 
@@ -8557,6 +8594,9 @@
             const hourInMs = 60 * 60 * 1000;
             
             if (now - lastReset >= hourInMs) {
+                // 保存当前收益作为上一小时的收益，用于离线收益计算
+                gameData.player.lastHourlyEarnings = {...gameData.player.hourlyEarnings};
+                
                 // 重置每小时收益
                 gameData.player.hourlyEarnings = {
                     exp: 0,
@@ -8606,8 +8646,8 @@
                     };
                 }
                 
-                // 使用上一个小时的实际收益数据
-                const hourlyEarnings = gameData.player.hourlyEarnings;
+                // 优先使用上一小时的收益数据（如果存在），否则使用当前的 hourlyEarnings
+                const hourlyEarnings = gameData.player.lastHourlyEarnings || gameData.player.hourlyEarnings;
                 
                 // 计算总收益
                 const hours = actualOfflineTime / 3600;
