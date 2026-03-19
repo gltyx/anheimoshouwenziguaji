@@ -1321,7 +1321,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.25",
+            GAME_VERSION: "1.26",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1440,7 +1440,7 @@
             MAX_SOCKETS: 5,
             BLACK_MARKET: { skillPrice: 500000, gemPrice: 1000000 },
             BLACK_MARKET_QUALITY_PROBS: { gray: 0.75, green: 0.10, blue: 0.08, purple: 0.05, orange: 0.02 },
-            DROP_RATES: { normalMob: 0.15, eliteTicket: 0.0333, diamondDrop: 0.05 },
+            DROP_RATES: { normalMob: 0.15, eliteTicket: 0.05, diamondDrop: 0.05 },
             ELITE_DROP_RATES: { equipment: { gold: 0.05, platinum: 0.02, diamond: 0.005, darkgold: 0.002, myth: 0.001, supreme: 0.00033, zenith: 0.0001 }, gem: { gray: 0.01, green: 0.005, blue: 0.0033, purple: 0.002, orange: 0.0005 }, skill: { gray: 0.02, green: 0.0067, blue: 0.0025, purple: 0.00125, orange: 0.0004 } },
             HELL_DROP_RATES: { equipment: { gold: 0.15, platinum: 0.06, diamond: 0.015, darkgold: 0.006, myth: 0.003, supreme: 0.001, zenith: 0.0003 }, gem: { gray: 0.03, green: 0.015, blue: 0.01, purple: 0.006, orange: 0.0015 }, skill: { gray: 0.06, green: 0.02, blue: 0.0075, purple: 0.00375, orange: 0.0012 } },
             ELITE_TYPES: { normal: { name: "普通精英", color: [255,152,0], atkM: 1.5, defM: 1.5, hpM: 4, dropM: 2, critBonus: 1.0 }, silver: { name: "白银精英", color: [192,192,192], atkM: 2.0, defM: 2.0, hpM: 7, dropM: 3, critBonus: 1.5 }, gold: { name: "黄金精英", color: [255,215,0], atkM: 3.0, defM: 3.0, hpM: 12, dropM: 5, critBonus: 2.0 }, adventure: { name: "奇遇BOSS", color: [255,0,255], atkM: 1.0, defM: 1.0, hpM: 1, dropM: 1, critBonus: 1.0 } },
@@ -2629,29 +2629,7 @@
                 // 基础概率
                 let baseChance = advBoss.triggerChance[gameData.player.vipLevel];
                 
-                // 根据VIP等级和已击杀奇遇BOSS数量调整概率
-                let vipLevel = gameData.player.vipLevel;
-                let killLimit = 0;
-                
-                switch(vipLevel) {
-                    case 0:
-                    case 1:
-                        killLimit = 5; // VIP1和普通用户5只
-                        break;
-                    case 2:
-                        killLimit = 15; // VIP2 15只
-                        break;
-                    case 3:
-                        killLimit = 30; // VIP3 30只
-                        break;
-                    default:
-                        killLimit = 5;
-                }
-                
-                // 超过上限后概率降低100倍
-                if (gameData.gameState.adventureBossKills >= killLimit) {
-                    baseChance = baseChance / 100;
-                }
+                // 移除奇遇BOSS上限限制，保持固定基础概率
                 
                 // 使用固定基础概率，移除累积机制
                 if (Math.random() < baseChance) {
@@ -8728,9 +8706,16 @@
             const zone = CONFIG.ZONES[zoneIdx];
             if (!zone) return { exp: 0, gold: 0, diamonds: 0, eliteTickets: 0, hellTickets: 0 };
             
-            // 计算怪物基础经验和金币
-            let baseExp = 15 + (zoneIdx + 1) * 14;
-            let baseGold = 8 + (zoneIdx + 1) * 7;
+            // 计算scaleFactor
+            let scaleFactor = 1;
+            if (zoneIdx <= 4) scaleFactor = 1.0;
+            else if (zoneIdx <= 6) scaleFactor = 1.3 + (zoneIdx - 4) * 0.25;
+            else if (zoneIdx <= 8) scaleFactor = 2.0 + (zoneIdx - 6) * 0.6;
+            else scaleFactor = 3.2 * Math.pow(1.35, zoneIdx - 8);
+            
+            // 计算怪物基础经验和金币（与在线收益保持一致，乘以Math.sqrt(scaleFactor)）
+            let baseExp = Math.floor((15 + (zoneIdx + 1) * 14) * Math.sqrt(scaleFactor));
+            let baseGold = Math.floor((8 + (zoneIdx + 1) * 7) * Math.sqrt(scaleFactor));
             
             // 计算玩家的攻击速度（每秒攻击次数）
             const attacksPerSecond = gameData.player.aspd;
@@ -8747,24 +8732,30 @@
             const expBonus = 1 + (gameData.player.expBonus + vipBonus.expBonus) / 100;
             const goldBonus = 1 + (gameData.player.goldBonus + vipBonus.goldBonus) / 100;
             
+            // 计算掉落药水加成
+            let dropPotionBonus = 1;
+            if (gameData.player.potions && gameData.player.potions.dropPotion && gameData.player.potions.dropPotion.active) {
+                dropPotionBonus = 1.3; // 30%爆率加成
+            }
+            
             // 计算每分钟基础收益
             let expPerMinute = baseExp * killsPerMinute * expBonus;
             let goldPerMinute = baseGold * killsPerMinute * goldBonus;
             
             // 计算钻石掉落率（简化计算）
             const diamondDropRate = CONFIG.DROP_RATES.diamondDrop;
-            let diamondsPerMinute = killsPerMinute * diamondDropRate;
+            let diamondsPerMinute = killsPerMinute * diamondDropRate * dropPotionBonus;
             
             // 计算精英门票掉落率（仅在普通区域）
             let eliteTicketsPerMinute = 0;
             if (!gameData.gameState.inElite && !gameData.gameState.inHell) {
-                eliteTicketsPerMinute = killsPerMinute * CONFIG.DROP_RATES.eliteTicket;
+                eliteTicketsPerMinute = killsPerMinute * CONFIG.DROP_RATES.eliteTicket * dropPotionBonus;
             }
             
             // 计算地狱门票掉落率（仅在精英副本）
             let hellTicketsPerMinute = 0;
             if (gameData.gameState.inElite) {
-                hellTicketsPerMinute = killsPerMinute * CONFIG.HELL_TICKET_DROP_RATE;
+                hellTicketsPerMinute = killsPerMinute * CONFIG.HELL_TICKET_DROP_RATE * dropPotionBonus;
             }
             
             // 移除VIP1用户收益减半，与在线收益保持一致
