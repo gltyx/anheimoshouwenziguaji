@@ -1327,7 +1327,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.29",
+            GAME_VERSION: "1.3",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -2378,25 +2378,58 @@
             const isInEliteDungeon = gameData.gameState.inElite;
             const isInHellDungeon = gameData.gameState.inHell;
             
-            if ((isElite && isInEliteDungeon) || isInHellDungeon) {
-                // 精英副本或地狱副本使用专用的装备掉落率
+            // 计算爆率加成
+            const vipBonus = CONFIG.VIP_BONUSES[gameData.player.vipLevel];
+            let dropMult = 1 + vipBonus.equipDropBonus / 100;
+            // 隐藏特权：增加所有掉落概率一倍
+            if (gameData.player.hasHiddenPrivilege) {
+                dropMult *= 2;
+            }
+            
+            if (isElite || isInHellDungeon) {
+                // 精英怪或地狱副本使用专用的装备掉落率
                 const dropRates = isInHellDungeon ? CONFIG.HELL_DROP_RATES : CONFIG.ELITE_DROP_RATES;
                 
                 // 检查是否有稀有装备特权
                 const hasRarePrivilege = gameData.player.hasRareEquipPrivilege || false;
                 
-                // 首先随机选择是否掉落精英专属品质
+                // 稀有装备特权：增加基础掉落率
+                let baseDropRate = 0.5; // 基础掉落率提高到50%
+                if (hasRarePrivilege) {
+                    baseDropRate = 0.8; // 稀有装备特权时提高到80%
+                }
+                
+                // 首先检查是否掉落装备
+                if (Math.random() > baseDropRate) {
+                    // 没有掉落装备
+                    return null;
+                }
+                
+                // 然后随机选择装备品质
                 let eliteQuality = null;
-                for (const [qId, rate] of Object.entries(dropRates.equipment)) {
-                    // 稀有装备特权：神话、至尊、至臻品质爆率增加10倍
-                    let adjustedRate = rate;
-                    if (hasRarePrivilege && (qId === 'myth' || qId === 'supreme' || qId === 'zenith')) {
-                        adjustedRate = rate * 10;
-                    }
-                    cumulative += adjustedRate;
-                    if (rand <= cumulative) {
-                        eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === qId);
-                        break;
+                const qualityRand = Math.random();
+                let qualityCumulative = 0;
+                
+                // 直接设置神话装备的基础概率
+                const mythRate = 0.02; // 2% 神话装备概率
+                const supremeRate = 0.005; // 0.5% 至尊装备概率
+                const zenithRate = 0.001; // 0.1% 至臻装备概率
+                
+                if (qualityRand < mythRate) {
+                    eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'myth');
+                } else if (qualityRand < mythRate + supremeRate) {
+                    eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'supreme');
+                } else if (qualityRand < mythRate + supremeRate + zenithRate) {
+                    eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'zenith');
+                } else {
+                    // 其他品质
+                    for (const [qId, rate] of Object.entries(dropRates.equipment)) {
+                        if (qId === 'myth' || qId === 'supreme' || qId === 'zenith') continue;
+                        qualityCumulative += rate;
+                        if (qualityRand <= mythRate + supremeRate + zenithRate + qualityCumulative) {
+                            eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === qId);
+                            break;
+                        }
                     }
                 }
                 
@@ -3405,35 +3438,33 @@
                         }
                     }
                 } else {
-                    if (Math.random() <= CONFIG.DROP_RATES.normalMob * finalDropMult * dropMult) {
-                        const equip = generateEquipment(gameData.gameState.currentZone, true);
-                        if (gameData.player.inventory.length < CONFIG.MAX_INVENTORY) {
-                            // 检查是否需要自动分解
-                            if (shouldAutoDecompose('equip', equip)) {
-                                // 直接分解，不添加到背包
-                                const baseGold = (equip.level || 1) * 10;
-                                const q = CONFIG.EQUIP_QUALITIES.find(x => x.id === equip.quality);
-                                const gold = Math.floor(baseGold / (q?.dropRate || 0.1) * 0.1) || 100;
-                                const fragCount = 1;
-                                const currentFrag = gameData.player.equipFragments[equip.quality] || 0;
-                                const actualFrag = Math.min(fragCount, 3000 - currentFrag);
-                                if (actualFrag > 0) {
-                                    gameData.player.equipFragments[equip.quality] = currentFrag + actualFrag;
-                                }
-                                gameData.player.gold += gold;
-                                addCombatLog(`自动分解${equip.name}获得: ${gold}金币, ${actualFrag}${equip.quality}装备碎片`, 'success');
-                            } else {
-                                // 添加到背包
-                                gameData.player.inventory.push(equip);
-                                addCombatLog(`获得 ${equip.name}`, 'success');
+                    const equip = generateEquipment(gameData.gameState.currentZone, true);
+                    if (equip && gameData.player.inventory.length < CONFIG.MAX_INVENTORY) {
+                        // 检查是否需要自动分解
+                        if (shouldAutoDecompose('equip', equip)) {
+                            // 直接分解，不添加到背包
+                            const baseGold = (equip.level || 1) * 10;
+                            const q = CONFIG.EQUIP_QUALITIES.find(x => x.id === equip.quality);
+                            const gold = Math.floor(baseGold / (q?.dropRate || 0.1) * 0.1) || 100;
+                            const fragCount = 1;
+                            const currentFrag = gameData.player.equipFragments[equip.quality] || 0;
+                            const actualFrag = Math.min(fragCount, 3000 - currentFrag);
+                            if (actualFrag > 0) {
+                                gameData.player.equipFragments[equip.quality] = currentFrag + actualFrag;
                             }
-                            updateUI();
-                            // 检查背包界面是否打开，如果打开则更新显示
-                            const inventoryModal = document.getElementById('inventory-modal');
-                            if (inventoryModal && inventoryModal.classList.contains('active')) {
-                                const activeFilter = document.querySelector('#inventory-modal .sub-tab.active').dataset.tab;
-                                renderInventory(activeFilter);
-                            }
+                            gameData.player.gold += gold;
+                            addCombatLog(`自动分解${equip.name}获得: ${gold}金币, ${actualFrag}${equip.quality}装备碎片`, 'success');
+                        } else {
+                            // 添加到背包
+                            gameData.player.inventory.push(equip);
+                            addCombatLog(`获得 ${equip.name}`, 'success');
+                        }
+                        updateUI();
+                        // 检查背包界面是否打开，如果打开则更新显示
+                        const inventoryModal = document.getElementById('inventory-modal');
+                        if (inventoryModal && inventoryModal.classList.contains('active')) {
+                            const activeFilter = document.querySelector('#inventory-modal .sub-tab.active').dataset.tab;
+                            renderInventory(activeFilter);
                         }
                     }
 
