@@ -2451,9 +2451,9 @@
                     if (!quality) quality = CONFIG.EQUIP_QUALITIES[0];
                 }
             } else {
-                // 普通区域使用基础掉落率
+                // 普通区域使用基础掉落率，无法爆出黄金及以上品质
                 for (const q of CONFIG.EQUIP_QUALITIES) {
-                    if (q.eliteOnly) continue;
+                    if (q.eliteOnly || q.id === 'gold' || q.id === 'platinum' || q.id === 'diamond' || q.id === 'darkgold' || q.id === 'myth' || q.id === 'supreme' || q.id === 'zenith') continue;
                     cumulative += q.dropRate;
                     if (rand <= cumulative) { quality = q; break; }
                 }
