@@ -1327,7 +1327,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.27",
+            GAME_VERSION: "1.28",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1341,16 +1341,16 @@
             },
             SKILL_POOL: {
                 warrior: [
-                    { name: "刺杀剑术", cd: 5, mult: 110, desc: "快速突刺" },
-                    { name: "开天剑法", cd: 7, mult: 130, desc: "强力斩击" },
-                    { name: "逐日剑法", cd: 10, mult: 160, desc: "剑气纵横" },
-                    { name: "裂天斩", cd: 12, mult: 200, desc: "终极剑技" }
+                    { name: "刺杀剑术", cd: 5, mult: 165, desc: "快速突刺" },
+                    { name: "开天剑法", cd: 7, mult: 195, desc: "强力斩击" },
+                    { name: "逐日剑法", cd: 10, mult: 240, desc: "剑气纵横" },
+                    { name: "裂天斩", cd: 12, mult: 300, desc: "终极剑技" }
                 ],
                 mage: [
-                    { name: "小火球", cd: 5, mult: 120, desc: "投射火球" },
-                    { name: "大火球", cd: 7, mult: 145, desc: "烈焰爆裂" },
-                    { name: "雷电术", cd: 10, mult: 180, desc: "召唤雷电" },
-                    { name: "灭天火", cd: 12, mult: 230, desc: "毁灭之焰" }
+                    { name: "小火球", cd: 5, mult: 240, desc: "投射火球" },
+                    { name: "大火球", cd: 7, mult: 290, desc: "烈焰爆裂" },
+                    { name: "雷电术", cd: 10, mult: 360, desc: "召唤雷电" },
+                    { name: "灭天火", cd: 12, mult: 460, desc: "毁灭之焰" }
                 ],
                 assassin: [
                     { name: "背刺", cd: 5, mult: 105, desc: "从背后突袭" },
@@ -3437,7 +3437,17 @@
                         }
                     }
 
-                    if (Math.random() <= 0.001 * finalDropMult * dropMult) {
+                    // 宝石掉落：使用配置文件中定义的爆率
+                    let gemDropRate = 0.001; // 默认普通怪物宝石爆率
+                    if (isHell) {
+                        // 地狱副本宝石总爆率
+                        gemDropRate = Object.values(CONFIG.HELL_DROP_RATES.gem).reduce((sum, rate) => sum + rate, 0);
+                    } else if (isElite) {
+                        // 精英副本宝石总爆率
+                        gemDropRate = Object.values(CONFIG.ELITE_DROP_RATES.gem).reduce((sum, rate) => sum + rate, 0);
+                    }
+                    
+                    if (Math.random() <= gemDropRate * finalDropMult * dropMult) {
                         if (gameData.player.gems.length < CONFIG.MAX_GEMS) {
                             const gem = generateGem(null, isElite, isHell);
                             // 检查是否需要自动分解
@@ -3466,8 +3476,18 @@
                         }
                     }
 
-                    if (Math.random() <= 0.001 * finalDropMult * dropMult) {
-                        if (gameData.player.inventory.length < CONFIG.MAX_INVENTORY) {
+                    // 技能掉落：使用配置文件中定义的爆率
+                    let skillDropRate = 0.001; // 默认普通怪物技能爆率
+                    if (isHell) {
+                        // 地狱副本技能总爆率
+                        skillDropRate = Object.values(CONFIG.HELL_DROP_RATES.skill).reduce((sum, rate) => sum + rate, 0);
+                    } else if (isElite) {
+                        // 精英副本技能总爆率
+                        skillDropRate = Object.values(CONFIG.ELITE_DROP_RATES.skill).reduce((sum, rate) => sum + rate, 0);
+                    }
+                    
+                    if (Math.random() <= skillDropRate * finalDropMult * dropMult) {
+                        if (gameData.player.skills.length < CONFIG.MAX_SKILLS) {
                             const skill = generateSkill(gameData.player.classId, isElite, isHell);
                             // 检查是否需要自动分解
                             if (shouldAutoDecompose('skill', skill)) {
@@ -7407,7 +7427,36 @@
 
         document.getElementById('close-skill').onclick = () => document.getElementById('skill-modal').classList.remove('active');
 
+        // 检查并自动卸下其他职业的技能
+        function checkSkillClassRestriction() {
+            const unequippedSkills = [];
+            gameData.player.equippedSkills = gameData.player.equippedSkills.filter(skill => {
+                if (skill.classId && skill.classId !== gameData.player.classId) {
+                    unequippedSkills.push(skill);
+                    return false;
+                }
+                return true;
+            });
+            
+            // 将卸下的技能放回背包
+            unequippedSkills.forEach(skill => {
+                if (gameData.player.inventory.length < CONFIG.MAX_INVENTORY) {
+                    gameData.player.inventory.push(skill);
+                }
+            });
+            
+            if (unequippedSkills.length > 0) {
+                addCombatLog(`已自动卸下${unequippedSkills.length}个其他职业的技能`, 'info');
+                renderSkillModal();
+                renderEquippedSkills();
+                updateUI();
+            }
+        }
+
         function renderSkillModal() {
+            // 检查技能职业限制
+            checkSkillClassRestriction();
+            
             const equippedDiv = document.getElementById('equipped-skills-modal');
             equippedDiv.innerHTML = '';
             for (let i = 0; i < CONFIG.MAX_EQUIPPED_SKILLS; i++) {
@@ -7463,6 +7512,11 @@
                         const hasSame = gameData.player.equippedSkills.find(s => s.baseName === skill.baseName);
                         if (hasSame) {
                             addCombatLog('不能装备同名技能!', 'warning');
+                            return;
+                        }
+                        // 检查职业限制：只能装备本职业技能和通用技能
+                        if (skill.classId && skill.classId !== gameData.player.classId) {
+                            addCombatLog('不能装备其他职业的技能!', 'warning');
                             return;
                         }
                         const idx = gameData.player.inventory.indexOf(skill);
@@ -9064,6 +9118,27 @@
         function selectClass(classId) {
             const cls = CONFIG.CLASSES[classId];
             gameData.gameVersion = "1.0.1";
+            // 保存原职业技能，转职时自动卸下非通用技能
+            const originalSkills = [...gameData.player.equippedSkills];
+            const unequippedSkills = [];
+            
+            // 过滤出通用技能（没有classId的技能）
+            gameData.player.equippedSkills = gameData.player.equippedSkills.filter(skill => {
+                if (!skill.classId) {
+                    return true; // 保留通用技能
+                } else {
+                    unequippedSkills.push(skill);
+                    return false; // 卸下非通用技能
+                }
+            });
+            
+            // 将卸下的技能放回背包
+            unequippedSkills.forEach(skill => {
+                if (gameData.player.inventory.length < CONFIG.MAX_INVENTORY) {
+                    gameData.player.inventory.push(skill);
+                }
+            });
+            
             gameData.player.classId = classId;
             gameData.player.className = cls.name;
             gameData.player.hp = cls.baseHp;
@@ -9083,6 +9158,9 @@
             updateUI();
             startAutoFight();
             addCombatLog(`选择职业: ${cls.name}`, 'success');
+            if (unequippedSkills.length > 0) {
+                addCombatLog(`已自动卸下${unequippedSkills.length}个非通用技能`, 'info');
+            }
             addCombatLog('游戏开始! 暗黑魔兽文字挂机 v' + CONFIG.GAME_VERSION, 'info');
             
 
