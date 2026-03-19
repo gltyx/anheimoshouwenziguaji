@@ -1327,7 +1327,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.3",
+            GAME_VERSION: "1.31",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -2410,23 +2410,39 @@
                 const qualityRand = Math.random();
                 let qualityCumulative = 0;
                 
-                // 直接设置神话装备的基础概率
-                const mythRate = 0.02; // 2% 神话装备概率
-                const supremeRate = 0.005; // 0.5% 至尊装备概率
-                const zenithRate = 0.001; // 0.1% 至臻装备概率
+                // 检查是否在精英副本或地狱副本中
+                const isInDungeon = gameData.gameState.inElite || gameData.gameState.inHell;
                 
-                if (qualityRand < mythRate) {
-                    eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'myth');
-                } else if (qualityRand < mythRate + supremeRate) {
-                    eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'supreme');
-                } else if (qualityRand < mythRate + supremeRate + zenithRate) {
-                    eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'zenith');
+                if (isInDungeon) {
+                    // 精英副本或地狱副本：保持原有爆率
+                    // 直接设置神话装备的基础概率
+                    const mythRate = 0.02; // 2% 神话装备概率
+                    const supremeRate = 0.005; // 0.5% 至尊装备概率
+                    const zenithRate = 0.001; // 0.1% 至臻装备概率
+                    
+                    if (qualityRand < mythRate) {
+                        eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'myth');
+                    } else if (qualityRand < mythRate + supremeRate) {
+                        eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'supreme');
+                    } else if (qualityRand < mythRate + supremeRate + zenithRate) {
+                        eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'zenith');
+                    } else {
+                        // 其他品质
+                        for (const [qId, rate] of Object.entries(dropRates.equipment)) {
+                            if (qId === 'myth' || qId === 'supreme' || qId === 'zenith') continue;
+                            qualityCumulative += rate;
+                            if (qualityRand <= mythRate + supremeRate + zenithRate + qualityCumulative) {
+                                eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === qId);
+                                break;
+                            }
+                        }
+                    }
                 } else {
-                    // 其他品质
+                    // 挂机区域的精英：只能产出黄金以下品质的装备
                     for (const [qId, rate] of Object.entries(dropRates.equipment)) {
-                        if (qId === 'myth' || qId === 'supreme' || qId === 'zenith') continue;
+                        if (qId === 'gold' || qId === 'platinum' || qId === 'diamond' || qId === 'darkgold' || qId === 'myth' || qId === 'supreme' || qId === 'zenith') continue;
                         qualityCumulative += rate;
-                        if (qualityRand <= mythRate + supremeRate + zenithRate + qualityCumulative) {
+                        if (qualityRand <= qualityCumulative) {
                             eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === qId);
                             break;
                         }
@@ -2504,7 +2520,7 @@
             return equipment;
         }
 
-        function generateGem(quality, isElite, isHell) {
+        function generateGem(quality, isElite, isHell, isNormalElite = false) {
             let gemQuality;
             if (quality) {
                 gemQuality = quality;
@@ -2522,14 +2538,24 @@
                         }
                     }
                 } else if (isElite) {
-                    // 精英副本
-                    const rand = Math.random();
-                    let cumulative = 0;
-                    for (const [q, rate] of Object.entries(CONFIG.ELITE_DROP_RATES.gem)) {
-                        cumulative += rate;
-                        if (rand <= cumulative) {
-                            gemQuality = CONFIG.GEM_QUALITIES.find(x => x.id === q);
-                            break;
+                    if (isNormalElite) {
+                        // 挂机区域的精英 - 只能产出绿色以下的宝石
+                        const rand = Math.random();
+                        if (rand < 0.7) {
+                            gemQuality = CONFIG.GEM_QUALITIES[0]; // 灰色
+                        } else {
+                            gemQuality = CONFIG.GEM_QUALITIES[1]; // 绿色
+                        }
+                    } else {
+                        // 精英副本
+                        const rand = Math.random();
+                        let cumulative = 0;
+                        for (const [q, rate] of Object.entries(CONFIG.ELITE_DROP_RATES.gem)) {
+                            cumulative += rate;
+                            if (rand <= cumulative) {
+                                gemQuality = CONFIG.GEM_QUALITIES.find(x => x.id === q);
+                                break;
+                            }
                         }
                     }
                 } else {
@@ -2578,7 +2604,7 @@
             return { id: Date.now() + Math.floor(Math.random() * 10000), name: gemName, quality: gemQuality.id, affixes: affixes, enhanceLevel: 0, locked: false };
         }
 
-        function generateSkill(classId, isElite, isHell) {
+        function generateSkill(classId, isElite, isHell, isNormalElite = false) {
             let pool;
             if (classId && CONFIG.SKILL_POOL[classId]) {
                 pool = Math.random() < 0.5 ? CONFIG.SKILL_POOL[classId] : CONFIG.UNIVERSAL_SKILL_POOL;
@@ -2600,14 +2626,24 @@
                     }
                 }
             } else if (isElite) {
-                // 精英副本
-                const rand = Math.random();
-                let cumulative = 0;
-                for (const [q, rate] of Object.entries(CONFIG.ELITE_DROP_RATES.skill)) {
-                    cumulative += rate;
-                    if (rand <= cumulative) {
-                        quality = CONFIG.SKILL_QUALITIES.find(x => x.id === q);
-                        break;
+                if (isNormalElite) {
+                    // 挂机区域的精英 - 只能产出绿色以下的技能
+                    const rand = Math.random();
+                    if (rand < 0.7) {
+                        quality = CONFIG.SKILL_QUALITIES[0]; // 灰色
+                    } else {
+                        quality = CONFIG.SKILL_QUALITIES[1]; // 绿色
+                    }
+                } else {
+                    // 精英副本
+                    const rand = Math.random();
+                    let cumulative = 0;
+                    for (const [q, rate] of Object.entries(CONFIG.ELITE_DROP_RATES.skill)) {
+                        cumulative += rate;
+                        if (rand <= cumulative) {
+                            quality = CONFIG.SKILL_QUALITIES.find(x => x.id === q);
+                            break;
+                        }
                     }
                 }
             } else {
@@ -3480,7 +3516,9 @@
                     
                     if (Math.random() <= gemDropRate * finalDropMult * dropMult) {
                         if (gameData.player.gems.length < CONFIG.MAX_GEMS) {
-                            const gem = generateGem(null, isElite, isHell);
+                            // 检查是否在精英副本或地狱副本中
+                            const isInDungeon = gameData.gameState.inElite || gameData.gameState.inHell;
+                            const gem = generateGem(null, isElite, isHell, !isInDungeon);
                             // 检查是否需要自动分解
                             if (shouldAutoDecompose('gem', gem)) {
                                 // 直接分解，不添加到背包
@@ -3519,7 +3557,9 @@
                     
                     if (Math.random() <= skillDropRate * finalDropMult * dropMult) {
                         if (gameData.player.skills.length < CONFIG.MAX_SKILLS) {
-                            const skill = generateSkill(gameData.player.classId, isElite, isHell);
+                            // 检查是否在精英副本或地狱副本中
+                            const isInDungeon = gameData.gameState.inElite || gameData.gameState.inHell;
+                            const skill = generateSkill(gameData.player.classId, isElite, isHell, !isInDungeon);
                             // 检查是否需要自动分解
                             if (shouldAutoDecompose('skill', skill)) {
                                 // 直接分解，不添加到背包
@@ -3690,6 +3730,8 @@
                     dailyLimit = 800; // VIP3上限
                 } else if (gameData.player.vipLevel >= 2) {
                     dailyLimit = 500; // VIP2上限
+                } else if (gameData.player.vipLevel >= 1) {
+                    dailyLimit = 350; // VIP1上限
                 }
                 const currentCount = gameData.player.dailyDiamondCount || 0;
                 
@@ -8833,6 +8875,8 @@
                     dailyLimit = 800; // VIP3上限
                 } else if (gameData.player.vipLevel >= 2) {
                     dailyLimit = 500; // VIP2上限
+                } else if (gameData.player.vipLevel >= 1) {
+                    dailyLimit = 350; // VIP1上限
                 }
                 
                 // 计算剩余可获得的钻石数量
