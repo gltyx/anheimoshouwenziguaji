@@ -1175,7 +1175,13 @@
     <div class="modal-overlay" id="equipment-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">🛡️ 装备管理</div>
+                <div class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+                    🛡️ 装备管理
+                    <div style="display: flex; gap: 5px; margin-left: 10px;">
+                        <button class="action-button button-blue" id="main-set-button" style="font-size: 11px; padding: 6px 10px;">主套装</button>
+                        <button class="action-button button-blue" id="secondary-set-button" style="font-size: 11px; padding: 6px 10px;">副套装</button>
+                    </div>
+                </div>
                 <button class="modal-close" id="close-equipment">&times;</button>
             </div>
             <div class="modal-body" id="equipment-body"></div>
@@ -1321,7 +1327,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.26",
+            GAME_VERSION: "1.27",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -3279,7 +3285,22 @@
             const eliteData = isElite ? CONFIG.ELITE_TYPES[gameData.currentMob.eliteType] : null;
             const baseDropMult = isElite ? (eliteData ? eliteData.dropM : 1) : 1;
             const hellDropMult = isHell ? CONFIG.HELL_MODE.dropMult : 1;
-            const finalDropMult = baseDropMult * hellDropMult * dropPotionBonus;
+            
+            // 85级及以上副本增加3倍爆率
+            let levelBonus = 1;
+            if (gameData.gameState.inElite) {
+                const eliteLevel = gameData.gameState.selectedEliteLevel || 25;
+                if (eliteLevel >= 85) {
+                    levelBonus = 3;
+                }
+            } else if (gameData.gameState.inHell) {
+                const hellLevel = gameData.gameState.selectedHellLevel || 30;
+                if (hellLevel >= 85) {
+                    levelBonus = 3;
+                }
+            }
+            
+            const finalDropMult = baseDropMult * hellDropMult * dropPotionBonus * levelBonus;
 
             if (isElite) {
                 if (isAdventureBoss) {
@@ -7832,6 +7853,37 @@
             }
         }
 
+        // 切换装备套装
+        function switchEquipSet(setId) {
+            if (!gameData.player.equipSets) {
+                gameData.player.equipSets = {
+                    currentSet: 'main',
+                    sets: {
+                        main: { name: '主套装', equipment: JSON.parse(JSON.stringify(gameData.player.equipment)) },
+                        secondary: { name: '副套装', equipment: {} }
+                    }
+                };
+            }
+            
+            // 保存当前装备到当前套装
+            gameData.player.equipSets.sets[gameData.player.equipSets.currentSet].equipment = JSON.parse(JSON.stringify(gameData.player.equipment));
+            
+            // 切换到新套装
+            gameData.player.equipSets.currentSet = setId;
+            
+            // 加载新套装的装备
+            if (gameData.player.equipSets.sets[setId].equipment) {
+                gameData.player.equipment = JSON.parse(JSON.stringify(gameData.player.equipSets.sets[setId].equipment));
+            }
+            
+            // 重新计算玩家属性
+            calculatePlayerStats();
+            updateUI();
+            addCombatLog(`已切换到${gameData.player.equipSets.sets[setId].name}!`, 'success');
+        }
+        
+
+        
         function renderEquipmentModal() {
             const body = document.getElementById('equipment-body');
             if (!body) {
@@ -7977,6 +8029,37 @@
             });
             
             body.appendChild(equipContainer);
+            
+            // 确保装备套装数据存在
+            if (!gameData.player.equipSets) {
+                gameData.player.equipSets = {
+                    currentSet: 'main',
+                    sets: {
+                        main: { name: '主套装', equipment: JSON.parse(JSON.stringify(gameData.player.equipment)) },
+                        secondary: { name: '副套装', equipment: {} }
+                    }
+                };
+            }
+            
+            // 更新标题栏的按钮状态
+            const mainSetButton = document.getElementById('main-set-button');
+            const secondarySetButton = document.getElementById('secondary-set-button');
+            
+            if (mainSetButton) {
+                mainSetButton.style.background = gameData.player.equipSets.currentSet === 'main' ? 'linear-gradient(135deg, #27ae60 0%, #229954 100%)' : 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)';
+                mainSetButton.onclick = () => {
+                    switchEquipSet('main');
+                    renderEquipmentModal();
+                };
+            }
+            
+            if (secondarySetButton) {
+                secondarySetButton.style.background = gameData.player.equipSets.currentSet === 'secondary' ? 'linear-gradient(135deg, #27ae60 0%, #229954 100%)' : 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)';
+                secondarySetButton.onclick = () => {
+                    switchEquipSet('secondary');
+                    renderEquipmentModal();
+                };
+            }
         }
         
         function showGemSocketModal(slotId) {
