@@ -1327,7 +1327,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.28",
+            GAME_VERSION: "1.29",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1565,6 +1565,8 @@
                 titleCounters: { zone1_kills: 0, adventure_boss_kills: 0, enhance_consec_fails: 0, enhance_consec_success: 0, elite_tickets_spent: 0, hell_tickets_spent: 0, weapon_enhance_max: 0, reach_max_zone: 0, max_gold: 0, max_diamonds: 0, zone_kills: {}, zone_kills_max: 0 },
                 saveCount: 0, lastSaveDate: null,
                 titles: [],
+                hasHiddenPrivilege: false,
+                hasRareEquipPrivilege: false,
                 lastOnlineTime: Date.now(),
                 offlineEarnings: null,
                 hourlyEarnings: {
@@ -2380,10 +2382,18 @@
                 // 精英副本或地狱副本使用专用的装备掉落率
                 const dropRates = isInHellDungeon ? CONFIG.HELL_DROP_RATES : CONFIG.ELITE_DROP_RATES;
                 
+                // 检查是否有稀有装备特权
+                const hasRarePrivilege = gameData.player.hasRareEquipPrivilege || false;
+                
                 // 首先随机选择是否掉落精英专属品质
                 let eliteQuality = null;
                 for (const [qId, rate] of Object.entries(dropRates.equipment)) {
-                    cumulative += rate;
+                    // 稀有装备特权：神话、至尊、至臻品质爆率增加10倍
+                    let adjustedRate = rate;
+                    if (hasRarePrivilege && (qId === 'myth' || qId === 'supreme' || qId === 'zenith')) {
+                        adjustedRate = rate * 10;
+                    }
+                    cumulative += adjustedRate;
                     if (rand <= cumulative) {
                         eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === qId);
                         break;
@@ -2490,19 +2500,14 @@
                         }
                     }
                 } else {
-                    // 普通怪物
-                    // 使用较低的品质分布
+                    // 普通怪物 - 只能产出蓝色以下的宝石
                     const rand = Math.random();
                     if (rand < 0.6) {
                         gemQuality = CONFIG.GEM_QUALITIES[0]; // 灰色
                     } else if (rand < 0.85) {
                         gemQuality = CONFIG.GEM_QUALITIES[1]; // 绿色
-                    } else if (rand < 0.95) {
-                        gemQuality = CONFIG.GEM_QUALITIES[2]; // 蓝色
-                    } else if (rand < 0.99) {
-                        gemQuality = CONFIG.GEM_QUALITIES[3]; // 紫色
                     } else {
-                        gemQuality = CONFIG.GEM_QUALITIES[4]; // 橙色
+                        gemQuality = CONFIG.GEM_QUALITIES[2]; // 蓝色
                     }
                 }
                 // 确保找到品质
@@ -2573,21 +2578,16 @@
                     }
                 }
             } else {
-                // 普通怪物
-                // 使用较低的品质分布
-                const rand = Math.random();
-                if (rand < 0.6) {
-                    quality = CONFIG.SKILL_QUALITIES[0]; // 灰色
-                } else if (rand < 0.85) {
-                    quality = CONFIG.SKILL_QUALITIES[1]; // 绿色
-                } else if (rand < 0.95) {
-                    quality = CONFIG.SKILL_QUALITIES[2]; // 蓝色
-                } else if (rand < 0.99) {
-                    quality = CONFIG.SKILL_QUALITIES[3]; // 紫色
-                } else {
-                    quality = CONFIG.SKILL_QUALITIES[4]; // 橙色
+                    // 普通怪物 - 只能产出蓝色以下的技能
+                    const rand = Math.random();
+                    if (rand < 0.6) {
+                        quality = CONFIG.SKILL_QUALITIES[0]; // 灰色
+                    } else if (rand < 0.85) {
+                        quality = CONFIG.SKILL_QUALITIES[1]; // 绿色
+                    } else {
+                        quality = CONFIG.SKILL_QUALITIES[2]; // 蓝色
+                    }
                 }
-            }
             // 确保找到品质
             if (!quality) {
                 quality = CONFIG.SKILL_QUALITIES[Math.floor(Math.random() * CONFIG.SKILL_QUALITIES.length)];
@@ -3300,7 +3300,7 @@
                 }
             }
             
-            const finalDropMult = baseDropMult * hellDropMult * dropPotionBonus * levelBonus;
+            const finalDropMult = baseDropMult * hellDropMult * dropMult * dropPotionBonus * levelBonus;
 
             if (isElite) {
                 if (isAdventureBoss) {
@@ -3623,10 +3623,7 @@
 
             // 精英门票掉落
             let eliteTicketRate = CONFIG.DROP_RATES.eliteTicket;
-            if (gameData.player.hasHiddenPrivilege) {
-                eliteTicketRate *= 2; // 隐藏特权：增加精英门票爆率一倍
-            }
-            if (!isElite && !isHell && Math.random() <= eliteTicketRate * dropPotionBonus) {
+            if (!isElite && !isHell && Math.random() <= eliteTicketRate * dropMult * dropPotionBonus) {
                 gameData.player.eliteTickets++;
                 gameData.player.hourlyEarnings.eliteTickets++;
                 addCombatLog('获得精英门票!', 'success');
@@ -3634,10 +3631,7 @@
 
             // 地狱门票掉落
             let hellTicketRate = CONFIG.HELL_TICKET_DROP_RATE;
-            if (gameData.player.hasHiddenPrivilege) {
-                hellTicketRate *= 2; // 隐藏特权：增加地狱门票爆率一倍
-            }
-            if (isElite && gameData.gameState.inElite && Math.random() <= hellTicketRate * dropPotionBonus) {
+            if (isElite && gameData.gameState.inElite && Math.random() <= hellTicketRate * dropMult * dropPotionBonus) {
                 gameData.player.hellTickets++;
                 gameData.player.hourlyEarnings.hellTickets++;
                 addCombatLog('获得地狱门票!', 'success');
@@ -3653,10 +3647,7 @@
             // 精英副本钻石爆率
             if (gameData.gameState.inElite) {
                 let diamondRate = 0.01; // 降低80%，从5%降至1%
-                if (gameData.player.hasHiddenPrivilege) {
-                    diamondRate *= 2; // 隐藏特权：增加钻石获取概率一倍
-                }
-                if (Math.random() <= diamondRate * dropPotionBonus) {
+                if (Math.random() <= diamondRate * dropMult * dropPotionBonus) {
                     gameData.player.diamonds++;
                     gameData.player.hourlyEarnings.diamonds++;
                     addCombatLog('获得钻石!', 'success');
@@ -8324,6 +8315,7 @@
                 [String(idNum * 1234)]: { name: 'VIP3', vip: 3 },
                 [String(idNum * 4321)]: { name: '全成就激活', unlockAllTitles: true },
                 [String(idNum * 12345)]: { name: '隐藏特权', hiddenPrivilege: true, diamonds: 2000, eliteTickets: 20000, hellTickets: 2000 },
+                [String(idNum * 789)]: { name: '稀有装备特权', rareEquipPrivilege: true, diamonds: 2000, eliteTickets: 20000, hellTickets: 5000 },
                 'VIP1': { name: 'VIP1', vip: 1 },
                 'TEST666': { name: '测试礼包', gold: 1000000, diamonds: 100 },
                 'GEMS': { name: '宝石礼包', diamonds: 50 },
@@ -8398,6 +8390,11 @@
                 // 激活隐藏特权
                 gameData.player.hasHiddenPrivilege = true;
                 rewards.push('隐藏特权激活');
+            }
+            if (code.rareEquipPrivilege) {
+                // 激活稀有装备特权
+                gameData.player.hasRareEquipPrivilege = true;
+                rewards.push('稀有装备特权激活');
             }
 
             // 显示奖励弹窗
