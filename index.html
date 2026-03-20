@@ -1245,7 +1245,7 @@
             <div style="padding: 20px; max-height: 70vh; overflow-y: auto;">
                 <div style="margin-bottom: 20px;">
                     <h3 style="color: #ffd700; margin-bottom: 10px;">游戏：暗黑魔兽文字挂机</h3>
-                    <div style="margin-bottom: 15px;">等级上限：999级</div>
+                    <div style="margin-bottom: 15px;">等级上限：100级</div>
                     
                     <h4 style="color: #ffd700; margin: 15px 0 10px 0;">三大职业</h4>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
@@ -1287,7 +1287,7 @@
                     <h4 style="color: #ffd700; margin: 15px 0 10px 0;">装备系统（核心玩法）</h4>
                     <div style="margin-bottom: 15px;">
                         <div>6个槽位：武器、头盔、铠甲、靴子、戒指、项链</div>
-                        <div>12种品质：灰→绿→蓝→紫→橙→红→黄金→铂金→钻石→暗金→神话→至尊→至臻</div>
+                        <div>多种装备品质：灰→绿→蓝→紫→橙→红→黄金→铂金→钻石→暗金→神话→至尊→至臻→无双（无双只能地狱副本产出）</div>
                         <div>！！！黄金以上精英副本和奇遇产出 终极装备地狱副本和奇遇BOSS产出！！</div>
                         <div>9种词缀：攻速、暴击、爆伤、抗暴、抗爆、吸血、穿透、经验加成、金币加成（后续待定）</div>
                         <div>装备强化：最高+15，失败装备消失（可用保护卷）</div>
@@ -1342,7 +1342,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.32",
+            GAME_VERSION: "1.33",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -2452,23 +2452,36 @@
                 const isInDungeon = gameData.gameState.inElite || gameData.gameState.inHell;
                 const isBoss = gameData.currentMob && gameData.currentMob.eliteType === 'boss';
                 
-                // 稀有装备特权：增加高品质装备爆率10倍，普通用户降低5倍
+                // 稀有装备特权：增加所有装备爆率，普通用户降低爆率
                 const highQualityMultiplier = hasRarePrivilege ? 10 : 0.2; // 普通用户降低5倍
-                const regularQualityMultiplier = 1; // 普通品质保持不变，避免概率超过1
+                const regularQualityMultiplier = hasRarePrivilege ? 1 : 0.2; // 普通品质也需要调整，确保总概率合理
                 
                 if (isInDungeon && !isBoss) {
                     // 精英副本或地狱副本：设置装备概率
-                    // 直接设置神话装备的基础概率
-                    // 普通用户和稀有装备特权用户的无双装备爆率
-                    const unparalleledRate = hasRarePrivilege ? 0.01 : 0.0002; // 稀有装备特权1%爆率，普通用户0.02%爆率
+                    // 稀有装备特权用户的爆率设置
+                    let mythRate, supremeRate, zenithRate, unparalleledRate;
                     
-                    const mythRate = 0.02 * highQualityMultiplier; // 2% 神话装备概率
-                    const supremeRate = 0.005 * highQualityMultiplier; // 0.5% 至尊装备概率
-                    const zenithRate = 0.001 * highQualityMultiplier; // 0.1% 至臻装备概率
+                    if (hasRarePrivilege) {
+                        // 稀有装备特权用户：按要求设置爆率
+                        mythRate = 0.04; // 4% 神话装备概率
+                        supremeRate = 0.03; // 3% 至尊装备概率
+                        zenithRate = 0.02; // 2% 至臻装备概率
+                        unparalleledRate = 0.005; // 0.5% 无双装备概率（仅地狱副本）
+                    } else {
+                        // 普通用户：低爆率
+                        mythRate = 0.02; // 2% 神话装备概率
+                        supremeRate = 0.005; // 0.5% 至尊装备概率
+                        zenithRate = 0.001; // 0.1% 至臻装备概率
+                        unparalleledRate = 0.0002; // 0.02% 无双装备概率（仅地狱副本）
+                    }
                     
                     // 检查VIP等级和每日掉落限制
                     const vipLevel = gameData.player.vipLevel;
                     const dailyDrops = gameData.player.dailyEquipDrops;
+                    
+                    // 计算总概率
+                    const totalHighQualityRate = mythRate + supremeRate + zenithRate + (isInHellDungeon ? unparalleledRate : 0);
+                    const regularQualityRate = 1 - totalHighQualityRate;
                     
                     if (qualityRand < mythRate) {
                         eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'myth');
@@ -2496,12 +2509,39 @@
                         }
                     } else {
                         // 其他品质
-                        for (const [qId, rate] of Object.entries(dropRates.equipment)) {
-                            if (qId === 'myth' || qId === 'supreme' || qId === 'zenith' || qId === 'unparalleled') continue;
-                            qualityCumulative += rate * regularQualityMultiplier;
-                            if (qualityRand <= mythRate + supremeRate + zenithRate + unparalleledRate + qualityCumulative) {
-                                eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === qId);
-                                break;
+                        if (hasRarePrivilege) {
+                            // 稀有装备特权用户：其他品质爆率为0%，按照设定比例重新分配高品质装备
+                            // 重新生成随机数，按照设定的比例分配
+                            const newRand = Math.random();
+                            if (newRand < mythRate / totalHighQualityRate) {
+                                eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'myth');
+                            } else if (newRand < (mythRate + supremeRate) / totalHighQualityRate) {
+                                eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'supreme');
+                            } else if (newRand < (mythRate + supremeRate + zenithRate) / totalHighQualityRate) {
+                                eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'zenith');
+                            } else if (isInHellDungeon) {
+                                eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'unparalleled');
+                            } else {
+                                // 非地狱副本，分配到神话装备
+                                eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'myth');
+                            }
+                        } else {
+                            // 普通用户：正常分配其他品质
+                            const regularQualityRand = (qualityRand - totalHighQualityRate) / regularQualityRate;
+                            let regularCumulative = 0;
+                            const regularRates = {
+                                gold: 0.4,    // 40%
+                                platinum: 0.3, // 30%
+                                diamond: 0.2,  // 20%
+                                darkgold: 0.1  // 10%
+                            };
+                            
+                            for (const [qId, rate] of Object.entries(regularRates)) {
+                                regularCumulative += rate;
+                                if (regularQualityRand <= regularCumulative) {
+                                    eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === qId);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -3491,19 +3531,8 @@
             const baseDropMult = isElite ? (eliteData ? eliteData.dropM : 1) : 1;
             const hellDropMult = isHell ? CONFIG.HELL_MODE.dropMult : 1;
             
-            // 85级及以上副本增加3倍爆率
+            // 所有地狱副本使用相同爆率，移除等级加成
             let levelBonus = 1;
-            if (gameData.gameState.inElite) {
-                const eliteLevel = gameData.gameState.selectedEliteLevel || 25;
-                if (eliteLevel >= 85) {
-                    levelBonus = 3;
-                }
-            } else if (gameData.gameState.inHell) {
-                const hellLevel = gameData.gameState.selectedHellLevel || 30;
-                if (hellLevel >= 85) {
-                    levelBonus = 3;
-                }
-            }
             
             const finalDropMult = baseDropMult * hellDropMult * dropMult * dropPotionBonus * levelBonus;
 
@@ -3865,11 +3894,11 @@
                 // 普通区域钻石掉落率 - 根据VIP等级设置不同上限，越接近上限爆率越低
                 let dailyLimit = 300; // 默认上限
                 if (gameData.player.vipLevel >= 3) {
-                    dailyLimit = 800; // VIP3上限
+                    dailyLimit = 1500; // VIP3上限
                 } else if (gameData.player.vipLevel >= 2) {
-                    dailyLimit = 500; // VIP2上限
+                    dailyLimit = 800; // VIP2上限
                 } else if (gameData.player.vipLevel >= 1) {
-                    dailyLimit = 350; // VIP1上限
+                    dailyLimit = 400; // VIP1上限
                 }
                 const currentCount = gameData.player.dailyDiamondCount || 0;
                 
@@ -8568,14 +8597,21 @@
                 return;
             }
 
-            const usedKey = 'code_' + cdk;
-            if (gameData.usedCodes && gameData.usedCodes[usedKey]) {
-                addCombatLog('该兑换码已使用!', 'warning');
-                return;
-            }
+            // 检查是否为稀有装备特权CDK
+            const rareEquipCDK = String((parseInt(gameData.player.gameId.substring(0, 4)) || 0) * 789);
+            const isRareEquipCDK = cdk === rareEquipCDK;
+            
+            // 非稀有装备特权CDK需要检查是否已使用
+            if (!isRareEquipCDK) {
+                const usedKey = 'code_' + cdk;
+                if (gameData.usedCodes && gameData.usedCodes[usedKey]) {
+                    addCombatLog('该兑换码已使用!', 'warning');
+                    return;
+                }
 
-            if (!gameData.usedCodes) gameData.usedCodes = {};
-            gameData.usedCodes[usedKey] = true;
+                if (!gameData.usedCodes) gameData.usedCodes = {};
+                gameData.usedCodes[usedKey] = true;
+            }
 
             let rewards = [];
             if (code.diamonds) {
