@@ -291,6 +291,12 @@
             50% { box-shadow: 0 0 35px rgba(255, 255, 255, 1), 0 0 45px rgba(255, 255, 0, 0.8), 0 0 55px rgba(255, 0, 255, 0.6); }
             100% { box-shadow: 0 0 30px rgba(255, 255, 255, 1), 0 0 40px rgba(0, 255, 255, 0.8), 0 0 50px rgba(255, 0, 255, 0.6); }
         }
+        .item-card.unparalleled { border-color: #800080; box-shadow: 0 0 30px rgba(128, 0, 128, 1), 0 0 40px rgba(255, 0, 255, 0.8), 0 0 50px rgba(255, 255, 0, 0.6); background-color: #583a58; border-width: 5px; animation: unparalleledGlow 2s ease-in-out infinite alternate; }
+        @keyframes unparalleledGlow {
+            0% { box-shadow: 0 0 30px rgba(128, 0, 128, 1), 0 0 40px rgba(255, 0, 255, 0.8), 0 0 50px rgba(255, 255, 0, 0.6); }
+            50% { box-shadow: 0 0 35px rgba(128, 0, 128, 1), 0 0 45px rgba(255, 0, 255, 1), 0 0 55px rgba(255, 255, 0, 0.8); }
+            100% { box-shadow: 0 0 30px rgba(128, 0, 128, 1), 0 0 40px rgba(255, 0, 255, 0.8), 0 0 50px rgba(255, 255, 0, 0.6); }
+        }
         .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 12px; border-top: 1px solid #3a3d48; flex-wrap: wrap; gap: 10px; }
         .decompose-info { font-size: 13px; color: #ffd700; }
         .decompose-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1020,7 +1026,7 @@
             </div>
             <div class="modal-footer">
                 <div class="auto-decompose-toggle">
-                    <input type="checkbox" id="auto-decompose"><label>自动分解选中品质</label>
+                    <button class="action-button button-gray" id="toggle-decompose-options">缩放分解选项</button>
                 </div>
                 <div class="decompose-info">已选择: <span id="selected-count">0</span> 件</div>
                 <div class="decompose-buttons">
@@ -1097,7 +1103,10 @@
                 <div class="decompose-info">背包: <span id="inventory-count">0</span>/100</div>
             </div>
             <div style="padding: 10px; background-color: #2a2d38; border-top: 1px solid #3a3d48;">
-                <div style="color: #ffd700; margin-bottom: 8px; font-size: 12px;">自动分解</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div style="color: #ffd700; font-size: 12px;">自动分解</div>
+                    <button class="action-button button-gray" id="toggle-decompose-options-inventory" style="padding: 4px 8px; font-size: 10px;">缩放</button>
+                </div>
                 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="auto-decompose-equip-list-inventory"></div>
                 <div class="auto-decompose-toggle">
                     <input type="checkbox" id="auto-decompose-inventory" style="width: 14px; height: 14px;"><label style="font-size: 11px;">自动分解选中品质</label>
@@ -1125,7 +1134,10 @@
             <div class="panel-title" style="margin-top: 15px;">📚 已拥有技能书</div>
             <div class="modal-body modal-body-list" id="skill-list"></div>
             <div style="padding: 10px; background-color: #2a2d38; border-top: 1px solid #3a3d48; margin-top: 10px;">
-                <div style="color: #ffd700; margin-bottom: 8px; font-size: 12px;">自动分解</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div style="color: #ffd700; font-size: 12px;">自动分解</div>
+                    <button class="action-button button-gray" id="toggle-decompose-options-skill" style="padding: 4px 8px; font-size: 10px;">缩放</button>
+                </div>
                 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="auto-decompose-skill-list-skill"></div>
                 <div class="auto-decompose-toggle">
                     <input type="checkbox" id="auto-decompose-skill" style="width: 14px; height: 14px;"><label style="font-size: 11px;">自动分解选中品质</label>
@@ -1143,7 +1155,10 @@
             <div class="panel-title">💎 已拥有宝石</div>
             <div class="modal-body modal-body-list" id="gem-list"></div>
             <div style="padding: 10px; background-color: #2a2d38; border-top: 1px solid #3a3d48; margin-top: 10px;">
-                <div style="color: #ffd700; margin-bottom: 8px; font-size: 12px;">自动分解</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div style="color: #ffd700; font-size: 12px;">自动分解</div>
+                    <button class="action-button button-gray" id="toggle-decompose-options-gem" style="padding: 4px 8px; font-size: 10px;">缩放</button>
+                </div>
                 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="auto-decompose-gem-list-gem"></div>
                 <div class="auto-decompose-toggle">
                     <input type="checkbox" id="auto-decompose-gem" style="width: 14px; height: 14px;"><label style="font-size: 11px;">自动分解选中品质</label>
@@ -1327,7 +1342,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.31",
+            GAME_VERSION: "1.32",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -1385,7 +1400,8 @@
                 { id: "darkgold", name: "暗金", color: [139,90,43], affixCount: 6, dropRate: 0.0005, eliteOnly: true },
                 { id: "myth", name: "神话", color: [255,50,150], affixCount: 7, dropRate: 0.0002, eliteOnly: true },
                 { id: "supreme", name: "至尊", color: [255,0,0], affixCount: 8, dropRate: 0.0001, eliteOnly: true },
-                { id: "zenith", name: "至臻", color: [255,255,255], affixCount: 9, dropRate: 0.00001, eliteOnly: true }
+                { id: "zenith", name: "至臻", color: [255,255,255], affixCount: 9, dropRate: 0.00001, eliteOnly: true },
+                { id: "unparalleled", name: "无双", color: [128,0,128], affixCount: 9, dropRate: 0.00001, eliteOnly: true }
             ],
             EQUIP_SLOTS: [
                 { id: "weapon", name: "武器", icon: "⚔️", primary: "atk" },
@@ -1404,7 +1420,8 @@
                 { id: "lifesteal", name: "吸血", fmt: "+%.2f%%" },
                 { id: "penetration", name: "穿透", fmt: "+%.1f%%" },
                 { id: "expBonus", name: "经验", fmt: "+%.1f%%" },
-                { id: "goldBonus", name: "金币", fmt: "+%.1f%%" }
+                { id: "goldBonus", name: "金币", fmt: "+%.1f%%" },
+                { id: "attackBonus", name: "攻击加成", fmt: "+%.1f%%" }
             ],
             AFFIX_RANGES: {
                 purple: { aspd: [5,15], crit: [5,10], critDmg: [10,40], antiCrit: [5,10], antiCritDmg: [5,20], lifesteal: [0.1,0.5], penetration: [10,15], expBonus: [1,5], goldBonus: [1,5] },
@@ -1416,7 +1433,8 @@
                 darkgold: { aspd: [30,40], crit: [25,28], critDmg: [130,200], antiCrit: [25,28], antiCritDmg: [35,45], lifesteal: [1.3,1.8], penetration: [35,45], expBonus: [20,30], goldBonus: [20,30] },
                 myth: { aspd: [40,55], crit: [25,35], critDmg: [160,250], antiCrit: [25,35], antiCritDmg: [40,50], lifesteal: [1.5,2.0], penetration: [40,50], expBonus: [30,35], goldBonus: [30,35] },
                 supreme: { aspd: [50,70], crit: [30,40], critDmg: [200,300], antiCrit: [30,40], antiCritDmg: [50,60], lifesteal: [2.0,3.0], penetration: [50,60], expBonus: [35,40], goldBonus: [35,40] },
-                zenith: { aspd: [80,88], crit: [50,55], critDmg: [350,400], antiCrit: [40,45], antiCritDmg: [60,70], lifesteal: [4.0,5.0], penetration: [70,80], expBonus: [45,50], goldBonus: [45,50] }
+                zenith: { aspd: [80,88], crit: [50,55], critDmg: [350,400], antiCrit: [40,45], antiCritDmg: [60,70], lifesteal: [4.0,5.0], penetration: [70,80], expBonus: [45,50], goldBonus: [45,50] },
+                unparalleled: { aspd: [100,100], crit: [60,60], critDmg: [450,450], antiCrit: [50,50], antiCritDmg: [100,100], lifesteal: [8.0,8.0], penetration: [90,90], expBonus: [60,60], goldBonus: [60,60] }
             },
             GEM_QUALITIES: [
                 { id: "gray", name: "灰", color: [160,160,160] },
@@ -1448,7 +1466,7 @@
             BLACK_MARKET_QUALITY_PROBS: { gray: 0.75, green: 0.10, blue: 0.08, purple: 0.05, orange: 0.02 },
             DROP_RATES: { normalMob: 0.15, eliteTicket: 0.05, diamondDrop: 0.05 },
             ELITE_DROP_RATES: { equipment: { gold: 0.05, platinum: 0.02, diamond: 0.005, darkgold: 0.002, myth: 0.001, supreme: 0.00033, zenith: 0.0001 }, gem: { gray: 0.01, green: 0.005, blue: 0.0033, purple: 0.002, orange: 0.0005 }, skill: { gray: 0.02, green: 0.0067, blue: 0.0025, purple: 0.00125, orange: 0.0004 } },
-            HELL_DROP_RATES: { equipment: { gold: 0.15, platinum: 0.06, diamond: 0.015, darkgold: 0.006, myth: 0.003, supreme: 0.001, zenith: 0.0003 }, gem: { gray: 0.03, green: 0.015, blue: 0.01, purple: 0.006, orange: 0.0015 }, skill: { gray: 0.06, green: 0.02, blue: 0.0075, purple: 0.00375, orange: 0.0012 } },
+            HELL_DROP_RATES: { equipment: { gold: 0.15, platinum: 0.06, diamond: 0.015, darkgold: 0.006, myth: 0.003, supreme: 0.001, zenith: 0.0003, unparalleled: 0.0003 }, gem: { gray: 0.03, green: 0.015, blue: 0.01, purple: 0.006, orange: 0.0015 }, skill: { gray: 0.06, green: 0.02, blue: 0.0075, purple: 0.00375, orange: 0.0012 } },
             ELITE_TYPES: { normal: { name: "普通精英", color: [255,152,0], atkM: 1.5, defM: 1.5, hpM: 4, dropM: 2, critBonus: 1.0 }, silver: { name: "白银精英", color: [192,192,192], atkM: 2.0, defM: 2.0, hpM: 7, dropM: 3, critBonus: 1.5 }, gold: { name: "黄金精英", color: [255,215,0], atkM: 3.0, defM: 3.0, hpM: 12, dropM: 5, critBonus: 2.0 }, adventure: { name: "奇遇BOSS", color: [255,0,255], atkM: 1.0, defM: 1.0, hpM: 1, dropM: 1, critBonus: 1.0 } },
             ELITE_SKILL: { cooldown: 8, minMult: 200, maxMult: 1000 },
             HELL_MODE: { unlockLevel: 45, hpMult: 2, atkMult: 2, rewardMult: 3, dropMult: 3 },
@@ -1485,7 +1503,7 @@
                 ring: { stats: [{ id: "def", base: 1, perZone: 1 }, { id: "atk", base: 2, perZone: 2 }, { id: "hp", base: 10, perZone: 8 }] },
                 necklace: { stats: [{ id: "atk", base: 3, perZone: 2 }, { id: "hp", base: 13, perZone: 11 }] }
             },
-            QUALITY_STAT_MULT: { gray:1.0, green:1.3, blue:1.7, purple:2.2, orange:3.0, red:5.0, gold:6.0, platinum:7.0, diamond:8.0, darkgold:8.5, myth:9.0, supreme:10.0, zenith:13.0 },
+            QUALITY_STAT_MULT: { gray:1.0, green:1.3, blue:1.7, purple:2.2, orange:3.0, red:5.0, gold:6.0, platinum:7.0, diamond:8.0, darkgold:8.5, myth:9.0, supreme:10.0, zenith:13.0, unparalleled:15.0 },
             ENHANCE_MULT: { equip: 0.5, skill: 0.1, gem: 0.1 },
             DECOMPOSE_FORMULA: { equip: 1, skill: 1, gem: 1 },
             TITLES: [
@@ -1539,7 +1557,7 @@
                 equipFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0, red: 0, gold: 0, platinum: 0, diamond: 0, darkgold: 0, myth: 0, supreme: 0, zenith: 0 },
                 skillFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0 },
                 gemFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0 },
-                autoDecompose: { equip: { gray: false, green: false, blue: false, purple: false, orange: false, red: false, gold: false, platinum: false, diamond: false, darkgold: false, myth: false, supreme: false, zenith: false }, skill: { gray: false, green: false, blue: false, purple: false, orange: false }, gem: { gray: false, green: false, blue: false, purple: false, orange: false } },
+                autoDecompose: { equip: { gray: false, green: false, blue: false, purple: false, orange: false, red: false, gold: false, platinum: false, diamond: false, darkgold: false, myth: false, supreme: false, zenith: false, unparalleled: false }, skill: { gray: false, green: false, blue: false, purple: false, orange: false }, gem: { gray: false, green: false, blue: false, purple: false, orange: false } },
                 protectionScrolls: 0, gemProtectionScrolls: 0, skillProtectionScrolls: 0,
                 dailyTasks: {
                     lastReset: new Date().toDateString(),
@@ -1576,6 +1594,12 @@
                     eliteTickets: 0,
                     hellTickets: 0,
                     lastUpdate: Date.now()
+                },
+                dailyEquipDrops: {
+                    date: new Date().toDateString(),
+                    zenith: 0,
+                    supreme: 0,
+                    unparalleled: 0
                 },
                 lastHourlyEarnings: null,
                 lastHourlyReset: Date.now()
@@ -1733,7 +1757,7 @@
             let baseCritDmg = cls.baseCritDmg;
 
             let bonusAtk = 0, bonusDef = 0, bonusHp = 0, bonusAspd = 0, bonusCrit = 0, bonusCritDmg = 0;
-            let bonusLifesteal = 0, bonusPenetration = 0, bonusExpBonus = 0, bonusGoldBonus = 0, bonusAntiCrit = 0, bonusAntiCritDmg = 0;
+            let bonusLifesteal = 0, bonusPenetration = 0, bonusExpBonus = 0, bonusGoldBonus = 0, bonusAntiCrit = 0, bonusAntiCritDmg = 0, bonusAttackBonus = 0;
 
             for (const slot in gameData.player.equipment) {
                 const equip = gameData.player.equipment[slot];
@@ -1753,6 +1777,7 @@
                             else if (a.id === 'goldBonus') bonusGoldBonus += a.value;
                             else if (a.id === 'antiCrit') bonusAntiCrit += a.value;
                             else if (a.id === 'antiCritDmg') bonusAntiCritDmg += Math.floor(a.value);
+                            else if (a.id === 'attackBonus') bonusAttackBonus += a.value;
                         });
                     }
                     if (equip.gems) {
@@ -1803,7 +1828,9 @@
             }
             
             gameData.player.maxHp = Math.floor(baseHp + bonusHp);
-            gameData.player.atk = Math.floor(baseAtk + bonusAtk);
+            const totalAtk = baseAtk + bonusAtk;
+            const attackBonusMultiplier = 1 + bonusAttackBonus / 100;
+            gameData.player.atk = Math.floor(totalAtk * attackBonusMultiplier);
             gameData.player.def = Math.floor(baseDef + bonusDef);
             gameData.player.aspd = Math.min(baseAspd + bonusAspd / 100, cls.maxAspd);
             gameData.player.crit = baseCrit + bonusCrit;
@@ -2386,6 +2413,17 @@
                 dropMult *= 2;
             }
             
+            // 检查并更新每日装备掉落记录
+            const today = new Date().toDateString();
+            if (!gameData.player.dailyEquipDrops || gameData.player.dailyEquipDrops.date !== today) {
+                gameData.player.dailyEquipDrops = {
+                    date: today,
+                    zenith: 0,
+                    supreme: 0,
+                    unparalleled: 0
+                };
+            }
+            
             if (isElite || isInHellDungeon) {
                 // 精英怪或地狱副本使用专用的装备掉落率
                 const dropRates = isInHellDungeon ? CONFIG.HELL_DROP_RATES : CONFIG.ELITE_DROP_RATES;
@@ -2394,7 +2432,7 @@
                 const hasRarePrivilege = gameData.player.hasRareEquipPrivilege || false;
                 
                 // 稀有装备特权：增加基础掉落率
-                let baseDropRate = 0.5; // 基础掉落率提高到50%
+                let baseDropRate = 0.5; // 普通用户基础掉落率50%
                 if (hasRarePrivilege) {
                     baseDropRate = 0.8; // 稀有装备特权时提高到80%
                 }
@@ -2410,37 +2448,67 @@
                 const qualityRand = Math.random();
                 let qualityCumulative = 0;
                 
-                // 检查是否在精英副本或地狱副本中
+                // 检查是否在精英副本或地狱副本中，或者是挂机区域的头目
                 const isInDungeon = gameData.gameState.inElite || gameData.gameState.inHell;
+                const isBoss = gameData.currentMob && gameData.currentMob.eliteType === 'boss';
                 
-                if (isInDungeon) {
-                    // 精英副本或地狱副本：保持原有爆率
+                // 稀有装备特权：增加高品质装备爆率10倍，普通用户降低5倍
+                const highQualityMultiplier = hasRarePrivilege ? 10 : 0.2; // 普通用户降低5倍
+                const regularQualityMultiplier = 1; // 普通品质保持不变，避免概率超过1
+                
+                if (isInDungeon && !isBoss) {
+                    // 精英副本或地狱副本：设置装备概率
                     // 直接设置神话装备的基础概率
-                    const mythRate = 0.02; // 2% 神话装备概率
-                    const supremeRate = 0.005; // 0.5% 至尊装备概率
-                    const zenithRate = 0.001; // 0.1% 至臻装备概率
+                    // 普通用户和稀有装备特权用户的无双装备爆率
+                    const unparalleledRate = hasRarePrivilege ? 0.01 : 0.0002; // 稀有装备特权1%爆率，普通用户0.02%爆率
+                    
+                    const mythRate = 0.02 * highQualityMultiplier; // 2% 神话装备概率
+                    const supremeRate = 0.005 * highQualityMultiplier; // 0.5% 至尊装备概率
+                    const zenithRate = 0.001 * highQualityMultiplier; // 0.1% 至臻装备概率
+                    
+                    // 检查VIP等级和每日掉落限制
+                    const vipLevel = gameData.player.vipLevel;
+                    const dailyDrops = gameData.player.dailyEquipDrops;
                     
                     if (qualityRand < mythRate) {
                         eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'myth');
                     } else if (qualityRand < mythRate + supremeRate) {
-                        eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'supreme');
+                        // 检查至尊装备的每日限制
+                        if (vipLevel <= 1 && dailyDrops.supreme >= 1) {
+                            // 普通用户和VIP1用户达到每日限制，跳过至尊装备
+                        } else {
+                            eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'supreme');
+                        }
                     } else if (qualityRand < mythRate + supremeRate + zenithRate) {
-                        eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'zenith');
+                        // 检查至臻装备的每日限制
+                        if (vipLevel <= 1 && dailyDrops.zenith >= 1) {
+                            // 普通用户和VIP1用户达到每日限制，跳过至臻装备
+                        } else {
+                            eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'zenith');
+                        }
+                    } else if (qualityRand < mythRate + supremeRate + zenithRate + unparalleledRate && isInHellDungeon) {
+                        // 检查无双装备的每日限制
+                        if (vipLevel <= 1 && dailyDrops.unparalleled >= 1) {
+                            // 普通用户和VIP1用户达到每日限制，跳过无双装备
+                        } else {
+                            // 只有地狱副本能爆无双装备
+                            eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === 'unparalleled');
+                        }
                     } else {
                         // 其他品质
                         for (const [qId, rate] of Object.entries(dropRates.equipment)) {
-                            if (qId === 'myth' || qId === 'supreme' || qId === 'zenith') continue;
-                            qualityCumulative += rate;
-                            if (qualityRand <= mythRate + supremeRate + zenithRate + qualityCumulative) {
+                            if (qId === 'myth' || qId === 'supreme' || qId === 'zenith' || qId === 'unparalleled') continue;
+                            qualityCumulative += rate * regularQualityMultiplier;
+                            if (qualityRand <= mythRate + supremeRate + zenithRate + unparalleledRate + qualityCumulative) {
                                 eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === qId);
                                 break;
                             }
                         }
                     }
                 } else {
-                    // 挂机区域的精英：只能产出黄金以下品质的装备
+                    // 挂机区域的头目：只能产出黄金以下品质的装备
                     for (const [qId, rate] of Object.entries(dropRates.equipment)) {
-                        if (qId === 'gold' || qId === 'platinum' || qId === 'diamond' || qId === 'darkgold' || qId === 'myth' || qId === 'supreme' || qId === 'zenith') continue;
+                        if (qId === 'gold' || qId === 'platinum' || qId === 'diamond' || qId === 'darkgold' || qId === 'myth' || qId === 'supreme' || qId === 'zenith' || qId === 'unparalleled') continue;
                         qualityCumulative += rate;
                         if (qualityRand <= qualityCumulative) {
                             eliteQuality = CONFIG.EQUIP_QUALITIES.find(x => x.id === qId);
@@ -2457,8 +2525,8 @@
                     let qualityCumulative = 0;
                     for (const q of CONFIG.EQUIP_QUALITIES) {
                         if (q.eliteOnly) continue;
-                        // 精英副本普通品质概率翻倍
-                        qualityCumulative += q.dropRate * (isInHellDungeon ? 3 : 2);
+                        // 精英副本普通品质概率翻倍，稀有装备特权再增加10倍
+                        qualityCumulative += q.dropRate * (isInHellDungeon ? 3 : 2) * regularQualityMultiplier;
                         if (qualityRand <= qualityCumulative) {
                             quality = q;
                             break;
@@ -2469,7 +2537,7 @@
             } else {
                 // 普通区域使用基础掉落率，无法爆出黄金及以上品质
                 for (const q of CONFIG.EQUIP_QUALITIES) {
-                    if (q.eliteOnly || q.id === 'gold' || q.id === 'platinum' || q.id === 'diamond' || q.id === 'darkgold' || q.id === 'myth' || q.id === 'supreme' || q.id === 'zenith') continue;
+                    if (q.eliteOnly || q.id === 'gold' || q.id === 'platinum' || q.id === 'diamond' || q.id === 'darkgold' || q.id === 'myth' || q.id === 'supreme' || q.id === 'zenith' || q.id === 'unparalleled') continue;
                     cumulative += q.dropRate;
                     if (rand <= cumulative) { quality = q; break; }
                 }
@@ -2485,23 +2553,69 @@
 
             const affixes = [];
             if (quality.affixCount > 0 && CONFIG.AFFIX_RANGES[quality.id]) {
-                const availableAffixes = [...CONFIG.AFFIX_TYPES];
-                for (let i = 0; i < quality.affixCount; i++) {
-                    if (availableAffixes.length === 0) break;
-                    const affixType = availableAffixes.splice(Math.floor(Math.random() * availableAffixes.length), 1)[0];
-                    const range = CONFIG.AFFIX_RANGES[quality.id][affixType.id];
-                    if (range) {
-                        let value;
-                        if (affixType.id === 'lifesteal') {
-                            // 吸血属性保留两位小数
-                            value = Math.round((range[0] + Math.random() * (range[1] - range[0])) * 100) / 100;
-                        } else {
-                            // 其他属性取整
-                            value = Math.floor(range[0] + Math.random() * (range[1] - range[0]));
+                // 无双装备生成9个固定词缀，然后添加1个特殊词缀
+                const affixCount = quality.id === 'unparalleled' ? 9 : quality.affixCount;
+                
+                // 对于无双装备，确保包含所有必要的词条
+                if (quality.id === 'unparalleled') {
+                    // 确保包含的词条列表
+                    const requiredAffixes = [
+                        { id: 'aspd', name: '攻速' },
+                        { id: 'crit', name: '暴击' },
+                        { id: 'critDmg', name: '爆伤' },
+                        { id: 'antiCrit', name: '抗暴击' },
+                        { id: 'antiCritDmg', name: '抗爆伤' },
+                        { id: 'lifesteal', name: '吸血' },
+                        { id: 'penetration', name: '穿透' },
+                        { id: 'expBonus', name: '经验' },
+                        { id: 'goldBonus', name: '金币' }
+                    ];
+                    
+                    // 为每个必要词条生成属性
+                    requiredAffixes.forEach(affixInfo => {
+                        const affixType = CONFIG.AFFIX_TYPES.find(a => a.id === affixInfo.id);
+                        if (affixType) {
+                            const range = CONFIG.AFFIX_RANGES[quality.id][affixType.id];
+                            if (range) {
+                                let value;
+                                if (affixType.id === 'lifesteal') {
+                                    // 吸血属性保留两位小数
+                                    value = Math.round((range[0] + Math.random() * (range[1] - range[0])) * 100) / 100;
+                                } else {
+                                    // 其他属性取整
+                                    value = Math.floor(range[0] + Math.random() * (range[1] - range[0]));
+                                }
+                                affixes.push({ id: affixType.id, name: affixType.name, value: value, fmt: affixType.fmt });
+                            }
                         }
-                        affixes.push({ id: affixType.id, name: affixType.name, value: value, fmt: affixType.fmt });
+                    });
+                } else {
+                    // 普通装备的词缀生成
+                    let availableAffixes = [...CONFIG.AFFIX_TYPES];
+                    for (let i = 0; i < affixCount; i++) {
+                        if (availableAffixes.length === 0) break;
+                        const affixType = availableAffixes.splice(Math.floor(Math.random() * availableAffixes.length), 1)[0];
+                        const range = CONFIG.AFFIX_RANGES[quality.id][affixType.id];
+                        if (range) {
+                            let value;
+                            if (affixType.id === 'lifesteal') {
+                                // 吸血属性保留两位小数
+                                value = Math.round((range[0] + Math.random() * (range[1] - range[0])) * 100) / 100;
+                            } else {
+                                // 其他属性取整
+                                value = Math.floor(range[0] + Math.random() * (range[1] - range[0]));
+                            }
+                            affixes.push({ id: affixType.id, name: affixType.name, value: value, fmt: affixType.fmt });
+                        }
                     }
                 }
+            }
+            
+            // 为无双品质装备添加特殊攻击加成词缀
+            if (quality.id === 'unparalleled') {
+                // 随机增加人物总攻击力的5-15%
+                const attackBonus = 5 + Math.floor(Math.random() * 11); // 5-15%
+                affixes.push({ id: 'attackBonus', name: '攻击加成', value: attackBonus, fmt: '+%.1f%%' });
             }
 
             const socketRand = Math.random();
@@ -2517,6 +2631,12 @@
             if (sockets === 4) {
                 equipment.originalSockets = true;
             }
+            
+            // 更新每日装备掉落记录
+            if (quality.id === 'zenith' || quality.id === 'supreme' || quality.id === 'unparalleled') {
+                gameData.player.dailyEquipDrops[quality.id]++;
+            }
+            
             return equipment;
         }
 
@@ -2539,7 +2659,7 @@
                     }
                 } else if (isElite) {
                     if (isNormalElite) {
-                        // 挂机区域的精英 - 只能产出绿色以下的宝石
+                        // 挂机区域的头目 - 只能产出绿色以下的宝石
                         const rand = Math.random();
                         if (rand < 0.7) {
                             gemQuality = CONFIG.GEM_QUALITIES[0]; // 灰色
@@ -2627,7 +2747,7 @@
                 }
             } else if (isElite) {
                 if (isNormalElite) {
-                    // 挂机区域的精英 - 只能产出绿色以下的技能
+                    // 挂机区域的头目 - 只能产出绿色以下的技能
                     const rand = Math.random();
                     if (rand < 0.7) {
                         quality = CONFIG.SKILL_QUALITIES[0]; // 灰色
@@ -2713,11 +2833,11 @@
                     // 增加奇遇BOSS击杀计数
                     gameData.gameState.adventureBossKills++;
                 } else {
-                    // 每5次击杀，强制触发一次普通精英
+                    // 每5次击杀，强制触发一次普通精英（更名为头目）
                     gameData.gameState.adventureBossAttempts++;
                     if (gameData.gameState.adventureBossAttempts % 5 === 0) {
                         isElite = true;
-                        eliteType = 'normal';
+                        eliteType = 'boss'; // 挂机区域的精英改称为头目
                         gameData.gameState.adventureBossAttempts = 0;
                     }
                 }
@@ -2766,12 +2886,20 @@
                 eliteScaleFactor = 2;
                 
                 // 计算额外属性
-                const tier = Math.floor((eliteLevel - 25) / 10);
-                const attributeMultiplier = Math.pow(1.5, tier);
-                extraCrit = Math.floor(70 * attributeMultiplier);
-                extraAntiCrit = Math.floor(70 * attributeMultiplier);
-                extraCritDmg = Math.floor(500 * attributeMultiplier);
-                extraAntiCritDmg = 0; // 去除抗爆伤属性
+                if (eliteLevel >= 95) {
+                    // 95级及以上的精英副本和地狱副本，固定暴击和抗暴击为550
+                    extraCrit = 550;
+                    extraAntiCrit = 550;
+                    extraCritDmg = 5000;
+                    extraAntiCritDmg = 0; // 去除抗爆伤属性
+                } else {
+                    const tier = Math.floor((eliteLevel - 25) / 10);
+                    const attributeMultiplier = Math.pow(1.5, tier);
+                    extraCrit = Math.floor(70 * attributeMultiplier);
+                    extraAntiCrit = Math.floor(70 * attributeMultiplier);
+                    extraCritDmg = Math.floor(500 * attributeMultiplier);
+                    extraAntiCritDmg = 0; // 去除抗爆伤属性
+                }
             } else if (isElite && gameData.gameState.inHell) {
                 // 地狱副本作为单独的区域，30级以上每10级一个地狱副本
                 // 使用存储的选择等级，如果没有则根据玩家等级计算
@@ -2792,12 +2920,20 @@
                 eliteScaleFactor = 4; // 2（精英） * 2（地狱） = 4
                 
                 // 计算额外属性（与对应精英副本相同）
-                const tier = Math.floor((eliteLevel - 25) / 10);
-                const attributeMultiplier = Math.pow(1.5, tier);
-                extraCrit = Math.floor(70 * attributeMultiplier);
-                extraAntiCrit = Math.floor(70 * attributeMultiplier);
-                extraCritDmg = Math.floor(500 * attributeMultiplier);
-                extraAntiCritDmg = 0; // 去除抗爆伤属性
+                if (eliteLevel >= 95) {
+                    // 95级及以上的精英副本和地狱副本，固定暴击和抗暴击为550
+                    extraCrit = 550;
+                    extraAntiCrit = 550;
+                    extraCritDmg = 5000;
+                    extraAntiCritDmg = 0; // 去除抗爆伤属性
+                } else {
+                    const tier = Math.floor((eliteLevel - 25) / 10);
+                    const attributeMultiplier = Math.pow(1.5, tier);
+                    extraCrit = Math.floor(70 * attributeMultiplier);
+                    extraAntiCrit = Math.floor(70 * attributeMultiplier);
+                    extraCritDmg = Math.floor(500 * attributeMultiplier);
+                    extraAntiCritDmg = 0; // 去除抗爆伤属性
+                }
             } else if (zone.reqLv >= 25 && isElite) {
                 // 普通精英怪的属性
                 eliteScaleFactor = 2;
@@ -3518,7 +3654,8 @@
                         if (gameData.player.gems.length < CONFIG.MAX_GEMS) {
                             // 检查是否在精英副本或地狱副本中
                             const isInDungeon = gameData.gameState.inElite || gameData.gameState.inHell;
-                            const gem = generateGem(null, isElite, isHell, !isInDungeon);
+                            const isBoss = gameData.currentMob.eliteType === 'boss';
+                            const gem = generateGem(null, isElite, isHell, isBoss);
                             // 检查是否需要自动分解
                             if (shouldAutoDecompose('gem', gem)) {
                                 // 直接分解，不添加到背包
@@ -3559,7 +3696,8 @@
                         if (gameData.player.skills.length < CONFIG.MAX_SKILLS) {
                             // 检查是否在精英副本或地狱副本中
                             const isInDungeon = gameData.gameState.inElite || gameData.gameState.inHell;
-                            const skill = generateSkill(gameData.player.classId, isElite, isHell, !isInDungeon);
+                            const isBoss = gameData.currentMob.eliteType === 'boss';
+                            const skill = generateSkill(gameData.player.classId, isElite, isHell, isBoss);
                             // 检查是否需要自动分解
                             if (shouldAutoDecompose('skill', skill)) {
                                 // 直接分解，不添加到背包
@@ -4515,7 +4653,7 @@
                         equipFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0, red: 0, gold: 0, platinum: 0, diamond: 0, darkgold: 0, myth: 0, supreme: 0, zenith: 0 },
                         skillFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0 },
                         gemFragments: { gray: 0, green: 0, blue: 0, purple: 0, orange: 0 },
-                        autoDecompose: { equip: { gray: false, green: false, blue: false, purple: false, orange: false, red: false, gold: false, platinum: false, diamond: false, darkgold: false, myth: false, supreme: false, zenith: false }, skill: { gray: false, green: false, blue: false, purple: false, orange: false }, gem: { gray: false, green: false, blue: false, purple: false, orange: false } },
+                        autoDecompose: { equip: { gray: false, green: false, blue: false, purple: false, orange: false, red: false, gold: false, platinum: false, diamond: false, darkgold: false, myth: false, supreme: false, zenith: false, unparalleled: false }, skill: { gray: false, green: false, blue: false, purple: false, orange: false }, gem: { gray: false, green: false, blue: false, purple: false, orange: false } },
                         protectionScrolls: savedProtectionScrolls, gemProtectionScrolls: savedGemProtectionScrolls, skillProtectionScrolls: savedSkillProtectionScrolls,
                         equipment: {
                             weapon: { id: 1, name: "新手剑", atk: 10, level: 1, quality: "gray", sockets: 0, gems: [], enhanceLevel: 0, locked: false },
@@ -5873,68 +6011,82 @@
                 renderGemModal();
             }
         });
+        
+        // 添加缩放分解选项按钮的事件监听
+        if (document.getElementById('toggle-decompose-options')) {
+            document.getElementById('toggle-decompose-options').addEventListener('click', function() {
+                const equipList = document.getElementById('auto-decompose-equip-list');
+                const skillList = document.getElementById('auto-decompose-skill-list');
+                const gemList = document.getElementById('auto-decompose-gem-list');
+                
+                if (equipList.style.display === 'none') {
+                    // 显示分解选项
+                    equipList.style.display = 'flex';
+                    skillList.style.display = 'flex';
+                    gemList.style.display = 'flex';
+                    this.textContent = '缩放分解选项';
+                } else {
+                    // 隐藏分解选项
+                    equipList.style.display = 'none';
+                    skillList.style.display = 'none';
+                    gemList.style.display = 'none';
+                    this.textContent = '展开分解选项';
+                }
+            });
+        }
+        
+        // 背包自动分解缩放按钮
+        if (document.getElementById('toggle-decompose-options-inventory')) {
+            document.getElementById('toggle-decompose-options-inventory').addEventListener('click', function() {
+                const equipList = document.getElementById('auto-decompose-equip-list-inventory');
+                
+                if (equipList.style.display === 'none') {
+                    // 显示分解选项
+                    equipList.style.display = 'flex';
+                    this.textContent = '缩放';
+                } else {
+                    // 隐藏分解选项
+                    equipList.style.display = 'none';
+                    this.textContent = '展开';
+                }
+            });
+        }
+        
+        // 技能自动分解缩放按钮
+        if (document.getElementById('toggle-decompose-options-skill')) {
+            document.getElementById('toggle-decompose-options-skill').addEventListener('click', function() {
+                const skillList = document.getElementById('auto-decompose-skill-list-skill');
+                
+                if (skillList.style.display === 'none') {
+                    // 显示分解选项
+                    skillList.style.display = 'flex';
+                    this.textContent = '缩放';
+                } else {
+                    // 隐藏分解选项
+                    skillList.style.display = 'none';
+                    this.textContent = '展开';
+                }
+            });
+        }
+        
+        // 宝石自动分解缩放按钮
+        if (document.getElementById('toggle-decompose-options-gem')) {
+            document.getElementById('toggle-decompose-options-gem').addEventListener('click', function() {
+                const gemList = document.getElementById('auto-decompose-gem-list-gem');
+                
+                if (gemList.style.display === 'none') {
+                    // 显示分解选项
+                    gemList.style.display = 'flex';
+                    this.textContent = '缩放';
+                } else {
+                    // 隐藏分解选项
+                    gemList.style.display = 'none';
+                    this.textContent = '展开';
+                }
+            });
+        }
 
-        document.getElementById('auto-decompose').addEventListener('change', function() {
-            if (this.checked) {
-                selectedItems = { equip: [], skill: [], gem: [] };
-                
-                // 从分解品质状态中获取勾选的品质
-                const equipQualities = gameData.decomposeQualityState['inventory-decompose-qualities'] || [];
-                const skillQualities = gameData.decomposeQualityState['skill-decompose-qualities'] || [];
-                const gemQualities = gameData.decomposeQualityState['gem-decompose-qualities'] || [];
-                
-                // 分解背包中的装备，不分解身上佩戴的
-                equipQualities.forEach(q => {
-                    gameData.player.inventory.forEach((item, idx) => {
-                        if (!item.baseName && item.quality === q && item.locked !== true) {
-                            // 检查是否是身上佩戴的装备
-                            const isEquipped = Object.values(gameData.player.equipment).some(equip => equip && equip.id === item.id);
-                            if (!isEquipped) {
-                                selectedItems.equip.push(idx);
-                            }
-                        }
-                    });
-                });
-                
-                // 分解技能书，不分解已装备的
-                skillQualities.forEach(q => {
-                    gameData.player.inventory.forEach((item, idx) => {
-                        if (item.baseName && item.quality === q && !item.locked) {
-                            // 检查是否是已装备的技能
-                            const isEquipped = gameData.player.equippedSkills.some(skill => skill && skill.id === item.id);
-                            if (!isEquipped) {
-                                selectedItems.skill.push(idx);
-                            }
-                        }
-                    });
-                });
-                
-                // 分解背包中的宝石，不分解已镶嵌的
-                gemQualities.forEach(q => {
-                    gameData.player.gems.forEach((gem, idx) => {
-                        if (gem.quality === q && !gem.locked) {
-                            // 检查是否是已镶嵌的宝石
-                            let isSocketed = false;
-                            Object.values(gameData.player.equipment).forEach(equip => {
-                                if (equip && equip.gems) {
-                                    equip.gems.forEach(socketedGem => {
-                                        if (socketedGem && socketedGem.id === gem.id) {
-                                            isSocketed = true;
-                                        }
-                                    });
-                                }
-                            });
-                            if (!isSocketed) {
-                                selectedItems.gem.push(idx);
-                            }
-                        }
-                    });
-                });
-                
-                document.getElementById('decompose-btn').click();
-                this.checked = false;
-            }
-        });
+        // 移除了旧的auto-decompose checkbox事件监听，替换为toggle-decompose-options按钮
 
         function openEnhanceModal() {
             gameData.gameState.showFloatingText = false;
@@ -7079,6 +7231,7 @@
                         else if (affix.id === 'goldBonus') { stats += `金币:${affix.value.toFixed(1)}%<br>`; statCount++; }
                         else if (affix.id === 'antiCrit') { stats += `抗暴击:${affix.value.toFixed(1)}%<br>`; statCount++; }
                         else if (affix.id === 'antiCritDmg') { stats += `抗爆伤:${affix.value.toFixed(1)}<br>`; statCount++; }
+                        else if (affix.id === 'attackBonus') { stats += `攻击加成:${affix.value.toFixed(1)}%<br>`; statCount++; }
                     });
                 }
                 if (statCount >= maxStats) {
@@ -7092,12 +7245,13 @@
                         if (affix.id === 'aspd') statArray.push(`攻速:${affix.value.toFixed(1)}%`);
                         else if (affix.id === 'crit') statArray.push(`暴击:${affix.value.toFixed(1)}%`);
                         else if (affix.id === 'critDmg') statArray.push(`爆伤:${Math.floor(affix.value)}%`);
+                        else if (affix.id === 'antiCrit') statArray.push(`抗暴击:${affix.value.toFixed(1)}%`);
                         else if (affix.id === 'lifesteal') statArray.push(`吸血:${affix.value.toFixed(2)}%`);
                         else if (affix.id === 'penetration') statArray.push(`穿透:${affix.value.toFixed(1)}%`);
                         else if (affix.id === 'expBonus') statArray.push(`经验:${affix.value.toFixed(1)}%`);
                         else if (affix.id === 'goldBonus') statArray.push(`金币:${affix.value.toFixed(1)}%`);
-                        else if (affix.id === 'antiCrit') statArray.push(`抗暴击:${affix.value.toFixed(1)}%`);
                         else if (affix.id === 'antiCritDmg') statArray.push(`抗爆伤:${affix.value.toFixed(1)}`);
+                        else if (affix.id === 'attackBonus') statArray.push(`攻击加成:${affix.value.toFixed(1)}%`);
                     });
                 } else if (isGem && item.affixes) {
                     item.affixes.forEach(affix => {
@@ -7116,8 +7270,9 @@
                 }
                 
                 // 分割属性数组为两列
-                const col1 = statArray.slice(0, 4);
-                const col2 = statArray.slice(4, 8);
+                // 无双装备有9个词条，需要调整分割逻辑
+                const col1 = statArray.slice(0, Math.ceil(statArray.length / 2));
+                const col2 = statArray.slice(Math.ceil(statArray.length / 2));
                 
                 // 构建两列属性HTML
                 let statsHtml = '';
@@ -8059,6 +8214,8 @@
                         const affixList = equip.affixes.map(affix => {
                             if (affix.id === 'critDmg') {
                                 return `${affix.name}: ${Math.floor(affix.value)}`;
+                            } else if (affix.id === 'attackBonus') {
+                                return `${affix.name}: ${affix.value.toFixed(1)}%`;
                             } else {
                                 return `${affix.name}: ${affix.value.toFixed(1)}`;
                             }
@@ -8395,7 +8552,8 @@
                 '2026316': { name: '门票礼包', eliteTickets: 5000, hellTickets: 1000 },
                 'GENGXIN': { name: '更新礼包', eliteTickets: 2000 },
                 '66668888': { name: '新手豪华礼包', diamonds: 500, eliteTickets: 3000, hellTickets: 300 },
-                '666666': { name: 'VIP3补偿礼包', diamonds: 10000, eliteTickets: 10000, hellTickets: 2000 }
+                '666666': { name: 'VIP3补偿礼包', diamonds: 10000, eliteTickets: 10000, hellTickets: 2000 },
+                'RESETPRIVILEGES': { name: '删除数据', resetPrivileges: true }
             };
 
             const code = codes[cdk];
@@ -8468,6 +8626,18 @@
                 // 激活稀有装备特权
                 gameData.player.hasRareEquipPrivilege = true;
                 rewards.push('稀有装备特权激活');
+            }
+            if (code.resetPrivileges) {
+                // 删除所有游戏特权
+                gameData.player.vipLevel = 0;
+                gameData.player.hasHiddenPrivilege = false;
+                gameData.player.hasRareEquipPrivilege = false;
+                gameData.player.eliteTickets = 0;
+                gameData.player.hellTickets = 0;
+                // 清除已使用的CDK记录，使所有CDK可以再次激活
+                gameData.usedCodes = {};
+                rewards.push('所有游戏特权已清空');
+                rewards.push('所有CDK已重置');
             }
 
             // 显示奖励弹窗
@@ -8702,7 +8872,7 @@
 
         // 获取最高装备品质
         function getMaxEquipmentQuality() {
-            const qualityOrder = ['gray', 'green', 'blue', 'purple', 'orange', 'red', 'gold', 'platinum', 'diamond', 'darkgold', 'myth', 'supreme', 'zenith'];
+            const qualityOrder = ['gray', 'green', 'blue', 'purple', 'orange', 'red', 'gold', 'platinum', 'diamond', 'darkgold', 'myth', 'supreme', 'zenith', 'unparalleled'];
             let maxQuality = 0;
             
             for (const slot in gameData.player.equipment) {
