@@ -2990,10 +2990,15 @@
             let atk = Math.floor(baseAtk * scaleFactor);
             let def = Math.floor(baseDef * scaleFactor);
 
-            if (isElite) {
+            if (isElite && eliteData) {
                 hp *= eliteData.hpM * eliteScaleFactor;
                 atk *= eliteData.atkM * eliteScaleFactor;
                 def *= eliteData.defM * eliteScaleFactor;
+            } else if (isElite) {
+                // 如果eliteData不存在，使用默认值
+                hp *= 4 * eliteScaleFactor; // 默认hp倍数
+                atk *= 1.5 * eliteScaleFactor; // 默认atk倍数
+                def *= 1.5 * eliteScaleFactor; // 默认def倍数
             }
 
             if (gameData.gameState.inHell) {
@@ -9509,5 +9514,6 @@ var _hmt = _hmt || [];
 })();
 </script>
     </div>
+
 </body>
 </html>
