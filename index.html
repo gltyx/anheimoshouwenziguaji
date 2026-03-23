@@ -1342,7 +1342,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.33",
+            GAME_VERSION: "1.34",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -9459,6 +9459,14 @@
 
         // 标签页切换功能
         document.addEventListener('DOMContentLoaded', function() {
+            // 启动游戏循环
+            startGameLoop();
+            
+            // 确保自动战斗开启
+            if (gameData.gameState.autoFight) {
+                startAutoFight();
+            }
+            
             const tabs = document.querySelectorAll('.panel-tab');
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
@@ -9514,6 +9522,5 @@ var _hmt = _hmt || [];
 })();
 </script>
     </div>
-
 </body>
 </html>
