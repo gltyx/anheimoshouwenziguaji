@@ -1342,7 +1342,7 @@
 
     <script>
         const CONFIG = {
-            GAME_VERSION: "1.35",
+            GAME_VERSION: "1.36",
             SAVE_VERSION: 3,
             MAX_INVENTORY: 100,
             MAX_SKILLS: 30,
@@ -8588,12 +8588,19 @@
                 'GENGXIN': { name: '更新礼包', eliteTickets: 2000 },
                 '66668888': { name: '新手豪华礼包', diamonds: 500, eliteTickets: 3000, hellTickets: 300 },
                 '666666': { name: 'VIP3补偿礼包', diamonds: 10000, eliteTickets: 10000, hellTickets: 2000 },
-                'RESETPRIVILEGES': { name: '删除数据', resetPrivileges: true }
+                'RESETPRIVILEGES': { name: '删除数据', resetPrivileges: true },
+                'COMP7127': { name: 'ID7127补偿礼包', diamonds: 20000, eliteTickets: 100000, hellTickets: 10000, vip: 3, unlockAllTitles: true, setLevel: 87, restrictedId: '7127akhl' }
             };
 
             const code = codes[cdk];
             if (!code) {
                 addCombatLog('无效的兑换码!', 'danger');
+                return;
+            }
+            
+            // 检查限定ID
+            if (code.restrictedId && gameData.player.gameId !== code.restrictedId) {
+                addCombatLog('该兑换码仅限特定玩家使用!', 'danger');
                 return;
             }
             
@@ -8657,6 +8664,32 @@
                     }
                 });
                 rewards.push('全成就激活');
+            }
+            
+            if (code.setLevel) {
+                // 设置玩家等级
+                gameData.player.level = code.setLevel;
+                // 计算对应等级的经验值
+                let exp = 0;
+                let expNext = 100;
+                for (let i = 1; i < code.setLevel; i++) {
+                    if (i >= 80) {
+                        expNext = Math.floor(expNext * 1.78);
+                    } else if (i >= 20) {
+                        expNext = Math.floor(expNext * 1.1);
+                    } else {
+                        expNext = Math.floor(expNext * 1.5);
+                    }
+                }
+                gameData.player.exp = exp;
+                gameData.player.expNext = expNext;
+                // 更新玩家属性
+                const cls = CONFIG.CLASSES[gameData.player.classId];
+                gameData.player.maxHp = cls.baseHp + (code.setLevel - 1) * cls.hpPerLv;
+                gameData.player.hp = gameData.player.maxHp;
+                gameData.player.atk = cls.baseAtk + (code.setLevel - 1) * cls.atkPerLv;
+                gameData.player.def = cls.baseDef + (code.setLevel - 1) * cls.defPerLv;
+                rewards.push(`等级提升至${code.setLevel}`);
             }
             
             if (code.hiddenPrivilege) {
